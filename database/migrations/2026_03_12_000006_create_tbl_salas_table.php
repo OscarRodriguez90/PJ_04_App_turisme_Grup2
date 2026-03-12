@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('codigo_sala', 8)->unique();
             $table->unsignedBigInteger('id_creador');
             $table->enum('estado', ['esperando', 'jugando', 'finalizada'])->default('esperando');
-            $table->unsignedBigInteger('id_equipo_ganador')->nullable();
             $table->timestamp('fecha_creacion')->useCurrent();
 
             $table->foreign('id_creador')->references('id')->on('tbl_usuarios');

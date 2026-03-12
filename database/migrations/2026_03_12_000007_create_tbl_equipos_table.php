@@ -13,12 +13,8 @@ return new class extends Migration
     {
         Schema::create('tbl_equipos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_sala');
             $table->integer('numero_equipo');
             $table->string('nombre_equipo', 50);
-
-            $table->foreign('id_sala')->references('id')->on('tbl_salas');
-            $table->unique(['id_sala', 'numero_equipo']);
         });
     }
 
