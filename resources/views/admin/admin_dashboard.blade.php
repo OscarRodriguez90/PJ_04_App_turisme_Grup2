@@ -21,9 +21,14 @@
                 <div class="user-profile">
                     <div class="user-info">
                         <span class="user-role">Administrador</span>
-                        <span class="user-email">admin@geoturismo.com</span>
+                        <span class="user-email">{{ $user->email }}</span>
                     </div>
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=0ea5a4&color=fff" alt="Avatar" class="user-avatar">
+                    @php
+                        $avatarUrl = $user->foto 
+                            ? asset('img/usuarios/' . $user->foto) 
+                            : 'https://ui-avatars.com/api/?name=' . urlencode($user->nombre) . '&background=0ea5a4&color=fff';
+                    @endphp
+                    <img src="{{ $avatarUrl }}" alt="Avatar" class="user-avatar" style="border-radius: 50%;">
                 </div>
             </header>
 
