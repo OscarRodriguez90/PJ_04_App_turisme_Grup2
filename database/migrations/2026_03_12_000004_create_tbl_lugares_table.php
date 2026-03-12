@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('direccion_completa', 255)->nullable();
             $table->decimal('latitud', 10, 8);
             $table->decimal('longitud', 11, 8);
+            $table->string('icono', 255)->nullable();
+            $table->string('imagen', 255)->nullable();
             $table->unsignedBigInteger('id_categoria');
 
             $table->foreign('id_categoria')->references('id')->on('tbl_categorias');

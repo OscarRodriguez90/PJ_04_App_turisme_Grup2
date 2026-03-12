@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tbl_grupos', function (Blueprint $table) {
+        Schema::create('tbl_equipos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre_grupo', 100);
-            $table->string('codigo_invitacion', 10)->unique();
-            $table->unsignedBigInteger('id_creador');
+            $table->unsignedBigInteger('id_sala');
+            $table->integer('numero_equipo');
+            $table->string('nombre_equipo', 50);
 
-            $table->foreign('id_creador')->references('id')->on('tbl_usuarios');
+            $table->foreign('id_sala')->references('id')->on('tbl_salas');
+            $table->unique(['id_sala', 'numero_equipo']);
         });
     }
 
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbl_grupos');
+        Schema::dropIfExists('tbl_equipos');
     }
 };
