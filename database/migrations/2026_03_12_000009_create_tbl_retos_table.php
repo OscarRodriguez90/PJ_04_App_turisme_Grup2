@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tbl_pruebas', function (Blueprint $table) {
+        Schema::create('tbl_retos', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('id_sala');
             $table->unsignedBigInteger('id_lugar');
             $table->integer('orden');
+            $table->text('pista');
             $table->text('pregunta');
             $table->string('respuesta_correcta', 255);
-            $table->text('pista_siguiente')->nullable();
 
+            $table->foreign('id_sala')->references('id')->on('tbl_salas');
             $table->foreign('id_lugar')->references('id')->on('tbl_lugares');
+            $table->unique(['id_sala', 'orden']);
         });
     }
 
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbl_pruebas');
+        Schema::dropIfExists('tbl_retos');
     }
 };

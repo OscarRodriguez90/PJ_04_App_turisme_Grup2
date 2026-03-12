@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class RolesSeeder extends Seeder
 {
     /**
-     * Seed de la tabla tbl_roles.
+     * Run the database seeds.
      */
     public function run(): void
     {
