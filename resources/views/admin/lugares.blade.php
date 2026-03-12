@@ -50,7 +50,13 @@
                          data-id-categoria="{{ $lugar->id_categoria }}"
                          data-categoria-nombre="{{ $lugar->categoria->nombre }}"
                          data-color="{{ $lugar->categoria->color_marcador }}"
+                         data-imagen="{{ $lugar->imagen }}"
                          onclick="if(!event.target.closest('.lugar-actions')) handleCardClick(this)">
+                        
+                        <div class="lugar-banner">
+                            <img src="{{ asset('img/lugares/' . ($lugar->imagen ?? 'default_lugar.jpg')) }}" alt="{{ $lugar->nombre }}">
+                        </div>
+
                         <div class="lugar-main">
                             <div class="lugar-title-wrapper">
                                 <span class="status-dot" style="background-color: {{ $lugar->categoria->color_marcador ?? '#0ea5a4' }};"></span>
@@ -102,6 +108,9 @@
     </script>
     @endif
 
+    <script src="{{ asset('js/admin/validaciones_lugares.js') }}"></script>
+    <script src="{{ asset('js/admin/lugares_alerts.js') }}"></script>
+    
     @if($errors->any())
     <script>
         Swal.fire({
@@ -119,9 +128,19 @@
                 popup: 'premium-swal-popup',
                 confirmButton: 'premium-swal-button'
             }
+        }).then(() => {
+            // Re-abrir el modal correspondiente
+            @if(old('_method') === 'PUT')
+                const id = "{{ old('id') }}";
+                const card = document.querySelector(`.lugar-card[data-id="${id}"]`);
+                if (card) {
+                    handleEditClick(card.querySelector('.btn-edit'), new Event('click'));
+                }
+            @else
+                showAddModal();
+            @endif
         });
     </script>
     @endif
-    <script src="{{ asset('js/admin/lugares_alerts.js') }}"></script>
 </body>
 </html>

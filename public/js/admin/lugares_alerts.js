@@ -15,7 +15,8 @@ function getPlaceData(element) {
         longitud: card.dataset.longitud,
         id_categoria: card.dataset.idCategoria,
         categoria: card.dataset.categoriaNombre,
-        color: card.dataset.color
+        color: card.dataset.color,
+        imagen: card.dataset.imagen
     };
 }
 
@@ -84,33 +85,24 @@ function showAddModal() {
     Swal.fire({
         title: '<div style="font-family: \'Inter\', sans-serif; font-weight: 700;">Añadir Nuevo Lugar</div>',
         html: formHtml,
+        didOpen: (popup) => {
+            if (typeof attachValidations === 'function') {
+                attachValidations(popup);
+            }
+        },
         focusConfirm: false,
         showCancelButton: true,
-        confirmButtonText: 'Añadir Lugar',
+        confirmButtonText: 'Crear Lugar',
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#0ea5a4',
         cancelButtonColor: '#64748b',
         preConfirm: () => {
-            const popup = Swal.getPopup();
-            const nombre = popup.querySelector('#swal-add-nombre').value;
-            const direccion = popup.querySelector('#swal-add-direccion').value;
-            const latitud = popup.querySelector('#swal-add-latitud').value;
-            const longitud = popup.querySelector('#swal-add-longitud').value;
-            const id_categoria = popup.querySelector('#swal-add-categoria').value;
-
-            if (!nombre || !direccion || !latitud || !longitud || !id_categoria) {
+            const form = Swal.getPopup().querySelector('#addForm');
+            if (!form.checkValidity()) {
                 Swal.showValidationMessage('Por favor, rellena todos los campos obligatorios');
                 return false;
             }
-
-            return {
-                nombre,
-                descripcion: popup.querySelector('#swal-add-descripcion').value,
-                direccion_completa: direccion,
-                latitud,
-                longitud,
-                id_categoria
-            }
+            return form;
         },
         customClass: {
             popup: 'premium-swal-popup',
@@ -118,21 +110,29 @@ function showAddModal() {
             cancelButton: 'premium-swal-button'
         }
     }).then((result) => {
-        if (result.isConfirmed) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/admin/lugares';
-            form.innerHTML = `
-                <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
-                <input type="hidden" name="nombre" value="${result.value.nombre}">
-                <input type="hidden" name="descripcion" value="${result.value.descripcion}">
-                <input type="hidden" name="direccion_completa" value="${result.value.direccion_completa}">
-                <input type="hidden" name="latitud" value="${result.value.latitud}">
-                <input type="hidden" name="longitud" value="${result.value.longitud}">
-                <input type="hidden" name="id_categoria" value="${result.value.id_categoria}">
-            `;
-            document.body.appendChild(form);
-            form.submit();
+        if (result.isConfirmed && result.value) {
+            const form = result.value;
+            const nombre = form.querySelector('#swal-add-nombre').value;
+            
+            Swal.fire({
+                title: '¿Confirmar creación?',
+                text: `¿Estás seguro de que quieres crear el lugar "${nombre}"?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0ea5a4',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, crear',
+                cancelButtonText: 'Revisar',
+                customClass: {
+                    popup: 'premium-swal-popup',
+                    confirmButton: 'premium-swal-button',
+                    cancelButton: 'premium-swal-button'
+                }
+            }).then((confirmResult) => {
+                if (confirmResult.isConfirmed) {
+                    form.submit();
+                }
+            });
         }
     });
 }
@@ -141,36 +141,40 @@ function showEditModal(data) {
     const template = document.getElementById('modal-edit-template');
     if (!template) return;
 
-    const formHtml = template.innerHTML;
-
     Swal.fire({
         title: '<div style="font-family: \'Inter\', sans-serif; font-weight: 700;">Editar Lugar</div>',
-        html: formHtml,
-        didOpen: () => {
-            const popup = Swal.getPopup();
-            popup.querySelector('#swal-input-nombre').value = data.nombre;
-            popup.querySelector('#swal-input-descripcion').value = data.descripcion || '';
-            popup.querySelector('#swal-input-direccion').value = data.direccion;
-            popup.querySelector('#swal-input-latitud').value = data.latitud;
-            popup.querySelector('#swal-input-longitud').value = data.longitud;
-            popup.querySelector('#swal-input-categoria').value = data.id_categoria;
+        html: template.innerHTML,
+        didOpen: (popup) => {
+            const setVal = (selector, val) => {
+                const el = popup.querySelector(selector);
+                if (el && !el.value) el.value = val;
+            };
+
+            setVal('#swal-input-nombre', data.nombre);
+            setVal('#swal-input-descripcion', data.descripcion || '');
+            setVal('#swal-input-direccion', data.direccion);
+            setVal('#swal-input-latitud', data.latitud);
+            setVal('#swal-input-longitud', data.longitud);
+            setVal('#swal-input-categoria', data.id_categoria);
+            setVal('#swal-edit-id', data.id);
+
+            if (typeof attachValidations === 'function') {
+                attachValidations(popup);
+            }
         },
-        focusConfirm: false,
         showCancelButton: true,
         confirmButtonText: 'Guardar Cambios',
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#0ea5a4',
         cancelButtonColor: '#64748b',
         preConfirm: () => {
-            const popup = Swal.getPopup();
-            return {
-                nombre: popup.querySelector('#swal-input-nombre').value,
-                descripcion: popup.querySelector('#swal-input-descripcion').value,
-                direccion_completa: popup.querySelector('#swal-input-direccion').value,
-                latitud: popup.querySelector('#swal-input-latitud').value,
-                longitud: popup.querySelector('#swal-input-longitud').value,
-                id_categoria: popup.querySelector('#swal-input-categoria').value
+            const form = Swal.getPopup().querySelector('#editForm');
+            if (!form.checkValidity()) {
+                Swal.showValidationMessage('Por favor, rellena todos los campos obligatorios');
+                return false;
             }
+            form.action = `/admin/lugares/${data.id}`;
+            return form;
         },
         customClass: {
             popup: 'premium-swal-popup',
@@ -178,10 +182,13 @@ function showEditModal(data) {
             cancelButton: 'premium-swal-button'
         }
     }).then((result) => {
-        if (result.isConfirmed) {
+        if (result.isConfirmed && result.value) {
+            const form = result.value;
+            const nombre = form.querySelector('#swal-input-nombre').value;
+
             Swal.fire({
-                title: '¿Confirmar cambios?',
-                text: "Se actualizará la información del lugar.",
+                title: '¿Guardar cambios?',
+                text: `¿Estás seguro de que quieres actualizar el lugar "${nombre}"?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#0ea5a4',
@@ -195,26 +202,14 @@ function showEditModal(data) {
                 }
             }).then((confirmResult) => {
                 if (confirmResult.isConfirmed) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = `/admin/lugares/${data.id}`;
-                    form.innerHTML = `
-                        <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="nombre" value="${result.value.nombre}">
-                        <input type="hidden" name="descripcion" value="${result.value.descripcion}">
-                        <input type="hidden" name="direccion_completa" value="${result.value.direccion_completa}">
-                        <input type="hidden" name="latitud" value="${result.value.latitud}">
-                        <input type="hidden" name="longitud" value="${result.value.longitud}">
-                        <input type="hidden" name="id_categoria" value="${result.value.id_categoria}">
-                    `;
-                    document.body.appendChild(form);
                     form.submit();
                 }
             });
         }
     });
 }
+
+// Remove submitFormWithData as it's no longer used
 
 function confirmDelete(id, nombre) {
     Swal.fire({
