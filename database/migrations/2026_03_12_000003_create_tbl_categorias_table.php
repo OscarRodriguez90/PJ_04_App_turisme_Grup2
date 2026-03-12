@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tbl_categorias', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 50)->unique();
+            $table->string('icono', 255)->nullable();
             $table->string('icono_url', 255)->nullable();
             $table->string('color_marcador', 7)->nullable();
         });
