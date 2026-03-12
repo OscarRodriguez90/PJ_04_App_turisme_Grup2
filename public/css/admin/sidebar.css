@@ -101,13 +101,6 @@
     flex-shrink: 0;
 }
 
-.sidebar-footer .sidebar-link {
-    color: #94a3b8;
-}
-
-.sidebar-footer .sidebar-link:hover {
-    color: #ef4444;
-}
 
 .logout-btn {
     margin-top: 1rem;
