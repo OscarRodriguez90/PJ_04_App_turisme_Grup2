@@ -9,91 +9,91 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    /**
-     * Mostrar formulario de login.
-     */
     public function showLogin()
     {
         return view('auth.login');
     }
 
-    /**
-     * Procesar el login.
-     */
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
+            'email'    => ['required', 'email'],
+            'password' => ['required'],
+        ], [
+            'email.required'    => 'El correo electrónico es obligatorio.',
+            'email.email'       => 'Introduce un correo electrónico válido.',
+            'password.required' => 'La contraseña es obligatoria.',
         ]);
 
-        $credentials = $request->only('email', 'password');
+        $usuario = Usuario::where('email', $request->email)->first();
 
-        if (Auth::guard('geoturismo')->attempt($credentials)) {
-            $request->session()->regenerate();
-
-            $usuario = Auth::guard('geoturismo')->user();
-
-            // Redirigir según el rol
-            if ($usuario->esAdmin()) {
-                return redirect()->route('admin.panel');
-            }
-
-            return redirect()->route('usuario.panel');
+        if (!$usuario || !Hash::check($request->password, $usuario->password)) {
+            return back()
+                ->withErrors(['credenciales' => 'Email o contraseña incorrectos.'])
+                ->withInput($request->only('email'));
         }
 
-        return back()->withErrors([
-            'email' => 'Las credenciales no coinciden con nuestros registros.',
-        ])->onlyInput('email');
+        Auth::login($usuario);
+        $request->session()->regenerate();
+
+        return redirect()->route('admin.dashboard');
     }
 
-    /**
-     * Mostrar formulario de registro.
-     */
-    public function showRegistro()
+    public function showRegister()
     {
-        return view('auth.registro');
+        return view('auth.register');
     }
 
-    /**
-     * Procesar el registro.
-     */
-    public function registro(Request $request)
+    public function register(Request $request)
     {
         $request->validate([
-            'username'  => 'required|string|max:25|unique:tbl_usuarios,username',
-            'nombre'    => 'required|string|max:25',
-            'apellido1' => 'required|string|max:50',
-            'apellido2' => 'nullable|string|max:50',
-            'email'     => 'required|email|max:100|unique:tbl_usuarios,email',
-            'password'  => 'required|string|min:6|confirmed',
+            'nombre'    => ['required', 'string', 'min:3', 'max:25'],
+            'apellido1' => ['required', 'string', 'min:3', 'max:50'],
+            'username'  => ['required', 'string', 'min:3', 'max:25', 'regex:/^[a-zA-Z0-9_]+$/', 'unique:tbl_usuarios,username'],
+            'email'     => ['required', 'email', 'max:100', 'unique:tbl_usuarios,email'],
+            'password'  => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'nombre.required'    => 'El nombre es obligatorio.',
+            'nombre.min'         => 'El nombre debe tener al menos 3 caracteres.',
+            'nombre.max'         => 'El nombre no puede superar 25 caracteres.',
+            'apellido1.required' => 'El apellido es obligatorio.',
+            'apellido1.min'      => 'El apellido debe tener al menos 3 caracteres.',
+            'apellido1.max'      => 'El apellido no puede superar 50 caracteres.',
+            'username.required'  => 'El nombre de usuario es obligatorio.',
+            'username.min'       => 'El usuario debe tener al menos 3 caracteres.',
+            'username.max'       => 'El usuario no puede superar 25 caracteres.',
+            'username.regex'     => 'El usuario solo puede contener letras, números y guión bajo.',
+            'username.unique'    => 'Este nombre de usuario ya está en uso.',
+            'email.required'     => 'El correo electrónico es obligatorio.',
+            'email.email'        => 'Introduce un correo electrónico válido.',
+            'email.unique'       => 'Este correo ya tiene una cuenta registrada.',
+            'password.required'  => 'La contraseña es obligatoria.',
+            'password.min'       => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
         ]);
 
-        $usuario = Usuario::create([
-            'username'  => $request->username,
+        Usuario::create([
             'nombre'    => $request->nombre,
             'apellido1' => $request->apellido1,
-            'apellido2' => $request->apellido2,
+            'apellido2' => null,
+            'username'  => $request->username,
             'email'     => $request->email,
             'password'  => Hash::make($request->password),
-            'id_rol'    => 2, // Rol de usuario por defecto
+            'id_rol'    => 2,
         ]);
 
-        Auth::guard('geoturismo')->login($usuario);
-
-        return redirect()->route('usuario.panel');
+        return redirect()->route('login');
     }
 
-    /**
-     * Cerrar sesión.
-     */
-    public function logout(Request $request)
+    public function checkUsername(Request $request)
     {
-        Auth::guard('geoturismo')->logout();
+        $exists = Usuario::where('username', $request->query('value', ''))->exists();
+        return response()->json(['exists' => $exists]);
+    }
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('/');
+    public function checkEmail(Request $request)
+    {
+        $exists = Usuario::where('email', $request->query('value', ''))->exists();
+        return response()->json(['exists' => $exists]);
     }
 }
