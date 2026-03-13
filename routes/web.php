@@ -31,3 +31,10 @@ Route::get('/admin/lugares', [AdminController::class, 'lugares'])->name('admin.l
 Route::post('/admin/lugares', [AdminController::class, 'storeLugar'])->name('admin.lugares.store');
 Route::put('/admin/lugares/{id}', [AdminController::class, 'updateLugar'])->name('admin.lugares.update');
 Route::delete('/admin/lugares/{id}', [AdminController::class, 'deleteLugar'])->name('admin.lugares.delete');
+
+// Rutas de Usuarios
+Route::get('/admin/usuarios', [AdminController::class, 'usuarios'])->name('admin.usuarios');
+Route::get('/admin/api/usuarios', [AdminController::class, 'apiUsuarios'])->name('admin.api.usuarios');
+Route::post('/admin/api/usuarios', [AdminController::class, 'apiStoreUsuario'])->name('admin.api.usuarios.store');
+Route::put('/admin/api/usuarios/{id}', [AdminController::class, 'apiUpdateUsuario'])->name('admin.api.usuarios.update');
+Route::delete('/admin/api/usuarios/{id}', [AdminController::class, 'apiDeleteUsuario'])->name('admin.api.usuarios.delete');
