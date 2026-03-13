@@ -1,16 +1,16 @@
 :root {
-    --bg: #f4f7fb;
+    --bg: #f8fafc;
     --surface: #ffffff;
-    --surface-soft: #eef3fb;
-    --border: #d9e2ef;
-    --text: #14213d;
-    --muted: #60708a;
-    --primary: #0b6ef6;
-    --primary-dark: #0854ba;
-    --accent: #12b886;
-    --danger: #e03131;
-    --shadow: 0 18px 50px rgba(20, 33, 61, 0.10);
-    --radius: 24px;
+    --surface-soft: #f8fafc;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --muted: #64748b;
+    --primary: #0ea5a4;
+    --primary-dark: #0c8f8e;
+    --accent: #0ea5a4;
+    --danger: #ef4444;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --radius: 16px;
 }
 
 * {
@@ -45,10 +45,10 @@ button, input {
 }
 
 .btn {
-    border: 0;
-    border-radius: 16px;
-    padding: 0.9rem 1rem;
-    font-weight: 700;
+    border: 1px solid transparent;
+    border-radius: 0.625rem;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
 }
 
 .btn-primary {
@@ -61,14 +61,20 @@ button, input {
 }
 
 .btn-secondary {
-    background: #e9f1ff;
+    background: #f0fdfa;
     color: var(--primary-dark);
+    border-color: #ccfbf1;
 }
 
 .btn-ghost {
-    background: transparent;
-    color: var(--text);
+    background: #ffffff;
+    color: var(--muted);
     border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+    background: #f8fafc;
+    color: var(--primary);
 }
 
 .btn-link {
@@ -104,9 +110,9 @@ button, input {
     grid-template-columns: 1fr;
     gap: 2rem;
     align-items: center;
-    background: linear-gradient(180deg, #ffffff 0%, #eef5ff 100%);
-    border: 1px solid rgba(11, 110, 246, 0.08);
-    border-radius: 32px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
     box-shadow: var(--shadow);
     padding: 1.5rem;
 }
@@ -145,9 +151,9 @@ button, input {
 }
 
 .landing-features li {
-    background: rgba(255,255,255,.75);
+    background: var(--surface-soft);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 0.75rem;
     padding: 1rem;
     color: var(--muted);
 }
@@ -159,15 +165,15 @@ button, input {
 
 .phone-frame {
     width: min(100%, 360px);
-    border-radius: 36px;
+    border-radius: 1.25rem;
     background: #0f172a;
     padding: 14px;
     box-shadow: 0 25px 60px rgba(15, 23, 42, .25);
 }
 
 .phone-screen {
-    background: #f8fbff;
-    border-radius: 28px;
+    background: #f8fafc;
+    border-radius: 1rem;
     padding: 1rem;
 }
 
@@ -180,7 +186,7 @@ button, input {
 
 .preview-header span:last-child,
 .preview-tags span {
-    background: #eaf2ff;
+    background: #e6fffa;
     color: var(--primary-dark);
     border-radius: 999px;
     padding: .35rem .7rem;
@@ -190,7 +196,7 @@ button, input {
 
 .preview-map {
     height: 260px;
-    border-radius: 22px;
+    border-radius: 0.75rem;
     background: linear-gradient(135deg, #bde0fe, #a0c4ff 45%, #caffbf);
     margin: 1rem 0;
     position: relative;
@@ -224,9 +230,10 @@ button, input {
 
 .preview-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 0.75rem;
     padding: 1rem;
-    box-shadow: 0 12px 25px rgba(20, 33, 61, .08);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
 }
 
 .preview-card p {
@@ -260,7 +267,7 @@ button, input {
 .floating-message {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 1rem;
     box-shadow: var(--shadow);
 }
 
@@ -277,6 +284,19 @@ button, input {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.brand-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.brand-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
 }
 
 .brand-block h1,
@@ -301,10 +321,10 @@ button, input {
 .avatar {
     width: 52px;
     height: 52px;
-    border-radius: 18px;
+    border-radius: 50%;
     display: grid;
     place-items: center;
-    background: linear-gradient(135deg, #0b6ef6, #12b886);
+    background: var(--primary);
     color: white;
     font-size: 1.2rem;
     font-weight: 800;
@@ -339,10 +359,16 @@ input[type="range"] {
 
 .input {
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: .9rem 1rem;
-    background: #fbfdff;
+    border-radius: 0.625rem;
+    padding: 0.75rem 0.875rem;
+    background: #ffffff;
     margin-bottom: 1rem;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.15);
 }
 
 .switch-row {
@@ -354,8 +380,8 @@ input[type="range"] {
 .chip-option,
 .place-card {
     border: 1px solid var(--border);
-    background: #fbfdff;
-    border-radius: 18px;
+    background: #ffffff;
+    border-radius: 0.625rem;
 }
 
 .switch-card,
@@ -380,8 +406,9 @@ input[type="range"] {
 
 .mini-stat {
     background: var(--surface-soft);
-    border-radius: 18px;
+    border-radius: 0.625rem;
     padding: .9rem;
+    border: 1px solid var(--border);
 }
 
 .mini-stat span,
@@ -413,7 +440,7 @@ input[type="range"] {
 
 .place-card.is-active {
     border-color: var(--primary);
-    box-shadow: 0 10px 25px rgba(11, 110, 246, .12);
+    box-shadow: 0 4px 10px rgba(14, 165, 164, 0.12);
 }
 
 .place-card__top,
@@ -458,9 +485,10 @@ input[type="range"] {
 #map {
     height: 100%;
     min-height: 52vh;
-    border-radius: 28px;
+    border-radius: 1rem;
     overflow: hidden;
     box-shadow: var(--shadow);
+    border: 1px solid var(--border);
 }
 
 .floating-message {
@@ -488,14 +516,14 @@ input[type="range"] {
     background: #fff;
     width: 48px;
     height: 48px;
-    border-radius: 16px;
+    border-radius: 0.625rem;
     font-size: 1.4rem;
 }
 
 .favorite-button.is-active {
-    background: #fff1f1;
+    background: #fef2f2;
     color: var(--danger);
-    border-color: rgba(224, 49, 49, .22);
+    border-color: #fecaca;
 }
 
 .detail-description {
@@ -551,6 +579,8 @@ input[type="range"] {
         border-bottom: 0;
         max-height: 100vh;
         overflow: hidden;
+        position: sticky;
+        top: 0;
     }
 
     .content-area {
