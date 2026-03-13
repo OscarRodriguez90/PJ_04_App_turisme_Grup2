@@ -36,7 +36,11 @@ class AuthController extends Controller
         Auth::login($usuario);
         $request->session()->regenerate();
 
-        return redirect()->route('admin.dashboard');
+        $defaultRoute = (int) $usuario->id_rol === 1
+            ? route('admin.dashboard')
+            : route('cliente.index');
+
+        return redirect()->intended($defaultRoute);
     }
 
     public function showRegister()
@@ -82,7 +86,7 @@ class AuthController extends Controller
             'id_rol'    => 2,
         ]);
 
-        return redirect()->route('login');
+        return redirect()->route('login')->with('success', 'Cuenta creada correctamente. Ya puedes iniciar sesión.');
     }
 
     public function checkUsername(Request $request)

@@ -9,16 +9,17 @@ class Prueba extends Model
 {
     use HasFactory;
 
-    protected $table = 'tbl_pruebas';
+    protected $table = 'tbl_retos';
 
     public $timestamps = false;
 
     protected $fillable = [
+        'id_sala',
         'id_lugar',
         'orden',
+        'pista',
         'pregunta',
         'respuesta_correcta',
-        'pista_siguiente',
     ];
 
     public function lugar()
