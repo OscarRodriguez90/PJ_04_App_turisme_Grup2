@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Lugar extends Model
 {
@@ -24,8 +26,14 @@ class Lugar extends Model
         'imagen',
     ];
 
-    public function categoria()
+    public function categoria(): BelongsTo
     {
         return $this->belongsTo(Categoria::class, 'id_categoria');
+    }
+
+    public function usuariosFavoritos(): BelongsToMany
+    {
+        return $this->belongsToMany(Usuario::class, 'tbl_favoritos', 'id_lugar', 'id_usuario')
+            ->withPivot('fecha_agregado');
     }
 }

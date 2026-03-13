@@ -11,7 +11,7 @@
 <body>
 
     <!-- Brand -->
-    <a href="#" class="brand">
+    <a href="{{ route('home') }}" class="brand">
         <img src="{{ asset('img/admin/logo.png') }}" alt="GeoTurismo" class="brand-logo">
         GeoTurismo
     </a>
