@@ -53,7 +53,9 @@ Route::post('/logout', function () {
 
 // Rutas de Salas (Gimcanas)
 Route::get('/admin/salas', [AdminController::class, 'salas'])->name('admin.salas');
+Route::get('/admin/salas/create', [AdminController::class, 'createSala'])->name('admin.salas.create');
 Route::post('/admin/salas', [AdminController::class, 'storeSala'])->name('admin.salas.store');
+Route::get('/admin/salas/{id}/edit', [AdminController::class, 'editSala'])->name('admin.salas.edit');
 Route::put('/admin/salas/{id}', [AdminController::class, 'updateSala'])->name('admin.salas.update');
 Route::delete('/admin/salas/{id}', [AdminController::class, 'deleteSala'])->name('admin.salas.delete');
 // Rutas de Usuarios

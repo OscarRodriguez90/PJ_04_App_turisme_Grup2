@@ -356,69 +356,82 @@ class AdminController extends Controller
         $user = Usuario::first();
         $salas = Sala::with(['creador', 'pruebas.lugar'])->get();
         $totalSalas = $salas->count();
-        $lugares = Lugar::all(); // Para el selector de lugares en el modal
 
-        return view('admin.salas', compact('salas', 'user', 'totalSalas', 'lugares'));
+        return view('admin.salas', compact('salas', 'user', 'totalSalas'));
+    }
+
+    public function createSala()
+    {
+        $user = Usuario::first();
+        $lugaresSeleccionables = Lugar::all();
+        
+        return view('admin.salas_create', compact('user', 'lugaresSeleccionables'));
     }
 
     public function storeSala(Request $request)
     {
         $messages = [
-            'codigo_sala.required' => 'El código de la sala es obligatorio.',
-            'codigo_sala.unique' => 'Este código de sala ya existe.',
-            'codigo_sala.max' => 'El código no puede superar los 8 caracteres.',
-            'estado.in' => 'El estado seleccionado no es válido.',
+            'nombre.required'  => 'El nombre de la gimcana es obligatorio.',
+            'nombre.unique'    => 'Ya existe una gimcana con ese nombre.',
+            'nombre.max'       => 'El nombre no puede superar los 50 caracteres.',
+            'descripcion.max'  => 'La descripción no puede superar los 255 caracteres.',
             'lugares.required' => 'Debes seleccionar exactamente 5 lugares.',
-            'lugares.array' => 'Formato de lugares inválido.',
-            'lugares.size' => 'Debe haber exactamente 5 lugares.',
+            'lugares.array'    => 'Formato de lugares inválido.',
+            'lugares.size'     => 'Debe haber exactamente 5 lugares.',
             'lugares.*.id_lugar.required' => 'Debes seleccionar un lugar válido.',
-            'lugares.*.id_lugar.exists' => 'El lugar seleccionado no existe.',
+            'lugares.*.id_lugar.exists'   => 'El lugar seleccionado no existe.',
             'lugares.*.pregunta.required' => 'El reto (pregunta) es obligatorio para cada lugar.',
-            'lugares.*.pregunta.min' => 'El reto debe tener al menos 10 caracteres.',
+            'lugares.*.pregunta.min'      => 'El reto debe tener al menos 10 caracteres.',
             'lugares.*.respuesta_correcta.required' => 'La respuesta correcta es obligatoria.',
-            'lugares.*.pista.required' => 'La pista es obligatoria para cada lugar.',
-            'lugares.*.pista.min' => 'La pista debe tener al menos 5 caracteres.',
+            'lugares.*.pista.required'    => 'La pista es obligatoria para cada lugar.',
+            'lugares.*.pista.min'         => 'La pista debe tener al menos 5 caracteres.',
         ];
 
         $request->validate([
-            'codigo_sala' => 'required|string|max:8|unique:tbl_salas,codigo_sala',
-            'estado' => 'nullable|in:esperando,jugando,finalizada',
-            'lugares' => 'required|array|size:5',
-            'lugares.*.id_lugar' => 'required|exists:tbl_lugares,id',
-            'lugares.*.pregunta' => 'required|string|min:10',
+            'nombre'      => 'required|string|max:50|unique:tbl_salas,nombre',
+            'descripcion' => 'nullable|string|max:255',
+            'lugares'     => 'required|array|size:5',
+            'lugares.*.id_lugar'           => 'required|exists:tbl_lugares,id',
+            'lugares.*.pregunta'           => 'required|string|min:10',
             'lugares.*.respuesta_correcta' => 'required|string|max:255',
-            'lugares.*.pista' => 'required|string|min:5',
+            'lugares.*.pista'              => 'required|string|min:5',
         ], $messages);
 
         \DB::beginTransaction();
 
         try {
-            $user = Usuario::first(); // Demo purposes, otherwise use auth user
-
             $sala = Sala::create([
-                'codigo_sala' => $request->codigo_sala,
-                'id_creador' => $user->id,
-                'estado' => $request->estado ?? 'esperando',
+                'nombre'      => $request->nombre,
+                'descripcion' => $request->descripcion,
             ]);
 
             foreach ($request->lugares as $index => $lugarData) {
                 Prueba::create([
-                    'id_sala' => $sala->id,
-                    'id_lugar' => $lugarData['id_lugar'],
-                    'orden' => $index + 1,
-                    'pista' => $lugarData['pista'],
-                    'pregunta' => $lugarData['pregunta'],
+                    'id_sala'            => $sala->id,
+                    'id_lugar'           => $lugarData['id_lugar'],
+                    'orden'              => $index + 1,
+                    'pista'              => $lugarData['pista'],
+                    'pregunta'           => $lugarData['pregunta'],
                     'respuesta_correcta' => $lugarData['respuesta_correcta']
                 ]);
             }
 
             \DB::commit();
 
-            return redirect()->back()->with('success', 'Gimcana creada correctamente.');
+            return redirect()->route('admin.salas')->with('success', 'Gimcana creada correctamente.');
         } catch (\Exception $e) {
             \DB::rollBack();
             return redirect()->back()->withErrors(['error' => 'Hubo un error al crear la gimcana: ' . $e->getMessage()])->withInput();
         }
+    }
+
+    public function editSala($id)
+    {
+        $sala = Sala::with('pruebas')->findOrFail($id);
+        $user = Usuario::first();
+        $lugaresSeleccionables = Lugar::all();
+        
+        return view('admin.salas_edit', compact('sala', 'user', 'lugaresSeleccionables'));
     }
 
     public function updateSala(Request $request, $id)
@@ -426,57 +439,56 @@ class AdminController extends Controller
         $sala = Sala::findOrFail($id);
 
         $messages = [
-            'codigo_sala.required' => 'El código de la sala es obligatorio.',
-            'codigo_sala.unique' => 'Este código de sala ya existe.',
-            'codigo_sala.max' => 'El código no puede superar los 8 caracteres.',
-            'estado.in' => 'El estado seleccionado no es válido.',
+            'nombre.required'  => 'El nombre de la gimcana es obligatorio.',
+            'nombre.unique'    => 'Ya existe una gimcana con ese nombre.',
+            'nombre.max'       => 'El nombre no puede superar los 50 caracteres.',
+            'descripcion.max'  => 'La descripción no puede superar los 255 caracteres.',
             'lugares.required' => 'Debes seleccionar exactamente 5 lugares.',
-            'lugares.array' => 'Formato de lugares inválido.',
-            'lugares.size' => 'Debe haber exactamente 5 lugares.',
+            'lugares.array'    => 'Formato de lugares inválido.',
+            'lugares.size'     => 'Debe haber exactamente 5 lugares.',
             'lugares.*.id_lugar.required' => 'Debes seleccionar un lugar válido.',
-            'lugares.*.id_lugar.exists' => 'El lugar seleccionado no existe.',
+            'lugares.*.id_lugar.exists'   => 'El lugar seleccionado no existe.',
             'lugares.*.pregunta.required' => 'El reto (pregunta) es obligatorio para cada lugar.',
-            'lugares.*.pregunta.min' => 'El reto debe tener al menos 10 caracteres.',
+            'lugares.*.pregunta.min'      => 'El reto debe tener al menos 10 caracteres.',
             'lugares.*.respuesta_correcta.required' => 'La respuesta correcta es obligatoria.',
-            'lugares.*.pista.required' => 'La pista es obligatoria para cada lugar.',
-            'lugares.*.pista.min' => 'La pista debe tener al menos 5 caracteres.',
+            'lugares.*.pista.required'    => 'La pista es obligatoria para cada lugar.',
+            'lugares.*.pista.min'         => 'La pista debe tener al menos 5 caracteres.',
         ];
 
         $request->validate([
-            'codigo_sala' => 'required|string|max:8|unique:tbl_salas,codigo_sala,' . $sala->id,
-            'estado' => 'nullable|in:esperando,jugando,finalizada',
-            'lugares' => 'required|array|size:5',
-            'lugares.*.id_lugar' => 'required|exists:tbl_lugares,id',
-            'lugares.*.pregunta' => 'required|string|min:10',
+            'nombre'      => 'required|string|max:50|unique:tbl_salas,nombre,' . $sala->id,
+            'descripcion' => 'nullable|string|max:255',
+            'lugares'     => 'required|array|size:5',
+            'lugares.*.id_lugar'           => 'required|exists:tbl_lugares,id',
+            'lugares.*.pregunta'           => 'required|string|min:10',
             'lugares.*.respuesta_correcta' => 'required|string|max:255',
-            'lugares.*.pista' => 'required|string|min:5',
+            'lugares.*.pista'              => 'required|string|min:5',
         ], $messages);
 
         \DB::beginTransaction();
 
         try {
             $sala->update([
-                'codigo_sala' => $request->codigo_sala,
-                'estado' => $request->estado ?? $sala->estado,
+                'nombre'      => $request->nombre,
+                'descripcion' => $request->descripcion,
             ]);
 
-            // Delete old pruebas and create new ones based on the updated form
             Prueba::where('id_sala', $sala->id)->delete();
 
             foreach ($request->lugares as $index => $lugarData) {
                 Prueba::create([
-                    'id_sala' => $sala->id,
-                    'id_lugar' => $lugarData['id_lugar'],
-                    'orden' => $index + 1,
-                    'pista' => $lugarData['pista'],
-                    'pregunta' => $lugarData['pregunta'],
+                    'id_sala'            => $sala->id,
+                    'id_lugar'           => $lugarData['id_lugar'],
+                    'orden'              => $index + 1,
+                    'pista'              => $lugarData['pista'],
+                    'pregunta'           => $lugarData['pregunta'],
                     'respuesta_correcta' => $lugarData['respuesta_correcta']
                 ]);
             }
 
             \DB::commit();
 
-            return redirect()->back()->with('success', 'Gimcana actualizada correctamente.');
+            return redirect()->route('admin.salas')->with('success', 'Gimcana actualizada correctamente.');
         } catch (\Exception $e) {
             \DB::rollBack();
             return redirect()->back()->withErrors(['error' => 'Hubo un error al actualizar la gimcana: ' . $e->getMessage()])->withInput();

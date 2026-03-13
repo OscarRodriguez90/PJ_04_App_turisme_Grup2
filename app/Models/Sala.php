@@ -15,9 +15,8 @@ class Sala extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'codigo_sala',
-        'id_creador',
-        'estado',
+        'nombre',
+        'descripcion',
         'fecha_creacion'
     ];
 
