@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('tbl_salas', function (Blueprint $table) {
             $table->id();
-            $table->string('codigo_sala', 8)->unique();
+            $table->string('nombre', 50);
+            $table->string('descripcion', 255)->nullable();
             $table->enum('estado', ['disponible', 'esperando', 'jugando', 'finalizada'])->default('disponible');
             $table->timestamp('fecha_creacion')->useCurrent();
         });
