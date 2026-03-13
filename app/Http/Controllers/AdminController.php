@@ -89,6 +89,8 @@ class AdminController extends Controller
             'longitud.between' => 'La longitud debe estar entre -180 y 180.',
             'id_categoria.required' => 'La categoría es obligatoria.',
             'id_categoria.exists' => 'La categoría seleccionada no es válida.',
+            'descripcion.required' => 'La descripción es obligatoria.',
+            'descripcion.min' => 'La descripción debe tener al menos 10 caracteres.',
             'numeric' => 'Este campo debe ser un número.',
             'imagen.image' => 'El archivo debe ser una imagen.',
             'imagen.mimes' => 'La imagen debe ser de tipo: jpeg, png, jpg, gif.',
@@ -97,7 +99,7 @@ class AdminController extends Controller
 
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
+            'descripcion' => 'required|string|min:10',
             'direccion_completa' => 'required|string|max:255',
             'latitud' => 'required|numeric|between:-90,90',
             'longitud' => 'required|numeric|between:-180,180',
@@ -132,6 +134,8 @@ class AdminController extends Controller
             'longitud.between' => 'La longitud debe estar entre -180 y 180.',
             'id_categoria.required' => 'La categoría es obligatoria.',
             'id_categoria.exists' => 'La categoría seleccionada no es válida.',
+            'descripcion.required' => 'La descripción es obligatoria.',
+            'descripcion.min' => 'La descripción debe tener al menos 10 caracteres.',
             'numeric' => 'Este campo debe ser un número.',
             'imagen.image' => 'El archivo debe ser una imagen.',
             'imagen.mimes' => 'La imagen debe ser de tipo: jpeg, png, jpg, gif.',
@@ -140,7 +144,7 @@ class AdminController extends Controller
 
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
+            'descripcion' => 'required|string|min:10',
             'direccion_completa' => 'required|string|max:255',
             'latitud' => 'required|numeric|between:-90,90',
             'longitud' => 'required|numeric|between:-180,180',

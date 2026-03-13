@@ -9,7 +9,7 @@
         
         <div style="margin-bottom: 1.25rem;">
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #334155; font-size: 0.875rem;">Descripción</label>
-            <textarea name="descripcion" id="swal-add-descripcion" class="swal2-textarea" style="width: 100%; margin: 0; min-height: 100px; font-family: 'Inter', sans-serif; border-radius: 0.5rem; font-size: 0.9rem; padding: 0.75rem;" placeholder="Describe brevemente el lugar...">{{ old('descripcion') }}</textarea>
+            <textarea name="descripcion" id="swal-add-descripcion" class="swal2-textarea" style="width: 100%; margin: 0; min-height: 100px; font-family: 'Inter', sans-serif; border-radius: 0.5rem; font-size: 0.9rem; padding: 0.75rem;" placeholder="Describe brevemente el lugar..." required>{{ old('descripcion') }}</textarea>
             @error('descripcion') <div style="color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem;">{{ $message }}</div> @enderror
         </div>
         
