@@ -20,6 +20,8 @@ class Lugar extends Model
         'latitud',
         'longitud',
         'id_categoria',
+        'icono',
+        'imagen',
     ];
 
     public function categoria()

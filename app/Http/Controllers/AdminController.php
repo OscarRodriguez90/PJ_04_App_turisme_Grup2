@@ -84,22 +84,39 @@ class AdminController extends Controller
             'nombre.required' => 'El nombre es obligatorio.',
             'direccion_completa.required' => 'La dirección es obligatoria.',
             'latitud.required' => 'La latitud es obligatoria.',
+            'latitud.between' => 'La latitud debe estar entre -90 y 90.',
             'longitud.required' => 'La longitud es obligatoria.',
+            'longitud.between' => 'La longitud debe estar entre -180 y 180.',
             'id_categoria.required' => 'La categoría es obligatoria.',
             'id_categoria.exists' => 'La categoría seleccionada no es válida.',
+            'descripcion.required' => 'La descripción es obligatoria.',
+            'descripcion.min' => 'La descripción debe tener al menos 10 caracteres.',
             'numeric' => 'Este campo debe ser un número.',
+            'imagen.image' => 'El archivo debe ser una imagen.',
+            'imagen.mimes' => 'La imagen debe ser de tipo: jpeg, png, jpg, gif.',
+            'imagen.max' => 'La imagen no debe pesar más de 10MB.',
         ];
 
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
+            'descripcion' => 'required|string|min:10',
             'direccion_completa' => 'required|string|max:255',
-            'latitud' => 'required|numeric',
-            'longitud' => 'required|numeric',
+            'latitud' => 'required|numeric|between:-90,90',
+            'longitud' => 'required|numeric|between:-180,180',
             'id_categoria' => 'required|exists:tbl_categorias,id',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ], $messages);
 
-        Lugar::create($request->all());
+        $data = $request->except(['imagen', '_token', '_method']);
+
+        if ($request->hasFile('imagen')) {
+            $file = $request->file('imagen');
+            $imageName = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('img/lugares'), $imageName);
+            $data['imagen'] = $imageName;
+        }
+
+        Lugar::create($data);
 
         return redirect()->back()->with('success', 'Lugar creado correctamente.');
     }
@@ -107,27 +124,49 @@ class AdminController extends Controller
     public function updateLugar(Request $request, $id)
     {
         $lugar = Lugar::findOrFail($id);
-
+        
         $messages = [
             'nombre.required' => 'El nombre es obligatorio.',
             'direccion_completa.required' => 'La dirección es obligatoria.',
             'latitud.required' => 'La latitud es obligatoria.',
+            'latitud.between' => 'La latitud debe estar entre -90 y 90.',
             'longitud.required' => 'La longitud es obligatoria.',
+            'longitud.between' => 'La longitud debe estar entre -180 y 180.',
             'id_categoria.required' => 'La categoría es obligatoria.',
             'id_categoria.exists' => 'La categoría seleccionada no es válida.',
+            'descripcion.required' => 'La descripción es obligatoria.',
+            'descripcion.min' => 'La descripción debe tener al menos 10 caracteres.',
             'numeric' => 'Este campo debe ser un número.',
+            'imagen.image' => 'El archivo debe ser una imagen.',
+            'imagen.mimes' => 'La imagen debe ser de tipo: jpeg, png, jpg, gif.',
+            'imagen.max' => 'La imagen no debe pesar más de 10MB.',
         ];
 
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
+            'descripcion' => 'required|string|min:10',
             'direccion_completa' => 'required|string|max:255',
-            'latitud' => 'required|numeric',
-            'longitud' => 'required|numeric',
+            'latitud' => 'required|numeric|between:-90,90',
+            'longitud' => 'required|numeric|between:-180,180',
             'id_categoria' => 'required|exists:tbl_categorias,id',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ], $messages);
 
-        $lugar->update($request->all());
+        $data = $request->except(['imagen', '_token', '_method']);
+
+        if ($request->hasFile('imagen')) {
+            // Eliminar imagen anterior si existe y no es la por defecto
+            if ($lugar->imagen && $lugar->imagen !== 'default_lugar.jpg' && file_exists(public_path('img/lugares/' . $lugar->imagen))) {
+                unlink(public_path('img/lugares/' . $lugar->imagen));
+            }
+
+            $file = $request->file('imagen');
+            $imageName = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('img/lugares'), $imageName);
+            $data['imagen'] = $imageName;
+        }
+
+        $lugar->update($data);
 
         return redirect()->back()->with('success', 'Lugar actualizado correctamente.');
     }
