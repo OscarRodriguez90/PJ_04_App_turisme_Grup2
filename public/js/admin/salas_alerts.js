@@ -16,16 +16,10 @@ function showAddModal() {
         confirmButtonText: 'Crear Gimcana',
         cancelButtonText: 'Cancelar',
         customClass: {
-            container: 'swal2-container-custom',
-            popup: 'swal2-popup-custom',
-            header: 'swal2-header-custom',
-            title: 'swal2-title-custom',
-            content: 'swal2-content-custom-modal',
-            actions: 'swal2-actions-custom',
-            confirmButton: 'swal2-confirm-custom',
-            cancelButton: 'swal2-cancel-custom'
+            popup: 'premium-swal-popup',
+            confirmButton: 'premium-swal-button',
+            cancelButton: 'premium-swal-button'
         },
-        buttonsStyling: false,
         width: '800px', // Wider modal to fit content
         didOpen: () => {
             // Re-assign listeners explicitly in the sweetalert DOM
@@ -83,16 +77,10 @@ function handleEditClick(id) {
         confirmButtonText: 'Guardar Cambios',
         cancelButtonText: 'Cancelar',
         customClass: {
-            container: 'swal2-container-custom',
-            popup: 'swal2-popup-custom',
-            header: 'swal2-header-custom',
-            title: 'swal2-title-custom',
-            content: 'swal2-content-custom-modal',
-            actions: 'swal2-actions-custom',
-            confirmButton: 'swal2-confirm-custom btn-edit-confirm',
-            cancelButton: 'swal2-cancel-custom'
+            popup: 'premium-swal-popup',
+            confirmButton: 'premium-swal-button',
+            cancelButton: 'premium-swal-button'
         },
-        buttonsStyling: false,
         width: '800px',
         didOpen: () => {
             const popup = Swal.getPopup();
@@ -140,10 +128,10 @@ function handleDeleteClick(id, codigo) {
         confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar',
         customClass: {
-            confirmButton: 'swal2-confirm-custom btn-delete-confirm',
-            cancelButton: 'swal2-cancel-custom'
-        },
-        buttonsStyling: false
+            popup: 'premium-swal-popup',
+            confirmButton: 'premium-swal-button',
+            cancelButton: 'premium-swal-button'
+        }
     }).then((result) => {
         if (result.isConfirmed) {
             // Creamos un formulario dinámico para enviar la petición DELETE

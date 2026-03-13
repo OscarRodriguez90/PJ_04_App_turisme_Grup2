@@ -32,6 +32,7 @@
                     
                     <div style="margin-bottom: 1.25rem;">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #334155; font-size: 0.875rem;">Lugar</label>
+                        <input type="text" class="swal2-input search-lugar" placeholder="Escribe para buscar lugar..." onkeyup="filterLugar(this)" style="width: 100%; margin: 0 0 0.5rem 0; font-family: 'Inter', sans-serif; border-radius: 0.5rem; font-size: 0.9rem; height: 2.5rem; display:block;">
                         <select name="lugares[{{$i}}][id_lugar]" class="lugar-select swal2-input" data-index="{{$i}}" onchange="validateFormAdd()" style="width: 100%; margin: 0; font-family: 'Inter', sans-serif; border-radius: 0.5rem; font-size: 0.9rem; height: 2.5rem;">
                             <option value="">-- Selecciona un lugar --</option>
                             @foreach($lugaresSeleccionables as $lugar)
@@ -52,7 +53,7 @@
                         </div>
                         <div>
                             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #334155; font-size: 0.875rem;">Pista</label>
-                            <input type="text" name="lugares[{{$i}}][pista]" class="swal2-input" placeholder="Ej: Es la última en la década de los 90" value="{{ old("lugares.$i.pista") }}" oninput="validateFormAdd()" style="width: 100%; margin: 0; font-family: 'Inter', sans-serif; border-radius: 0.5rem; font-size: 0.9rem; height: 2.5rem;">
+                            <textarea name="lugares[{{$i}}][pista]" class="swal2-textarea" rows="2" placeholder="Ej: Es la última en la década de los 90" oninput="validateFormAdd()" style="width: 100%; margin: 0; min-height: 80px; font-family: 'Inter', sans-serif; border-radius: 0.5rem; font-size: 0.9rem; padding: 0.75rem;">{{ old("lugares.$i.pista") }}</textarea>
                         </div>
                     </div>
                 </div>

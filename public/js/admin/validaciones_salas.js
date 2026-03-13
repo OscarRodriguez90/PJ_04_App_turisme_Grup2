@@ -2,6 +2,21 @@
  * Validaciones en tiempo real para el formulario de Salas (Gimcanas)
  */
 
+function filterLugar(input) {
+    const filter = input.value.toLowerCase();
+    const select = input.nextElementSibling;
+    const options = select.options;
+    for (let i = 1; i < options.length; i++) {
+        const text = options[i].text.toLowerCase();
+        if (text.indexOf(filter) > -1) {
+            options[i].style.display = '';
+        } else {
+            options[i].style.display = 'none';
+        }
+    }
+}
+
+
 function validateField(inputId, type) {
     const input = document.getElementById(inputId);
     const errorSpan = document.getElementById('error-' + inputId);
@@ -85,16 +100,13 @@ function checkAllFieldsFilled(formPrefix, salaId = '') {
     selects.forEach((select, index) => {
         const blockId = salaId ? `edit-lugar-block-${salaId}-${index}` : `add-lugar-block-${index}`;
         const block = document.getElementById(blockId);
-        const pregunta = textareas[index].value.trim();
         
-        // Find inputs corresponding to this block (respuesta_correcta and pista)
-        const blockInputs = block.querySelectorAll('input[type="text"]');
-        let respuesta = '';
-        let pista = '';
-        if (blockInputs.length >= 2) {
-            respuesta = blockInputs[0].value.trim();
-            pista = blockInputs[1].value.trim();
-        }
+        const blockTextareas = block.querySelectorAll('textarea');
+        const pregunta = blockTextareas.length >= 1 ? blockTextareas[0].value.trim() : '';
+        const pista = blockTextareas.length >= 2 ? blockTextareas[1].value.trim() : '';
+        
+        const blockInputs = block.querySelectorAll('input[type="text"]:not(.search-lugar)');
+        let respuesta = blockInputs.length >= 1 ? blockInputs[0].value.trim() : '';
 
         if (!select.value || pregunta.length < 10 || respuesta.length === 0 || pista.length < 5) {
             allValid = false;
