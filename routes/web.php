@@ -36,6 +36,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/lugares', [AdminController::class, 'storeLugar'])->name('admin.lugares.store');
     Route::put('/admin/lugares/{id}', [AdminController::class, 'updateLugar'])->name('admin.lugares.update');
     Route::delete('/admin/lugares/{id}', [AdminController::class, 'deleteLugar'])->name('admin.lugares.delete');
+  
+    Route::get('/admin/categorias', [AdminController::class, 'categorias'])->name('admin.categorias');
+    Route::post('/admin/categorias', [AdminController::class, 'storeCategoria'])->name('admin.categorias.store');
+    Route::put('/admin/categorias/{id}', [AdminController::class, 'updateCategoria'])->name('admin.categorias.update');
+    Route::delete('/admin/categorias/{id}', [AdminController::class, 'deleteCategoria'])->name('admin.categorias.delete');
 });
 
 Route::post('/logout', function () {
