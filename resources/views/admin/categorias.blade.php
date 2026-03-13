@@ -105,7 +105,7 @@
 
             <div class="modal-form-group">
                 <label for="input-nombre">Nombre</label>
-                <input type="text" id="input-nombre" name="nombre" placeholder="Ej. Museos" maxlength="100">
+                <input type="text" id="input-nombre" name="nombre" placeholder="Ej. Museos" maxlength="100" required>
             </div>
 
             <div class="modal-form-group">
@@ -121,7 +121,7 @@
                 <div class="color-row">
                     <input type="color" id="input-color-picker" value="#0ea5a4" oninput="syncColor(this.value)">
                     <input type="text"  id="input-color-text"   name="color_marcador" value="#0ea5a4" maxlength="7"
-                           placeholder="#0ea5a4" oninput="syncPicker(this.value)">
+                           placeholder="#0ea5a4" oninput="syncPicker(this.value)" pattern="^#[0-9a-fA-F]{6}$" title="Usa un color hexadecimal con formato #RRGGBB">
                 </div>
             </div>
 

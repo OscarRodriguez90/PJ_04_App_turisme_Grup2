@@ -261,6 +261,19 @@
     box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.12);
 }
 
+.input-error {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+}
+
+.field-error {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
+    color: #ef4444;
+    font-weight: 500;
+}
+
 .icono-preview-row {
     display: flex;
     align-items: center;
