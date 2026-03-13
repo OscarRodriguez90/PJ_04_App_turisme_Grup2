@@ -181,6 +181,113 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Lugar eliminado correctamente.');
     }
 
+    // --- USUARIOS CRUD (AJAX) ---
+    public function usuarios()
+    {
+        $user = Usuario::first();
+        // Return view and pass initial total count
+        $totalUsuarios = Usuario::count();
+        return view('admin.usuarios', compact('user', 'totalUsuarios'));
+    }
+
+    public function apiUsuarios(Request $request)
+    {
+        $query = Usuario::query();
+        
+        if ($request->has('nombre') && $request->nombre != '') {
+            $nombre = $request->nombre;
+            $query->where(function($q) use ($nombre) {
+                $q->where('nombre', 'like', "%{$nombre}%")
+                  ->orWhere('username', 'like', "%{$nombre}%");
+            });
+        }
+        
+        if ($request->has('rol') && $request->rol != '') {
+            $query->where('id_rol', $request->rol);
+        }
+
+        $usuarios = $query->get();
+        return response()->json($usuarios);
+    }
+
+    public function apiStoreUsuario(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string|max:25|unique:tbl_usuarios',
+            'nombre' => 'required|string|max:25',
+            'apellido1' => 'required|string|max:50',
+            'apellido2' => 'nullable|string|max:50',
+            'email' => 'required|email|max:100|unique:tbl_usuarios',
+            'password' => 'required|string|min:6',
+            'id_rol' => 'required|integer',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $data = $request->except(['foto']);
+        $data['password'] = bcrypt($request->password);
+
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('img/usuarios'), $filename);
+            $data['foto'] = $filename;
+        }
+
+        $usuario = Usuario::create($data);
+
+        return response()->json(['success' => true, 'usuario' => $usuario]);
+    }
+
+    public function apiUpdateUsuario(Request $request, $id)
+    {
+        $usuario = Usuario::findOrFail($id);
+
+        $request->validate([
+            'username' => 'required|string|max:25|unique:tbl_usuarios,username,' . $usuario->id,
+            'nombre' => 'required|string|max:25',
+            'apellido1' => 'required|string|max:50',
+            'apellido2' => 'nullable|string|max:50',
+            'email' => 'required|email|max:100|unique:tbl_usuarios,email,' . $usuario->id,
+            'password' => 'nullable|string|min:6',
+            'id_rol' => 'required|integer',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $data = $request->except(['foto', 'password']);
+        
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($request->password);
+        }
+
+        if ($request->hasFile('foto')) {
+            if ($usuario->foto && $usuario->foto !== 'default_user.png' && file_exists(public_path('img/usuarios/' . $usuario->foto))) {
+                unlink(public_path('img/usuarios/' . $usuario->foto));
+            }
+
+            $file = $request->file('foto');
+            $filename = time() . '_' . $file->getClientOriginalExtension();
+            $file->move(public_path('img/usuarios'), $filename);
+            $data['foto'] = $filename;
+        }
+
+        $usuario->update($data);
+
+        return response()->json(['success' => true, 'usuario' => $usuario]);
+    }
+
+    public function apiDeleteUsuario($id)
+    {
+        $usuario = Usuario::findOrFail($id);
+        
+        if ($usuario->foto && $usuario->foto !== 'default_user.png' && file_exists(public_path('img/usuarios/' . $usuario->foto))) {
+            unlink(public_path('img/usuarios/' . $usuario->foto));
+        }
+        
+        $usuario->delete();
+
+        return response()->json(['success' => true]);
+    }
+
     // --- SALAS (GIMCANAS) CRUD ---
 
     public function salas()

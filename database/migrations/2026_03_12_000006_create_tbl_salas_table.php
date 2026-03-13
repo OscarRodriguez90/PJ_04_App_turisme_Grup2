@@ -14,11 +14,8 @@ return new class extends Migration
         Schema::create('tbl_salas', function (Blueprint $table) {
             $table->id();
             $table->string('codigo_sala', 8)->unique();
-            $table->unsignedBigInteger('id_creador');
-            $table->enum('estado', ['esperando', 'jugando', 'finalizada'])->default('esperando');
+            $table->enum('estado', ['disponible', 'esperando', 'jugando', 'finalizada'])->default('disponible');
             $table->timestamp('fecha_creacion')->useCurrent();
-
-            $table->foreign('id_creador')->references('id')->on('tbl_usuarios');
         });
     }
 

@@ -37,3 +37,9 @@ Route::get('/admin/salas', [AdminController::class, 'salas'])->name('admin.salas
 Route::post('/admin/salas', [AdminController::class, 'storeSala'])->name('admin.salas.store');
 Route::put('/admin/salas/{id}', [AdminController::class, 'updateSala'])->name('admin.salas.update');
 Route::delete('/admin/salas/{id}', [AdminController::class, 'deleteSala'])->name('admin.salas.delete');
+// Rutas de Usuarios
+Route::get('/admin/usuarios', [AdminController::class, 'usuarios'])->name('admin.usuarios');
+Route::get('/admin/api/usuarios', [AdminController::class, 'apiUsuarios'])->name('admin.api.usuarios');
+Route::post('/admin/api/usuarios', [AdminController::class, 'apiStoreUsuario'])->name('admin.api.usuarios.store');
+Route::put('/admin/api/usuarios/{id}', [AdminController::class, 'apiUpdateUsuario'])->name('admin.api.usuarios.update');
+Route::delete('/admin/api/usuarios/{id}', [AdminController::class, 'apiDeleteUsuario'])->name('admin.api.usuarios.delete');
