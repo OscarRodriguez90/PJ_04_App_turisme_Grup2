@@ -11,7 +11,7 @@
 <body>
 
     <!-- Brand -->
-    <a href="#" class="brand">
+    <a href="{{ route('home') }}" class="brand">
         <img src="{{ asset('img/admin/logo.png') }}" alt="GeoTurismo" class="brand-logo">
         GeoTurismo
     </a>
@@ -20,6 +20,12 @@
     <div class="card">
         <h1 class="card-title">Bienvenido de nuevo</h1>
         <p class="card-subtitle">Inicia sesión para continuar explorando</p>
+
+        @if(session('success'))
+            <div class="success-card">
+                {{ session('success') }}
+            </div>
+        @endif
 
         <form id="login-form" action="{{ route('login') }}" method="POST">
             @csrf
