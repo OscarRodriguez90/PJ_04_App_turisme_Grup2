@@ -249,6 +249,17 @@ input:focus {
     margin-bottom: 1.25rem;
 }
 
+.success-card {
+    background: #ecfdf5;
+    border: 1.5px solid #a7f3d0;
+    color: #166534;
+    border-radius: 0.75rem;
+    padding: 0.875rem 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
 .error-card svg {
     width: 18px;
     height: 18px;

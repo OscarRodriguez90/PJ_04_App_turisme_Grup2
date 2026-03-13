@@ -15,7 +15,7 @@ class AdminController extends Controller
     public function dashboard()
     {
         $user = Usuario::first(); // Demo purposes
-        
+
         $stats = [
             'lugares' => Lugar::count(),
             'categorias' => Categoria::count(),
@@ -31,8 +31,8 @@ class AdminController extends Controller
         // For now, since we don't have a real auth system yet in this task's scope
         // we'll fetch a default admin or the first user for demonstration.
         // If auth() is implemented, use auth()->user()
-        $user = Usuario::first(); 
-        
+        $user = Usuario::first();
+
         return view('admin.mi_perfil', compact('user'));
     }
 
@@ -74,9 +74,9 @@ class AdminController extends Controller
         $lugaresGrouped = Lugar::with('categoria')->get()->groupBy(function($item) {
             return $item->categoria->nombre ?? 'Sin Categoría';
         });
-        
+
         $totalLugares = Lugar::count();
-        
+
         return view('admin.lugares', compact('lugaresGrouped', 'user', 'totalLugares', 'categorias'));
     }
 
@@ -179,6 +179,67 @@ class AdminController extends Controller
         $lugar->delete();
 
         return redirect()->back()->with('success', 'Lugar eliminado correctamente.');
+    }
+
+    // ── Categorías CRUD ──────────────────────────────────────────────────────
+
+    public function categorias()
+    {
+        $user = Usuario::first();
+        $categorias = Categoria::withCount('lugares')->get();
+        return view('admin.categorias', compact('categorias', 'user'));
+    }
+
+    public function storeCategoria(Request $request)
+    {
+        $request->validate([
+            'nombre'         => 'required|string|max:100|unique:tbl_categorias,nombre',
+            'icono_url'      => 'nullable|string|max:100',
+            'color_marcador' => 'nullable|regex:/^#[0-9a-fA-F]{6}$/',
+        ], [
+            'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.unique'   => 'Ya existe una categoría con ese nombre.',
+            'color_marcador.regex' => 'El color debe tener formato hexadecimal (#RRGGBB).',
+        ]);
+
+        Categoria::create([
+            'nombre'         => $request->nombre,
+            'icono_url'      => $request->icono_url ?: null,
+            'color_marcador' => $request->color_marcador ?: '#0ea5a4',
+        ]);
+
+        return redirect()->route('admin.categorias')->with('success', 'Categoría creada correctamente.');
+    }
+
+    public function updateCategoria(Request $request, $id)
+    {
+        $categoria = Categoria::findOrFail($id);
+
+        $request->validate([
+            'nombre'         => 'required|string|max:100|unique:tbl_categorias,nombre,' . $id,
+            'icono_url'      => 'nullable|string|max:100',
+            'color_marcador' => 'nullable|regex:/^#[0-9a-fA-F]{6}$/',
+        ], [
+            'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.unique'   => 'Ya existe una categoría con ese nombre.',
+            'color_marcador.regex' => 'El color debe tener formato hexadecimal (#RRGGBB).',
+        ]);
+
+        $categoria->update([
+            'nombre'         => $request->nombre,
+            'icono_url'      => $request->icono_url ?: null,
+            'color_marcador' => $request->color_marcador ?: '#0ea5a4',
+        ]);
+
+        return redirect()->route('admin.categorias')->with('success', 'Categoría actualizada correctamente.');
+    }
+
+    public function deleteCategoria($id)
+    {
+        $categoria = Categoria::findOrFail($id);
+        $categoria->delete();
+
+        return redirect()->route('admin.categorias')->with('success', 'Categoría eliminada correctamente.');
     }
 
     // --- USUARIOS CRUD (AJAX) ---
