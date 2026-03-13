@@ -16,9 +16,12 @@
     <div class="app-shell">
         <aside class="sidebar">
             <div class="brand-block">
-                <div>
+                <div class="brand-row">
+                    <img src="{{ asset('img/admin/logo.png') }}" alt="GeoTurismo" class="brand-logo">
+                    <div>
                     <p class="eyebrow">Área cliente</p>
                     <h1>GeoTurismo</h1>
+                    </div>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
