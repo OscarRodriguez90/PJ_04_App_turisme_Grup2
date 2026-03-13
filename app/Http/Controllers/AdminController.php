@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sala;
 use App\Models\Lugar;
 use App\Models\Categoria;
 use App\Models\Usuario;
 use App\Models\Prueba;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -238,5 +240,275 @@ class AdminController extends Controller
         $categoria->delete();
 
         return redirect()->route('admin.categorias')->with('success', 'Categoría eliminada correctamente.');
+    }
+
+    // --- USUARIOS CRUD (AJAX) ---
+    public function usuarios()
+    {
+        $user = Usuario::first();
+        // Return view and pass initial total count
+        $totalUsuarios = Usuario::count();
+        return view('admin.usuarios', compact('user', 'totalUsuarios'));
+    }
+
+    public function apiUsuarios(Request $request)
+    {
+        $query = Usuario::query();
+        
+        if ($request->has('nombre') && $request->nombre != '') {
+            $nombre = $request->nombre;
+            $query->where(function($q) use ($nombre) {
+                $q->where('nombre', 'like', "%{$nombre}%")
+                  ->orWhere('username', 'like', "%{$nombre}%");
+            });
+        }
+        
+        if ($request->has('rol') && $request->rol != '') {
+            $query->where('id_rol', $request->rol);
+        }
+
+        $usuarios = $query->get();
+        return response()->json($usuarios);
+    }
+
+    public function apiStoreUsuario(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string|max:25|unique:tbl_usuarios',
+            'nombre' => 'required|string|max:25',
+            'apellido1' => 'required|string|max:50',
+            'apellido2' => 'nullable|string|max:50',
+            'email' => 'required|email|max:100|unique:tbl_usuarios',
+            'password' => 'required|string|min:6',
+            'id_rol' => 'required|integer',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $data = $request->except(['foto']);
+        $data['password'] = bcrypt($request->password);
+
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('img/usuarios'), $filename);
+            $data['foto'] = $filename;
+        }
+
+        $usuario = Usuario::create($data);
+
+        return response()->json(['success' => true, 'usuario' => $usuario]);
+    }
+
+    public function apiUpdateUsuario(Request $request, $id)
+    {
+        $usuario = Usuario::findOrFail($id);
+
+        $request->validate([
+            'username' => 'required|string|max:25|unique:tbl_usuarios,username,' . $usuario->id,
+            'nombre' => 'required|string|max:25',
+            'apellido1' => 'required|string|max:50',
+            'apellido2' => 'nullable|string|max:50',
+            'email' => 'required|email|max:100|unique:tbl_usuarios,email,' . $usuario->id,
+            'password' => 'nullable|string|min:6',
+            'id_rol' => 'required|integer',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $data = $request->except(['foto', 'password']);
+        
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($request->password);
+        }
+
+        if ($request->hasFile('foto')) {
+            if ($usuario->foto && $usuario->foto !== 'default_user.png' && file_exists(public_path('img/usuarios/' . $usuario->foto))) {
+                unlink(public_path('img/usuarios/' . $usuario->foto));
+            }
+
+            $file = $request->file('foto');
+            $filename = time() . '_' . $file->getClientOriginalExtension();
+            $file->move(public_path('img/usuarios'), $filename);
+            $data['foto'] = $filename;
+        }
+
+        $usuario->update($data);
+
+        return response()->json(['success' => true, 'usuario' => $usuario]);
+    }
+
+    public function apiDeleteUsuario($id)
+    {
+        $usuario = Usuario::findOrFail($id);
+        
+        if ($usuario->foto && $usuario->foto !== 'default_user.png' && file_exists(public_path('img/usuarios/' . $usuario->foto))) {
+            unlink(public_path('img/usuarios/' . $usuario->foto));
+        }
+        
+        $usuario->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    // --- SALAS (GIMCANAS) CRUD ---
+
+    public function salas()
+    {
+        $user = Usuario::first();
+        $salas = Sala::with(['creador', 'pruebas.lugar'])->get();
+        $totalSalas = $salas->count();
+
+        return view('admin.salas', compact('salas', 'user', 'totalSalas'));
+    }
+
+    public function createSala()
+    {
+        $user = Usuario::first();
+        $lugaresSeleccionables = Lugar::all();
+        
+        return view('admin.salas_create', compact('user', 'lugaresSeleccionables'));
+    }
+
+    public function storeSala(Request $request)
+    {
+        $messages = [
+            'nombre.required'  => 'El nombre de la gimcana es obligatorio.',
+            'nombre.unique'    => 'Ya existe una gimcana con ese nombre.',
+            'nombre.max'       => 'El nombre no puede superar los 50 caracteres.',
+            'descripcion.max'  => 'La descripción no puede superar los 255 caracteres.',
+            'lugares.required' => 'Debes seleccionar exactamente 5 lugares.',
+            'lugares.array'    => 'Formato de lugares inválido.',
+            'lugares.size'     => 'Debe haber exactamente 5 lugares.',
+            'lugares.*.id_lugar.required' => 'Debes seleccionar un lugar válido.',
+            'lugares.*.id_lugar.exists'   => 'El lugar seleccionado no existe.',
+            'lugares.*.pregunta.required' => 'El reto (pregunta) es obligatorio para cada lugar.',
+            'lugares.*.pregunta.min'      => 'El reto debe tener al menos 10 caracteres.',
+            'lugares.*.respuesta_correcta.required' => 'La respuesta correcta es obligatoria.',
+            'lugares.*.pista.required'    => 'La pista es obligatoria para cada lugar.',
+            'lugares.*.pista.min'         => 'La pista debe tener al menos 5 caracteres.',
+        ];
+
+        $request->validate([
+            'nombre'      => 'required|string|max:50|unique:tbl_salas,nombre',
+            'descripcion' => 'nullable|string|max:255',
+            'lugares'     => 'required|array|size:5',
+            'lugares.*.id_lugar'           => 'required|exists:tbl_lugares,id',
+            'lugares.*.pregunta'           => 'required|string|min:10',
+            'lugares.*.respuesta_correcta' => 'required|string|max:255',
+            'lugares.*.pista'              => 'required|string|min:5',
+        ], $messages);
+
+        \DB::beginTransaction();
+
+        try {
+            $sala = Sala::create([
+                'nombre'      => $request->nombre,
+                'descripcion' => $request->descripcion,
+            ]);
+
+            foreach ($request->lugares as $index => $lugarData) {
+                Prueba::create([
+                    'id_sala'            => $sala->id,
+                    'id_lugar'           => $lugarData['id_lugar'],
+                    'orden'              => $index + 1,
+                    'pista'              => $lugarData['pista'],
+                    'pregunta'           => $lugarData['pregunta'],
+                    'respuesta_correcta' => $lugarData['respuesta_correcta']
+                ]);
+            }
+
+            \DB::commit();
+
+            return redirect()->route('admin.salas')->with('success', 'Gimcana creada correctamente.');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()->back()->withErrors(['error' => 'Hubo un error al crear la gimcana: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    public function editSala($id)
+    {
+        $sala = Sala::with('pruebas')->findOrFail($id);
+        $user = Usuario::first();
+        $lugaresSeleccionables = Lugar::all();
+        
+        return view('admin.salas_edit', compact('sala', 'user', 'lugaresSeleccionables'));
+    }
+
+    public function updateSala(Request $request, $id)
+    {
+        $sala = Sala::findOrFail($id);
+
+        $messages = [
+            'nombre.required'  => 'El nombre de la gimcana es obligatorio.',
+            'nombre.unique'    => 'Ya existe una gimcana con ese nombre.',
+            'nombre.max'       => 'El nombre no puede superar los 50 caracteres.',
+            'descripcion.max'  => 'La descripción no puede superar los 255 caracteres.',
+            'lugares.required' => 'Debes seleccionar exactamente 5 lugares.',
+            'lugares.array'    => 'Formato de lugares inválido.',
+            'lugares.size'     => 'Debe haber exactamente 5 lugares.',
+            'lugares.*.id_lugar.required' => 'Debes seleccionar un lugar válido.',
+            'lugares.*.id_lugar.exists'   => 'El lugar seleccionado no existe.',
+            'lugares.*.pregunta.required' => 'El reto (pregunta) es obligatorio para cada lugar.',
+            'lugares.*.pregunta.min'      => 'El reto debe tener al menos 10 caracteres.',
+            'lugares.*.respuesta_correcta.required' => 'La respuesta correcta es obligatoria.',
+            'lugares.*.pista.required'    => 'La pista es obligatoria para cada lugar.',
+            'lugares.*.pista.min'         => 'La pista debe tener al menos 5 caracteres.',
+        ];
+
+        $request->validate([
+            'nombre'      => 'required|string|max:50|unique:tbl_salas,nombre,' . $sala->id,
+            'descripcion' => 'nullable|string|max:255',
+            'lugares'     => 'required|array|size:5',
+            'lugares.*.id_lugar'           => 'required|exists:tbl_lugares,id',
+            'lugares.*.pregunta'           => 'required|string|min:10',
+            'lugares.*.respuesta_correcta' => 'required|string|max:255',
+            'lugares.*.pista'              => 'required|string|min:5',
+        ], $messages);
+
+        \DB::beginTransaction();
+
+        try {
+            $sala->update([
+                'nombre'      => $request->nombre,
+                'descripcion' => $request->descripcion,
+            ]);
+
+            Prueba::where('id_sala', $sala->id)->delete();
+
+            foreach ($request->lugares as $index => $lugarData) {
+                Prueba::create([
+                    'id_sala'            => $sala->id,
+                    'id_lugar'           => $lugarData['id_lugar'],
+                    'orden'              => $index + 1,
+                    'pista'              => $lugarData['pista'],
+                    'pregunta'           => $lugarData['pregunta'],
+                    'respuesta_correcta' => $lugarData['respuesta_correcta']
+                ]);
+            }
+
+            \DB::commit();
+
+            return redirect()->route('admin.salas')->with('success', 'Gimcana actualizada correctamente.');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()->back()->withErrors(['error' => 'Hubo un error al actualizar la gimcana: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    public function deleteSala($id)
+    {
+        $sala = Sala::findOrFail($id);
+        
+        \DB::beginTransaction();
+        try {
+            Prueba::where('id_sala', $sala->id)->delete();
+            $sala->delete();
+            \DB::commit();
+
+            return redirect()->back()->with('success', 'Gimcana eliminada correctamente.');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()->back()->withErrors(['error' => 'Hubo un error al eliminar la gimcana: ' . $e->getMessage()]);
+        }
     }
 }

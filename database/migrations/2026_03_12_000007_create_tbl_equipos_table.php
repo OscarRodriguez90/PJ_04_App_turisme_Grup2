@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->integer('numero_equipo');
             $table->string('nombre_equipo', 50);
+            $table->unsignedBigInteger('id_lider');
+            
+            $table->foreign('id_lider')->references('id')->on('tbl_usuarios');
         });
     }
 
