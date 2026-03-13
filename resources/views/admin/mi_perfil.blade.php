@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="{{ asset('css/admin/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/admin_dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/mi_perfil.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/admin/admin_notifications.js') }}" defer></script>
+    <script src="{{ asset('js/admin/validaciones_lugares.js') }}" defer></script>
+    <script src="{{ asset('js/admin/perfil_alerts.js') }}" defer></script>
 </head>
 <body>
     <div class="admin-layout">
@@ -22,9 +26,7 @@
 
             <div class="profile-container">
                 @if(session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
+                    <input type="hidden" id="session-success-message" value="{{ session('success') }}">
                 @endif
 
                 @if($errors->any())
@@ -103,20 +105,5 @@
         </main>
     </div>
 
-    <script>
-        function previewFile() {
-            const preview = document.getElementById('previewImg');
-            const file = document.getElementById('fotoInput').files[0];
-            const reader = new FileReader();
-
-            reader.onloadend = function () {
-                preview.src = reader.result;
-            }
-
-            if (file) {
-                reader.readAsDataURL(file);
-            }
-        }
-    </script>
 </body>
 </html>

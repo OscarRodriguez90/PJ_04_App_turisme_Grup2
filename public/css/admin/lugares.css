@@ -29,23 +29,46 @@
 
 .lugares-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
 }
 
 .lugar-card {
     background: #ffffff;
     border-radius: 1rem;
-    padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     border: 1px solid #f1f5f9;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lugar-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.lugar-banner {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    background-color: #f1f5f9;
+}
+
+.lugar-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.lugar-card:hover .lugar-banner img {
+    transform: scale(1.05);
 }
 
 .lugar-main {
+    padding: 1.25rem;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;

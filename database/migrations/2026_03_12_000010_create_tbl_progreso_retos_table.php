@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('tbl_progreso_retos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_usuario');
+            $table->unsignedBigInteger('id_equipo_usuario');
             $table->unsignedBigInteger('id_reto');
             $table->boolean('completado')->default(false);
             $table->timestamp('fecha_completado')->nullable();
 
-            $table->foreign('id_usuario')->references('id')->on('tbl_usuarios');
+            $table->foreign('id_equipo_usuario')->references('id')->on('tbl_equipo_usuarios');
             $table->foreign('id_reto')->references('id')->on('tbl_retos');
-            $table->unique(['id_usuario', 'id_reto']);
+            $table->unique(['id_equipo_usuario', 'id_reto']);
         });
     }
 
