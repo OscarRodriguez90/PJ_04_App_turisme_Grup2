@@ -28,7 +28,7 @@
             <section class="card card-current">
                 <div class="card-head">
                     <h2>Tu grupo</h2>
-                    <span class="badge">#{{ str_pad((string) $miEquipo->numero_equipo, 6, '0', STR_PAD_LEFT) }}</span>
+                    <span class="badge">#{{ $miEquipo->codigo_invitacion }}</span>
                 </div>
                 <h3 class="group-name">{{ $miEquipo->nombre_equipo }}</h3>
                 <p class="group-meta">Integrantes: {{ $miEquipo->integrantes->count() }}</p>
@@ -53,16 +53,18 @@
             </section>
         @endif
 
-        <section class="card">
-            <div class="card-head">
-                <h2>Vista de prueba</h2>
-            </div>
-            <p class="group-meta">Pantalla demo para visualizar una pregunta de la gimcana (sin funcionalidad).</p>
-            <a href="{{ route('gimcana.pregunta') }}" class="btn btn-plain-link">
-                <i class="bi bi-ticket-perforated"></i>
-                Abrir pregunta demo
-            </a>
-        </section>
+        @if($salaId && $miEquipo)
+            <section class="card">
+                <div class="card-head">
+                    <h2>Gimcana</h2>
+                </div>
+                <p class="group-meta">Todo listo para empezar. Sigue la pista del siguiente destino y responde el reto.</p>
+                <a href="{{ route('gimcana.mapa') }}" class="btn btn-plain-link">
+                    <i class="bi bi-ticket-perforated"></i>
+                    Empezar retos
+                </a>
+            </section>
+        @endif
 
         <section class="section-list">
             <div class="section-row">
@@ -75,7 +77,7 @@
                 <article class="group-card {{ $esMio ? 'is-mine' : '' }}">
                     <div>
                         <strong>{{ $equipo->nombre_equipo }}</strong>
-                        <p>Codigo: #{{ str_pad((string) $equipo->numero_equipo, 6, '0', STR_PAD_LEFT) }}</p>
+                        <p>Codigo: #{{ $equipo->codigo_invitacion }}</p>
                         <p>Lider: {{ $equipo->lider->nombre ?? 'Sin lider' }}</p>
                         <p>Miembros: {{ $equipo->integrantes_count }}</p>
                     </div>

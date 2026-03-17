@@ -126,7 +126,7 @@ class AdminController extends Controller
     public function updateLugar(Request $request, $id)
     {
         $lugar = Lugar::findOrFail($id);
-        
+
         $messages = [
             'nombre.required' => 'El nombre es obligatorio.',
             'direccion_completa.required' => 'La dirección es obligatoria.',
@@ -254,7 +254,7 @@ class AdminController extends Controller
     public function apiUsuarios(Request $request)
     {
         $query = Usuario::query();
-        
+
         if ($request->has('nombre') && $request->nombre != '') {
             $nombre = $request->nombre;
             $query->where(function($q) use ($nombre) {
@@ -262,7 +262,7 @@ class AdminController extends Controller
                   ->orWhere('username', 'like', "%{$nombre}%");
             });
         }
-        
+
         if ($request->has('rol') && $request->rol != '') {
             $query->where('id_rol', $request->rol);
         }
@@ -315,7 +315,7 @@ class AdminController extends Controller
         ]);
 
         $data = $request->except(['foto', 'password']);
-        
+
         if ($request->filled('password')) {
             $data['password'] = bcrypt($request->password);
         }
@@ -339,11 +339,11 @@ class AdminController extends Controller
     public function apiDeleteUsuario($id)
     {
         $usuario = Usuario::findOrFail($id);
-        
+
         if ($usuario->foto && $usuario->foto !== 'default_user.png' && file_exists(public_path('img/usuarios/' . $usuario->foto))) {
             unlink(public_path('img/usuarios/' . $usuario->foto));
         }
-        
+
         $usuario->delete();
 
         return response()->json(['success' => true]);
@@ -354,7 +354,7 @@ class AdminController extends Controller
     public function salas()
     {
         $user = Usuario::first();
-        $salas = Sala::with(['creador', 'pruebas.lugar'])->get();
+        $salas = Sala::with(['pruebas.lugar'])->get();
         $totalSalas = $salas->count();
 
         return view('admin.salas', compact('salas', 'user', 'totalSalas'));
@@ -364,7 +364,7 @@ class AdminController extends Controller
     {
         $user = Usuario::first();
         $lugaresSeleccionables = Lugar::all();
-        
+
         return view('admin.salas_create', compact('user', 'lugaresSeleccionables'));
     }
 
@@ -430,7 +430,7 @@ class AdminController extends Controller
         $sala = Sala::with('pruebas')->findOrFail($id);
         $user = Usuario::first();
         $lugaresSeleccionables = Lugar::all();
-        
+
         return view('admin.salas_edit', compact('sala', 'user', 'lugaresSeleccionables'));
     }
 
@@ -498,7 +498,7 @@ class AdminController extends Controller
     public function deleteSala($id)
     {
         $sala = Sala::findOrFail($id);
-        
+
         \DB::beginTransaction();
         try {
             Prueba::where('id_sala', $sala->id)->delete();

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\GimcanaController;
 use App\Http\Controllers\GruposController;
 use App\Http\Controllers\SalaController;
 
@@ -45,12 +46,12 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::post('/sala/{id}/equipos', [SalaController::class, 'crearEquipo'])->name('sala.equipo.crear');
     Route::post('/sala/{id}/equipos/{equipo}/unirse', [SalaController::class, 'unirse'])->name('sala.equipo.unirse');
     Route::post('/sala/{id}/salir-equipo', [SalaController::class, 'salirEquipo'])->name('sala.equipo.salir');
-    Route::get('/gimcana/pregunta', function () {
-        return view('gimcana.pregunta');
-    })->name('gimcana.pregunta');
-    Route::get('/gimcana/progreso', function () {
-        return view('gimcana.progreso');
-    })->name('gimcana.progreso');
+    Route::get('/gimcana', [GimcanaController::class, 'mapa'])->name('gimcana.mapa');
+    Route::get('/gimcana/pregunta/{reto?}', [GimcanaController::class, 'pregunta'])->name('gimcana.pregunta');
+    Route::post('/gimcana/pregunta/{reto}/resolver', [GimcanaController::class, 'resolverPregunta'])->name('gimcana.pregunta.resolver');
+    Route::get('/gimcana/progreso', [GimcanaController::class, 'progreso'])->name('gimcana.progreso');
+    Route::get('/gimcana/final', [GimcanaController::class, 'final'])->name('gimcana.final');
+    Route::post('/gimcana/reiniciar', [GimcanaController::class, 'reiniciar'])->name('gimcana.reiniciar');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {

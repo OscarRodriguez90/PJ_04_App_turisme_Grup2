@@ -1,0 +1,156 @@
+:root {
+    --bg: #f3f4f6;
+    --surface: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --primary: #11a8ad;
+    --primary-dark: #0e868b;
+    --border: #e5e7eb;
+    --ok-bg: #eafaf0;
+    --ok-border: #b7ebcc;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at 10% 10%, #ffffff 0%, #f3f4f6 55%, #eceff3 100%);
+    color: var(--text);
+}
+
+body {
+    display: flex;
+    justify-content: center;
+}
+
+.gimcana-app {
+    width: min(100%, 420px);
+    min-height: 100vh;
+    background: var(--bg);
+    border-inline: 1px solid var(--border);
+}
+
+.screen-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    padding: 16px 18px 12px;
+    background: rgba(243, 244, 246, 0.95);
+    backdrop-filter: blur(8px);
+}
+
+.screen-header h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 1.08rem;
+    font-weight: 800;
+}
+
+.header-back,
+.header-spacer {
+    width: 36px;
+    height: 36px;
+}
+
+.header-back {
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.screen-content {
+    padding: 0 18px 20px;
+    display: grid;
+    gap: 12px;
+}
+
+.eyebrow {
+    margin: 0 0 0.35rem;
+    color: var(--primary-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.alert-ok {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--ok-bg);
+    border: 1px solid var(--ok-border);
+    color: #0f6f3f;
+    margin-top: 8px;
+}
+
+.status-card,
+.hint-card,
+.map-card,
+.location-card {
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 14px;
+}
+
+.status-card h2,
+.location-card h3 {
+    margin: 0;
+}
+
+.status-card p,
+.location-card p {
+    margin: 6px 0 0;
+    color: var(--muted);
+}
+
+.hint-text {
+    margin: 0;
+    color: #0f172a;
+    line-height: 1.55;
+    font-weight: 500;
+}
+
+#reto-map {
+    width: 100%;
+    height: 260px;
+    border-radius: 10px;
+}
+
+.btn-primary,
+.btn-ghost {
+    border: 0;
+    border-radius: 10px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+    color: #ffffff;
+}
+
+.btn-ghost {
+    background: #e7f3f4;
+    color: #12888e;
+}
