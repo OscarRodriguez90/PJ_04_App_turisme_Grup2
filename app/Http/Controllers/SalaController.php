@@ -15,26 +15,19 @@ class SalaController extends Controller
 {
     public function index(): View
     {
-        return view('sala.index');
+        $salas = Sala::where('estado', '!=', 'finalizada')
+            ->withCount('equipos')
+            ->get();
+
+        return view('sala.index', compact('salas'));
     }
 
-    public function entrar(Request $request): RedirectResponse
+    public function entrar(int $id): RedirectResponse
     {
-        $request->validate([
-            'codigo_sala' => 'required|digits_between:1,6',
-        ]);
-
-        $codigoSala = (int) ltrim(trim((string) $request->codigo_sala), '0');
-        $codigoSala = $codigoSala > 0 ? $codigoSala : 0;
-
-        $sala = Sala::find($codigoSala);
-
-        if (!$sala) {
-            return back()->with('error', 'Código de sala no válido.')->withInput();
-        }
+        $sala = Sala::findOrFail($id);
 
         if ($sala->estado === 'finalizada') {
-            return back()->with('error', 'Esta sala ya ha finalizado.')->withInput();
+            return back()->with('error', 'Esta sala ya ha finalizado.');
         }
 
         return redirect()->route('sala.show', $sala->id);

@@ -92,7 +92,7 @@
             <section class="quick-actions">
                 <h2>Acciones Rápidas</h2>
                 <div class="actions-grid">
-                    <a href="#" class="action-card">
+                    <a href="{{ route('admin.lugares') }}?action=add" class="action-card">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="12" y1="8" x2="12" y2="16"></line>
@@ -100,7 +100,7 @@
                         </svg>
                         Añadir Nuevo Lugar
                     </a>
-                    <a href="#" class="action-card">
+                    <a href="{{ route('admin.salas.create') }}" class="action-card">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                             <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>

@@ -394,7 +394,10 @@ class AdminController extends Controller
             'lugares.*.id_lugar'           => 'required|exists:tbl_lugares,id',
             'lugares.*.pregunta'           => 'required|string|min:10',
             'lugares.*.respuesta_correcta' => 'required|string|max:255',
-            'lugares.*.pista'              => 'required|string|min:5',
+            'lugares.0.pista'              => 'required|string|min:5',
+            'lugares.1.pista'              => 'required|string|min:5',
+            'lugares.2.pista'              => 'required|string|min:5',
+            'lugares.3.pista'              => 'required|string|min:5',
         ], $messages);
 
         \DB::beginTransaction();
@@ -410,7 +413,7 @@ class AdminController extends Controller
                     'id_sala'            => $sala->id,
                     'id_lugar'           => $lugarData['id_lugar'],
                     'orden'              => $index + 1,
-                    'pista'              => $lugarData['pista'],
+                    'pista'              => $lugarData['pista'] ?? '',
                     'pregunta'           => $lugarData['pregunta'],
                     'respuesta_correcta' => $lugarData['respuesta_correcta']
                 ]);
@@ -462,7 +465,10 @@ class AdminController extends Controller
             'lugares.*.id_lugar'           => 'required|exists:tbl_lugares,id',
             'lugares.*.pregunta'           => 'required|string|min:10',
             'lugares.*.respuesta_correcta' => 'required|string|max:255',
-            'lugares.*.pista'              => 'required|string|min:5',
+            'lugares.0.pista'              => 'required|string|min:5',
+            'lugares.1.pista'              => 'required|string|min:5',
+            'lugares.2.pista'              => 'required|string|min:5',
+            'lugares.3.pista'              => 'required|string|min:5',
         ], $messages);
 
         \DB::beginTransaction();
@@ -480,7 +486,7 @@ class AdminController extends Controller
                     'id_sala'            => $sala->id,
                     'id_lugar'           => $lugarData['id_lugar'],
                     'orden'              => $index + 1,
-                    'pista'              => $lugarData['pista'],
+                    'pista'              => $lugarData['pista'] ?? '',
                     'pregunta'           => $lugarData['pregunta'],
                     'respuesta_correcta' => $lugarData['respuesta_correcta']
                 ]);
@@ -510,5 +516,18 @@ class AdminController extends Controller
             \DB::rollBack();
             return redirect()->back()->withErrors(['error' => 'Hubo un error al eliminar la gimcana: ' . $e->getMessage()]);
         }
+    }
+
+    public function updateEstadoSala(Request $request, $id)
+    {
+        $sala = Sala::findOrFail($id);
+
+        $request->validate([
+            'estado' => 'required|in:disponible,esperando,jugando,finalizada',
+        ]);
+
+        $sala->update(['estado' => $request->estado]);
+
+        return response()->json(['success' => true, 'estado' => $sala->estado]);
     }
 }

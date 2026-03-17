@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sala {{ $sala->codigo_sala }} – GeoTurismo</title>
+    <title>Sala {{ $sala->nombre }} – GeoTurismo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
     {{-- ── Header ── --}}
     <header class="sala-header">
         <div class="sala-header-info">
-            <span class="sala-code-badge">{{ $sala->codigo_sala }}</span>
+            <span class="sala-code-badge">{{ $sala->nombre }}</span>
             <span class="sala-estado sala-estado--{{ $sala->estado }}">{{ ucfirst($sala->estado) }}</span>
         </div>
         <a href="{{ route('sala.index') }}" class="btn-ghost-small">

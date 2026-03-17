@@ -86,6 +86,7 @@ Route::post('/admin/salas', [AdminController::class, 'storeSala'])->name('admin.
 Route::get('/admin/salas/{id}/edit', [AdminController::class, 'editSala'])->name('admin.salas.edit');
 Route::put('/admin/salas/{id}', [AdminController::class, 'updateSala'])->name('admin.salas.update');
 Route::delete('/admin/salas/{id}', [AdminController::class, 'deleteSala'])->name('admin.salas.delete');
+Route::patch('/admin/salas/{id}/estado', [AdminController::class, 'updateEstadoSala'])->name('admin.salas.updateEstado');
 // Rutas de Usuarios
 Route::get('/admin/usuarios', [AdminController::class, 'usuarios'])->name('admin.usuarios');
 Route::get('/admin/api/usuarios', [AdminController::class, 'apiUsuarios'])->name('admin.api.usuarios');

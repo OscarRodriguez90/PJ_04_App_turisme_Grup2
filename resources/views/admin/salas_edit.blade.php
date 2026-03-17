@@ -25,7 +25,7 @@
 
             <div class="form-container">
                 <div class="header-section">
-                    <h2>Editar Gimcana <span style="color: #0ea5a4;">{{ $sala->codigo_sala }}</span></h2>
+                    <h2>Editar Gimcana <span style="color: #0ea5a4;">{{ $sala->nombre }}</span></h2>
                     <a href="{{ route('admin.salas') }}" class="btn-back">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -106,10 +106,12 @@
                                 <label class="form-label">Respuesta Correcta</label>
                                 <input type="text" name="lugares[{{$i}}][respuesta_correcta]" class="form-input" placeholder="Ej: 1990" value="{{ old("lugares.$i.respuesta_correcta", $pruebaExistente ? $pruebaExistente->respuesta_correcta : '') }}">
                             </div>
+                            @if($i < 4)
                             <div class="form-group">
                                 <label class="form-label">Pista</label>
                                 <textarea name="lugares[{{$i}}][pista]" class="form-textarea" rows="2" placeholder="Ej: Es la última en la década de los 90" style="min-height: 80px;">{{ old("lugares.$i.pista", $pruebaExistente ? $pruebaExistente->pista : '') }}</textarea>
                             </div>
+                            @endif
                         </div>
                         @endfor
                     </div>

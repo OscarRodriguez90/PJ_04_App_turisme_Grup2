@@ -13,26 +13,15 @@ class Sala extends Model
     protected $table = 'tbl_salas';
     public $timestamps = false;
 
-    protected $fillable = [
-        'nombre',
-        'descripcion',
-        'codigo_sala',
-        'estado',
-    ];
+    protected $fillable = ['nombre', 'descripcion', 'estado'];
 
-    // numero_equipo in tbl_equipos stores the sala id (implicit link without FK)
-    public function equipos(): HasMany
+    public function equipos()
     {
         return $this->hasMany(Equipo::class, 'numero_equipo', 'id');
     }
 
-    public function pruebas(): HasMany
+    public function pruebas()
     {
         return $this->hasMany(Prueba::class, 'id_sala');
-    }
-
-    public function getCodigoSalaAttribute(): string
-    {
-        return str_pad((string) $this->id, 6, '0', STR_PAD_LEFT);
     }
 }

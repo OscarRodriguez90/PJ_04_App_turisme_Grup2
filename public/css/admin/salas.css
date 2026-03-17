@@ -239,3 +239,58 @@
 .lugar-list li:last-child {
     border-bottom: none;
 }
+
+/* Estado Select */
+.gimcana-estado-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.estado-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.estado-select {
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 2px solid transparent;
+    cursor: pointer;
+    outline: none;
+    appearance: auto;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.estado-select:focus {
+    box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.2);
+}
+
+.estado-select.estado-disponible {
+    background-color: #d1fae5;
+    color: #065f46;
+    border-color: #6ee7b7;
+}
+
+.estado-select.estado-esperando {
+    background-color: #fef3c7;
+    color: #92400e;
+    border-color: #fcd34d;
+}
+
+.estado-select.estado-jugando {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border-color: #93c5fd;
+}
+
+.estado-select.estado-finalizada {
+    background-color: #f1f5f9;
+    color: #475569;
+    border-color: #cbd5e1;
+}
