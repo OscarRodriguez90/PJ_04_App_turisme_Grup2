@@ -13,38 +13,49 @@
 <body>
     <div class="gimcana-app">
         <header class="screen-header">
-            <a href="{{ route('grupos.index') }}" class="header-back" aria-label="Volver a grupos">
+            <a href="{{ route('gimcana.mapa') }}" class="header-back" aria-label="Volver al mapa">
                 <i class="bi bi-arrow-left"></i>
             </a>
-            <h1>Resolver_Prueba</h1>
+            <h1>Resolver reto</h1>
             <span class="header-spacer" aria-hidden="true"></span>
         </header>
 
         <main class="screen-content">
+            @if(session('success'))
+                <section class="group-state" aria-label="Mensaje">
+                    <header>
+                        <h4>{{ session('success') }}</h4>
+                    </header>
+                </section>
+            @endif
+
             <section class="arrival-card" aria-label="Ubicacion actual">
                 <div class="arrival-icon" aria-hidden="true">
                     <i class="bi bi-geo-alt"></i>
                 </div>
                 <h2>¡Has llegado al punto!</h2>
-                <p>La Catedral Metropolitana</p>
+                <p>{{ $retoActual->lugar->nombre ?? 'Lugar del reto' }}</p>
             </section>
 
             <section class="question-card" aria-label="Pregunta de la gincana">
                 <article class="question-box">
-                    <h3>Prueba #3</h3>
-                    <p>
-                        "Custodio de piedra, testigo del tiempo. Cuentan las leyendas que nunca duerme.
-                        ¿Cuantos leones resguardan la puerta principal de este sagrado templo?"
-                    </p>
+                    <h3>Reto #{{ $retoActual->orden }}</h3>
+                    <p>{{ $retoActual->pregunta }}</p>
                 </article>
 
-                <div class="answer-group">
+                <form class="answer-group" method="POST" action="{{ route('gimcana.pregunta.resolver', ['reto' => $retoActual->id]) }}">
+                    @csrf
                     <input
                         type="text"
+                        name="respuesta"
+                        value="{{ old('respuesta') }}"
                         placeholder="Escribe tu respuesta..."
                         aria-label="Respuesta"
                     >
-                    <button type="button" class="btn-primary" disabled>
+                    @error('respuesta')
+                        <span style="color:#b91c1c;font-size:0.9rem;">{{ $message }}</span>
+                    @enderror
+                    <button type="submit" class="btn-primary">
                         <i class="bi bi-check-circle"></i>
                         Validar respuesta
                     </button>
@@ -52,18 +63,17 @@
                         <i class="bi bi-signpost-split"></i>
                         Ver progreso
                     </a>
-                </div>
+                </form>
 
                 <section class="group-state" aria-label="Estado del grupo">
                     <header>
                         <h4>Estado del Grupo</h4>
-                        <span>3/4 en posicion</span>
+                        <span>{{ $integrantesEnReto }}/{{ $equipo->integrantes->count() }} completado</span>
                     </header>
                     <div class="avatars" aria-hidden="true">
-                        <div class="avatar">A</div>
-                        <div class="avatar">L</div>
-                        <div class="avatar">M</div>
-                        <div class="avatar avatar-off">R</div>
+                        @foreach($equipo->integrantes as $integrante)
+                            <div class="avatar">{{ strtoupper(substr($integrante->nombre, 0, 1)) }}</div>
+                        @endforeach
                     </div>
                 </section>
             </section>
@@ -78,7 +88,7 @@
                 <i class="bi bi-heart"></i>
                 <span>Favoritos</span>
             </a>
-            <a href="{{ route('gimcana.pregunta') }}" class="nav-item active" aria-current="page">
+            <a href="{{ route('gimcana.mapa') }}" class="nav-item active" aria-current="page">
                 <i class="bi bi-ticket-perforated"></i>
                 <span>Gimcana</span>
             </a>

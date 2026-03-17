@@ -20,4 +20,9 @@ class Equipo extends Model
     {
         return $this->belongsTo(Usuario::class, 'id_lider');
     }
+
+    public function getCodigoInvitacionAttribute(): string
+    {
+        return str_pad((string) $this->id, 6, '0', STR_PAD_LEFT);
+    }
 }

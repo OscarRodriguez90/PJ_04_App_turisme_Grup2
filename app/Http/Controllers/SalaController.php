@@ -21,10 +21,13 @@ class SalaController extends Controller
     public function entrar(Request $request): RedirectResponse
     {
         $request->validate([
-            'codigo_sala' => 'required|string|max:8',
+            'codigo_sala' => 'required|digits_between:1,6',
         ]);
 
-        $sala = Sala::where('codigo_sala', strtoupper(trim($request->codigo_sala)))->first();
+        $codigoSala = (int) ltrim(trim((string) $request->codigo_sala), '0');
+        $codigoSala = $codigoSala > 0 ? $codigoSala : 0;
+
+        $sala = Sala::find($codigoSala);
 
         if (!$sala) {
             return back()->with('error', 'Código de sala no válido.')->withInput();
@@ -41,6 +44,7 @@ class SalaController extends Controller
     {
         $sala = Sala::findOrFail($id);
         $usuario = Auth::user();
+        $retosCompletados = false;
 
         $miEquipo = Equipo::where('numero_equipo', $sala->id)
             ->whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id))
@@ -52,7 +56,27 @@ class SalaController extends Controller
             ->with('lider')
             ->get();
 
-        return view('sala.show', compact('sala', 'miEquipo', 'equipos'));
+        if ($miEquipo) {
+            $pivotId = DB::table('tbl_equipo_usuarios')
+                ->where('id_equipo', $miEquipo->id)
+                ->where('id_usuario', $usuario->id)
+                ->value('id');
+
+            if ($pivotId) {
+                $totalRetos = DB::table('tbl_retos')
+                    ->where('id_sala', $sala->id)
+                    ->count();
+
+                $completados = DB::table('tbl_progreso_retos')
+                    ->where('id_equipo_usuario', $pivotId)
+                    ->where('completado', true)
+                    ->count();
+
+                $retosCompletados = $totalRetos > 0 && $completados >= $totalRetos;
+            }
+        }
+
+        return view('sala.show', compact('sala', 'miEquipo', 'equipos', 'retosCompletados'));
     }
 
     public function crearEquipo(Request $request, int $id): JsonResponse

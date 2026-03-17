@@ -13,73 +13,67 @@
 <body>
     <div class="gimcana-app">
         <header class="screen-header">
-            <a href="{{ route('gimcana.pregunta') }}" class="header-back" aria-label="Volver">
+            <a href="{{ route('gimcana.mapa') }}" class="header-back" aria-label="Volver">
                 <i class="bi bi-arrow-left"></i>
             </a>
-            <h1>Progreso_gimcana</h1>
+            <h1>Progreso gimcana</h1>
             <span class="header-spacer" aria-hidden="true"></span>
         </header>
 
         <main class="screen-content">
             <h2 class="page-title">Progreso de la Gimcana</h2>
 
-            <div class="alert-waiting" role="status">
-                <i class="bi bi-clock"></i>
-                <span>Esperando a que todo tu equipo llegue al punto 2</span>
-            </div>
+            @if(session('success'))
+                <div class="alert-waiting" role="status">
+                    <i class="bi bi-check-circle"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
 
             <ol class="timeline" aria-label="Puntos de la gimcana">
-                <li class="tl-item tl-done">
-                    <div class="tl-icon" aria-hidden="true">
-                        <i class="bi bi-check-lg"></i>
-                    </div>
-                    <div class="tl-connector" aria-hidden="true"></div>
-                    <div class="tl-card tl-card--done">
-                        <p class="tl-label">PUNTO 1 <span class="tl-status tl-status--done">• COMPLETADO</span></p>
-                        <p class="tl-name">La Catedral Metropolitana</p>
-                    </div>
-                </li>
+                @foreach($retos as $reto)
+                    @php
+                        $completado = in_array((int) $reto->id, $completadosIds, true);
+                        $actual = !$completado && $ordenActual === $reto->orden;
+                        $bloqueado = !$completado && !$actual;
+                        $itemClass = $completado ? 'tl-done' : ($actual ? 'tl-current' : 'tl-locked');
+                        $isLast = $loop->last ? ' tl-last' : '';
+                    @endphp
+                    <li class="tl-item {{ $itemClass }}{{ $isLast }}">
+                        <div class="tl-icon" aria-hidden="true">
+                            @if($completado)
+                                <i class="bi bi-check-lg"></i>
+                            @elseif($actual)
+                                <i class="bi bi-geo-alt-fill"></i>
+                            @else
+                                <i class="bi bi-lock-fill"></i>
+                            @endif
+                        </div>
+                        @if(!$loop->last)
+                            <div class="tl-connector" aria-hidden="true"></div>
+                        @endif
+                        <div class="tl-card {{ $completado ? 'tl-card--done' : ($actual ? 'tl-card--current' : 'tl-card--locked') }}">
+                            <p class="tl-label">
+                                PUNTO {{ $reto->orden }}
+                                @if($completado)
+                                    <span class="tl-status tl-status--done">• COMPLETADO</span>
+                                @elseif($actual)
+                                    <span class="tl-status tl-status--current">• DESTINO ACTUAL</span>
+                                @else
+                                    <span class="tl-status tl-status--locked">• BLOQUEADO</span>
+                                @endif
+                            </p>
+                            <p class="tl-name">{{ $bloqueado ? 'Desconocido' : ($reto->lugar->nombre ?? 'Lugar del reto') }}</p>
 
-                <li class="tl-item tl-current">
-                    <div class="tl-icon" aria-hidden="true">
-                        <i class="bi bi-geo-alt-fill"></i>
-                    </div>
-                    <div class="tl-connector" aria-hidden="true"></div>
-                    <div class="tl-card tl-card--current">
-                        <p class="tl-label">PUNTO 2 <span class="tl-status tl-status--current">• DESTINO ACTUAL</span></p>
-                        <p class="tl-name">
-                            <span class="tl-riddle-badge">
-                                <i class="bi bi-question-lg" aria-hidden="true"></i>
-                                El custodio de piedra
-                            </span>
-                        </p>
-                        <a href="{{ route('gimcana.pregunta') }}" class="btn-location">
-                            <i class="bi bi-send"></i>
-                            Ir a la pregunta
-                        </a>
-                    </div>
-                </li>
-
-                <li class="tl-item tl-locked">
-                    <div class="tl-icon" aria-hidden="true">
-                        <i class="bi bi-lock-fill"></i>
-                    </div>
-                    <div class="tl-connector" aria-hidden="true"></div>
-                    <div class="tl-card tl-card--locked">
-                        <p class="tl-label">PUNTO 3 <span class="tl-status tl-status--locked">• BLOQUEADO</span></p>
-                        <p class="tl-name">Desconocido</p>
-                    </div>
-                </li>
-
-                <li class="tl-item tl-locked tl-last">
-                    <div class="tl-icon" aria-hidden="true">
-                        <i class="bi bi-lock-fill"></i>
-                    </div>
-                    <div class="tl-card tl-card--locked">
-                        <p class="tl-label">PUNTO 4 <span class="tl-status tl-status--locked">• BLOQUEADO</span></p>
-                        <p class="tl-name">Desconocido</p>
-                    </div>
-                </li>
+                            @if($actual)
+                                <a href="{{ route('gimcana.mapa') }}" class="btn-location">
+                                    <i class="bi bi-send"></i>
+                                    Ir al punto
+                                </a>
+                            @endif
+                        </div>
+                    </li>
+                @endforeach
             </ol>
         </main>
 
@@ -92,7 +86,7 @@
                 <i class="bi bi-heart"></i>
                 <span>Favoritos</span>
             </a>
-            <a href="{{ route('gimcana.progreso') }}" class="nav-item active" aria-current="page">
+            <a href="{{ route('gimcana.mapa') }}" class="nav-item active" aria-current="page">
                 <i class="bi bi-ticket-perforated"></i>
                 <span>Gimcana</span>
             </a>

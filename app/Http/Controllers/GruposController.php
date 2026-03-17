@@ -17,15 +17,11 @@ class GruposController extends Controller
         $usuario = Auth::user();
 
         $query = Equipo::whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id));
-        if ($salaId !== null) {
-            $query->where('numero_equipo', $salaId);
-        }
+        $this->applyScopeToEquiposQuery($query, $salaId);
         $miEquipo = $query->with('integrantes')->first();
 
         $equiposQuery = Equipo::withCount('integrantes')->with('lider')->orderByDesc('id');
-        if ($salaId !== null) {
-            $equiposQuery->where('numero_equipo', $salaId);
-        }
+        $this->applyScopeToEquiposQuery($equiposQuery, $salaId);
         $equipos = $equiposQuery->get();
 
         return view('grupos.index', compact('miEquipo', 'equipos', 'salaId'));
@@ -41,9 +37,7 @@ class GruposController extends Controller
         $usuario = Auth::user();
 
         $yaEnEquipo = Equipo::whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id));
-        if ($salaId !== null) {
-            $yaEnEquipo->where('numero_equipo', $salaId);
-        }
+        $this->applyScopeToEquiposQuery($yaEnEquipo, $salaId);
         if ($yaEnEquipo->exists()) {
             return response()->json(['error' => 'Ya estas en un grupo.'], 422);
         }
@@ -66,15 +60,11 @@ class GruposController extends Controller
         $salaId = $this->resolveSalaId($request);
         $usuario = Auth::user();
         $equipoQuery = Equipo::where('id', $equipo);
-        if ($salaId !== null) {
-            $equipoQuery->where('numero_equipo', $salaId);
-        }
+        $this->applyScopeToEquiposQuery($equipoQuery, $salaId);
         $equipoModel = $equipoQuery->firstOrFail();
 
         $yaEnEquipo = Equipo::whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id));
-        if ($salaId !== null) {
-            $yaEnEquipo->where('numero_equipo', $salaId);
-        }
+        $this->applyScopeToEquiposQuery($yaEnEquipo, $salaId);
         if ($yaEnEquipo->exists()) {
             return response()->json(['error' => 'Ya estas en un grupo.'], 422);
         }
@@ -89,9 +79,7 @@ class GruposController extends Controller
         $salaId = $this->resolveSalaId($request);
 
         $query = Equipo::whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id));
-        if ($salaId !== null) {
-            $query->where('numero_equipo', $salaId);
-        }
+        $this->applyScopeToEquiposQuery($query, $salaId);
         $equipo = $query->first();
 
         if ($equipo) {
@@ -108,16 +96,14 @@ class GruposController extends Controller
     {
         $salaId = $this->resolveSalaId($request);
         $request->validate([
-            'codigo' => 'required|string|max:8',
+            'codigo' => 'required|digits:6',
         ]);
 
         $usuario = Auth::user();
         $codigo = (int) trim($request->codigo);
 
-        $equipoQuery = Equipo::where('numero_equipo', $codigo);
-        if ($salaId !== null) {
-            $equipoQuery->where('numero_equipo', $salaId);
-        }
+        $equipoQuery = Equipo::where('id', $codigo);
+        $this->applyScopeToEquiposQuery($equipoQuery, $salaId);
         $equipoModel = $equipoQuery->first();
 
         if (!$equipoModel) {
@@ -125,9 +111,7 @@ class GruposController extends Controller
         }
 
         $yaEnEquipo = Equipo::whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id));
-        if ($salaId !== null) {
-            $yaEnEquipo->where('numero_equipo', $salaId);
-        }
+        $this->applyScopeToEquiposQuery($yaEnEquipo, $salaId);
         if ($yaEnEquipo->exists()) {
             return response()->json(['error' => 'Ya estás en un grupo.'], 422);
         }
@@ -158,5 +142,15 @@ class GruposController extends Controller
         }
 
         return null;
+    }
+
+    private function applyScopeToEquiposQuery($query, ?int $salaId): void
+    {
+        if ($salaId !== null) {
+            $query->where('numero_equipo', $salaId);
+            return;
+        }
+
+        $query->where('numero_equipo', '>=', 100000);
     }
 }

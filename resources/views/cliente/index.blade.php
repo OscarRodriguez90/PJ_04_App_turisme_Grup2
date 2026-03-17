@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
     <link rel="stylesheet" href="{{ asset('css/cliente/cliente.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/cliente/acceso-sala.css') }}">
 </head>
 <body>
     <div class="app-shell">
@@ -82,10 +83,13 @@
                 </div>
             </section>
 
-            <section class="panel-section">
-                <a href="{{ route('grupos.index') }}" class="btn btn-primary" style="display:flex;align-items:center;justify-content:center;gap:.4rem;text-decoration:none">
-                    👥 Ir a Grupos
+            <section class="panel-section sala-access-panel">
+                <a href="{{ route('sala.index') }}" class="btn btn-primary sala-access-btn">
+                    🎯 Entrar a Sala
                 </a>
+                <p class="sala-access-help">
+                    Usa este acceso cuando te hayan compartido un codigo de sala para empezar la gimcana.
+                </p>
             </section>
 
             <section class="panel-section list-section">
