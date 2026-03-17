@@ -49,6 +49,7 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::get('/gimcana', [GimcanaController::class, 'mapa'])->name('gimcana.mapa');
     Route::get('/gimcana/pregunta/{reto?}', [GimcanaController::class, 'pregunta'])->name('gimcana.pregunta');
     Route::post('/gimcana/pregunta/{reto}/resolver', [GimcanaController::class, 'resolverPregunta'])->name('gimcana.pregunta.resolver');
+    Route::get('/gimcana/espera', [GimcanaController::class, 'espera'])->name('gimcana.espera');
     Route::get('/gimcana/progreso', [GimcanaController::class, 'progreso'])->name('gimcana.progreso');
     Route::get('/gimcana/final', [GimcanaController::class, 'final'])->name('gimcana.final');
     Route::post('/gimcana/reiniciar', [GimcanaController::class, 'reiniciar'])->name('gimcana.reiniciar');
