@@ -154,3 +154,95 @@ body {
     background: #e7f3f4;
     color: #12888e;
 }
+
+    .map-card {
+        position: relative;
+    }
+
+    .btn-locate-me {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        background: var(--primary);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(17, 168, 173, 0.3);
+    }
+
+    .btn-locate-me:hover {
+        background: var(--primary-dark);
+        box-shadow: 0 4px 12px rgba(17, 168, 173, 0.4);
+    }
+
+    .btn-locate-me:active {
+        transform: scale(0.95);
+    }
+
+    .map-message {
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: none;
+        margin-bottom: 12px;
+    }
+
+    .map-message--success {
+        background: #d4f8d4;
+        color: #1b5e20;
+        display: block;
+    }
+
+    .map-message--error {
+        background: #ffe0e0;
+        color: #b91c1c;
+        display: block;
+    }
+
+    .map-message--info {
+        background: #e3f2fd;
+        color: #0d47a1;
+        display: block;
+    }
+
+    .location-info {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .location-info > div {
+        flex: 1;
+    }
+
+    .location-info h3 {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .location-info p {
+        margin: 0;
+        font-size: 0.85rem;
+    }
+
+    .distance-info {
+        text-align: center;
+        padding: 0 0 0 1rem;
+        border-left: 1px solid var(--border);
+    }
+
+    .distance-text {
+        margin: 0;
+        font-weight: 600;
+        color: var(--primary);
+        font-size: 1.1rem;
+    }

@@ -258,6 +258,80 @@ body {
     font-weight: 500;
 }
 
+.location-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.location-box {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.location-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #666666;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+.location-value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #11a8ad;
+}
+
+.btn-locate {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    background: #11a8ad;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.btn-locate:hover {
+    background: #0d7b7e;
+}
+
+.location-message {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: none;
+}
+
+.location-message--success {
+    background: #d4f8d4;
+    color: #1b5e20;
+    display: block;
+}
+
+.location-message--error {
+    background: #ffe0e0;
+    color: #b91c1c;
+    display: block;
+}
+
+.answer-error {
+    color: #b91c1c;
+    font-size: 0.9rem;
+}
+
 .nav-item i {
     font-size: 1.1rem;
 }

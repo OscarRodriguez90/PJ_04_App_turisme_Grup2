@@ -36,7 +36,7 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::post('/grupos/salir', [GruposController::class, 'leave'])->name('grupos.leave');
 
     Route::get('/sala', [SalaController::class, 'index'])->name('sala.index');
-    Route::post('/sala/entrar', [SalaController::class, 'entrar'])->name('sala.entrar');
+    Route::get('/sala/{id}/entrar', [SalaController::class, 'entrar'])->name('sala.entrar');
     Route::get('/sala/{id}', [SalaController::class, 'show'])->name('sala.show');
     Route::get('/sala/{id}/grupos', [GruposController::class, 'index'])->name('sala.grupos.index');
     Route::post('/sala/{id}/grupos', [GruposController::class, 'store'])->name('sala.grupos.store');

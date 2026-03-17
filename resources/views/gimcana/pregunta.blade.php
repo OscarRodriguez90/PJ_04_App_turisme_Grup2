@@ -35,6 +35,32 @@
                 </div>
                 <h2>¡Has llegado al punto!</h2>
                 <p>{{ $retoActual->lugar->nombre ?? 'Lugar del reto' }}</p>
+
+                <button
+                    type="button"
+                    id="locateBtn"
+                    class="btn-locate"
+                    aria-label="Obtener mi ubicación"
+                    data-lat="{{ (float) ($retoActual->lugar->latitud ?? 41.3874) }}"
+                    data-lng="{{ (float) ($retoActual->lugar->longitud ?? 2.1686) }}"
+                    data-nombre="{{ $retoActual->lugar->nombre ?? 'Destino' }}"
+                >
+                    <i class="bi bi-crosshair2"></i>
+                    Obtener mi ubicación
+                </button>
+
+                <div id="locationMessage" class="location-message"></div>
+
+                <div class="location-section">
+                    <div class="location-box">
+                        <span class="location-label">Tu ubicación</span>
+                        <span class="location-value" id="userLocDisplay">—</span>
+                    </div>
+                    <div class="location-box">
+                        <span class="location-label">Distancia</span>
+                        <span class="location-value" id="distanceDisplay">—</span>
+                    </div>
+                </div>
             </section>
 
             <section class="question-card" aria-label="Pregunta de la gincana">
@@ -53,7 +79,7 @@
                         aria-label="Respuesta"
                     >
                     @error('respuesta')
-                        <span style="color:#b91c1c;font-size:0.9rem;">{{ $message }}</span>
+                        <span class="answer-error">{{ $message }}</span>
                     @enderror
                     <button type="submit" class="btn-primary">
                         <i class="bi bi-check-circle"></i>
@@ -98,6 +124,7 @@
             </a>
         </nav>
     </div>
+
     <script src="{{ asset('js/gimcana/pregunta.js') }}"></script>
 </body>
 </html>

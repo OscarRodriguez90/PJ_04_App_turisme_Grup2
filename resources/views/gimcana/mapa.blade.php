@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
     <link rel="stylesheet" href="{{ asset('css/gimcana/mapa.css') }}">
 </head>
 <body>
@@ -41,14 +42,33 @@
             </section>
 
             <section class="map-card" aria-label="Mapa del destino">
-                <div id="reto-map"></div>
+                <div
+                    id="reto-map"
+                    data-lat="{{ (float) ($retoActual->lugar->latitud ?? 41.3874) }}"
+                    data-lng="{{ (float) ($retoActual->lugar->longitud ?? 2.1686) }}"
+                    data-nombre="{{ $retoActual->lugar->nombre ?? 'Destino' }}"
+                ></div>
+                <button type="button" id="locateMeButton" class="btn-locate-me" aria-label="Mi ubicación">
+                    <i class="bi bi-crosshair2"></i>
+                    Mi ubicación
+                </button>
             </section>
 
             <section class="location-card">
-                <p class="eyebrow">Destino actual</p>
-                <h3>{{ $retoActual->lugar->nombre ?? 'Lugar del reto' }}</h3>
-                <p>{{ $retoActual->lugar->direccion_completa ?? 'Direccion no disponible' }}</p>
+                <div class="location-info">
+                    <div>
+                        <p class="eyebrow">Destino actual</p>
+                        <h3>{{ $retoActual->lugar->nombre ?? 'Lugar del reto' }}</h3>
+                        <p>{{ $retoActual->lugar->direccion_completa ?? 'Dirección no disponible' }}</p>
+                    </div>
+                    <div class="distance-info">
+                        <p class="eyebrow">Distancia</p>
+                        <p id="distanceDisplay" class="distance-text">Obtén tu ubicación</p>
+                    </div>
+                </div>
             </section>
+
+            <div id="mapMessage" class="map-message"></div>
 
             <a href="{{ route('gimcana.pregunta', ['reto' => $retoActual->id]) }}" class="btn-primary">
                 <i class="bi bi-geo-alt-fill"></i>
@@ -62,14 +82,8 @@
         </main>
     </div>
 
-    <script>
-        window.gimcanaMapaData = {
-            lat: @json((float) ($retoActual->lugar->latitud ?? 41.3874)),
-            lng: @json((float) ($retoActual->lugar->longitud ?? 2.1686)),
-            nombre: @json($retoActual->lugar->nombre ?? 'Destino')
-        };
-    </script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <script src="{{ asset('js/gimcana/mapa.js') }}"></script>
 </body>
 </html>
