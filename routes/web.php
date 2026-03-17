@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\GruposController;
+use App\Http\Controllers\SalaController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -25,6 +27,30 @@ Route::get('/check-email',    [AuthController::class, 'checkEmail'])->name('chec
 Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::get('/cliente', [ClienteController::class, 'index'])->name('cliente.index');
     Route::post('/cliente/favoritos/{lugar}', [ClienteController::class, 'toggleFavorito'])->name('cliente.favoritos.toggle');
+
+    Route::get('/grupos', [GruposController::class, 'index'])->name('grupos.index');
+    Route::post('/grupos', [GruposController::class, 'store'])->name('grupos.store');
+    Route::post('/grupos/unirse-codigo', [GruposController::class, 'joinByCode'])->name('grupos.joinByCode');
+    Route::post('/grupos/{equipo}/unirse', [GruposController::class, 'join'])->name('grupos.join');
+    Route::post('/grupos/salir', [GruposController::class, 'leave'])->name('grupos.leave');
+
+    Route::get('/sala', [SalaController::class, 'index'])->name('sala.index');
+    Route::post('/sala/entrar', [SalaController::class, 'entrar'])->name('sala.entrar');
+    Route::get('/sala/{id}', [SalaController::class, 'show'])->name('sala.show');
+    Route::get('/sala/{id}/grupos', [GruposController::class, 'index'])->name('sala.grupos.index');
+    Route::post('/sala/{id}/grupos', [GruposController::class, 'store'])->name('sala.grupos.store');
+    Route::post('/sala/{id}/grupos/unirse-codigo', [GruposController::class, 'joinByCode'])->name('sala.grupos.joinByCode');
+    Route::post('/sala/{id}/grupos/{equipo}/unirse', [GruposController::class, 'join'])->name('sala.grupos.join');
+    Route::post('/sala/{id}/grupos/salir', [GruposController::class, 'leave'])->name('sala.grupos.leave');
+    Route::post('/sala/{id}/equipos', [SalaController::class, 'crearEquipo'])->name('sala.equipo.crear');
+    Route::post('/sala/{id}/equipos/{equipo}/unirse', [SalaController::class, 'unirse'])->name('sala.equipo.unirse');
+    Route::post('/sala/{id}/salir-equipo', [SalaController::class, 'salirEquipo'])->name('sala.equipo.salir');
+    Route::get('/gimcana/pregunta', function () {
+        return view('gimcana.pregunta');
+    })->name('gimcana.pregunta');
+    Route::get('/gimcana/progreso', function () {
+        return view('gimcana.progreso');
+    })->name('gimcana.progreso');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -36,7 +62,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/lugares', [AdminController::class, 'storeLugar'])->name('admin.lugares.store');
     Route::put('/admin/lugares/{id}', [AdminController::class, 'updateLugar'])->name('admin.lugares.update');
     Route::delete('/admin/lugares/{id}', [AdminController::class, 'deleteLugar'])->name('admin.lugares.delete');
-  
+
     Route::get('/admin/categorias', [AdminController::class, 'categorias'])->name('admin.categorias');
     Route::post('/admin/categorias', [AdminController::class, 'storeCategoria'])->name('admin.categorias.store');
     Route::put('/admin/categorias/{id}', [AdminController::class, 'updateCategoria'])->name('admin.categorias.update');

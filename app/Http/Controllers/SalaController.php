@@ -1,0 +1,127 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Equipo;
+use App\Models\Sala;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
+
+class SalaController extends Controller
+{
+    public function index(): View
+    {
+        return view('sala.index');
+    }
+
+    public function entrar(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'codigo_sala' => 'required|string|max:8',
+        ]);
+
+        $sala = Sala::where('codigo_sala', strtoupper(trim($request->codigo_sala)))->first();
+
+        if (!$sala) {
+            return back()->with('error', 'Código de sala no válido.')->withInput();
+        }
+
+        if ($sala->estado === 'finalizada') {
+            return back()->with('error', 'Esta sala ya ha finalizado.')->withInput();
+        }
+
+        return redirect()->route('sala.show', $sala->id);
+    }
+
+    public function show(int $id): View
+    {
+        $sala = Sala::findOrFail($id);
+        $usuario = Auth::user();
+
+        $miEquipo = Equipo::where('numero_equipo', $sala->id)
+            ->whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id))
+            ->with('integrantes')
+            ->first();
+
+        $equipos = Equipo::where('numero_equipo', $sala->id)
+            ->withCount('integrantes')
+            ->with('lider')
+            ->get();
+
+        return view('sala.show', compact('sala', 'miEquipo', 'equipos'));
+    }
+
+    public function crearEquipo(Request $request, int $id): JsonResponse
+    {
+        $sala = Sala::findOrFail($id);
+        $request->validate([
+            'nombre_equipo' => 'required|string|min:3|max:50',
+        ]);
+
+        $usuario = Auth::user();
+
+        $yaEnEquipo = Equipo::where('numero_equipo', $sala->id)
+            ->whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id))
+            ->exists();
+
+        if ($yaEnEquipo) {
+            return response()->json(['error' => 'Ya estás en un equipo en esta sala.'], 422);
+        }
+
+        DB::transaction(function () use ($request, $sala, $usuario) {
+            $equipo = Equipo::create([
+                'numero_equipo' => $sala->id,
+                'nombre_equipo' => $request->nombre_equipo,
+                'id_lider'      => $usuario->id,
+            ]);
+            $equipo->integrantes()->attach($usuario->id);
+        });
+
+        return response()->json(['success' => true]);
+    }
+
+    public function unirse(Request $request, int $id, int $equipo): JsonResponse
+    {
+        $sala = Sala::findOrFail($id);
+        $equipoModel = Equipo::where('id', $equipo)
+            ->where('numero_equipo', $sala->id)
+            ->firstOrFail();
+
+        $usuario = Auth::user();
+
+        $yaEnEquipo = Equipo::where('numero_equipo', $sala->id)
+            ->whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id))
+            ->exists();
+
+        if ($yaEnEquipo) {
+            return response()->json(['error' => 'Ya estás en un equipo en esta sala.'], 422);
+        }
+
+        $equipoModel->integrantes()->syncWithoutDetaching([$usuario->id]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function salirEquipo(Request $request, int $id): JsonResponse
+    {
+        $sala = Sala::findOrFail($id);
+        $usuario = Auth::user();
+
+        $equipo = Equipo::where('numero_equipo', $sala->id)
+            ->whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id))
+            ->first();
+
+        if ($equipo) {
+            $equipo->integrantes()->detach($usuario->id);
+            if ($equipo->integrantes()->count() === 0) {
+                $equipo->delete();
+            }
+        }
+
+        return response()->json(['success' => true]);
+    }
+}

@@ -82,6 +82,12 @@
                 </div>
             </section>
 
+            <section class="panel-section">
+                <a href="{{ route('grupos.index') }}" class="btn btn-primary" style="display:flex;align-items:center;justify-content:center;gap:.4rem;text-decoration:none">
+                    👥 Ir a Grupos
+                </a>
+            </section>
+
             <section class="panel-section list-section">
                 <div class="section-title-row">
                     <h2>Lugares</h2>

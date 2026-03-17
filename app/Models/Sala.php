@@ -10,23 +10,13 @@ class Sala extends Model
     use HasFactory;
 
     protected $table = 'tbl_salas';
-    
-    // Si la tabla no usa created_at o updated_at, de momento tbl_salas solo tiene fecha_creacion
     public $timestamps = false;
 
-    protected $fillable = [
-        'nombre',
-        'descripcion',
-        'fecha_creacion'
-    ];
+    protected $fillable = ['codigo_sala', 'estado'];
 
-    public function creador()
+    // numero_equipo in tbl_equipos stores the sala id (implicit link without FK)
+    public function equipos()
     {
-        return $this->belongsTo(Usuario::class, 'id_creador');
-    }
-
-    public function pruebas()
-    {
-        return $this->hasMany(Prueba::class, 'id_sala');
+        return $this->hasMany(Equipo::class, 'numero_equipo', 'id');
     }
 }
