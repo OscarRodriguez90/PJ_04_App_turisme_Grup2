@@ -30,13 +30,14 @@
                     id="codigo_sala"
                     name="codigo_sala"
                     type="text"
-                    maxlength="8"
-                    placeholder="XXXXXXXX"
+                    maxlength="6"
+                    placeholder="000000"
                     autocomplete="off"
                     autofocus
                     value="{{ old('codigo_sala') }}"
                     class="input-sala {{ $errors->has('codigo_sala') ? 'input-error' : '' }}"
-                    style="text-transform:uppercase;letter-spacing:0.15em"
+                    style="letter-spacing:0.15em"
+                    inputmode="numeric"
                 >
                 @error('codigo_sala')
                     <span class="field-error">{{ $message }}</span>

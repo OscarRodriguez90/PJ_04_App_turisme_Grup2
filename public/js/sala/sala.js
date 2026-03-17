@@ -14,7 +14,15 @@
             },
             body: JSON.stringify(data),
         });
-        return { status: res.status, data: await res.json() };
+
+        let payload = {};
+        try {
+            payload = await res.json();
+        } catch (_) {
+            payload = {};
+        }
+
+        return { status: res.status, data: payload };
     }
 
     // ── Toast ────────────────────────────────────────────────

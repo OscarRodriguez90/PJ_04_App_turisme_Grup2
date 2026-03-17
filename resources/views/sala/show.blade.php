@@ -54,6 +54,18 @@
                 <button class="btn-danger-small" onclick="salirEquipo()">
                     <i class="bi bi-door-open"></i> Salir del equipo
                 </button>
+                @if($retosCompletados)
+                    <form method="POST" action="{{ route('gimcana.reiniciar') }}" class="restart-retos-form">
+                        @csrf
+                        <button type="submit" class="btn-outline-small btn-start-retos">
+                            <i class="bi bi-arrow-counterclockwise"></i> Volver a empezar retos
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('gimcana.mapa') }}" class="btn-outline-small btn-start-retos">
+                        <i class="bi bi-play-circle"></i> Empezar retos
+                    </a>
+                @endif
             </div>
         </section>
         @else

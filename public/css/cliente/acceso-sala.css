@@ -1,0 +1,19 @@
+.sala-access-panel {
+    display: grid;
+    gap: 0.6rem;
+}
+
+.sala-access-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    text-decoration: none;
+}
+
+.sala-access-help {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.82rem;
+    line-height: 1.35;
+}

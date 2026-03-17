@@ -206,6 +206,16 @@ body {
 
 .btn-outline-small:hover { background: var(--primary-light); }
 
+.btn-start-retos {
+    margin-top: 0.6rem;
+    text-decoration: none;
+    justify-content: center;
+}
+
+.restart-retos-form {
+    margin-top: 0.6rem;
+}
+
 .btn-danger-small {
     background: transparent;
     border: 1.5px solid var(--danger);
