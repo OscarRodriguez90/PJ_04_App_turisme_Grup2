@@ -297,7 +297,7 @@ function checkAllFieldsFilled(formPrefix, salaId = '') {
         const blockInputs = block.querySelectorAll('input[type="text"]:not(.search-lugar-input)');
         const respuesta = blockInputs.length >= 1 ? blockInputs[0].value.trim() : '';
 
-        if (!input.value || pregunta.length < 10 || respuesta.length === 0 || pista.length < 5) {
+        if (!input.value || pregunta.length < 10 || respuesta.length === 0 || (index < 4 && pista.length < 5)) {
             allValid = false;
             if (block) block.classList.add('error-border');
         }

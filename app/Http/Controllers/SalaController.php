@@ -21,10 +21,10 @@ class SalaController extends Controller
     public function entrar(Request $request): RedirectResponse
     {
         $request->validate([
-            'codigo_sala' => 'required|string|max:8',
+            'codigo_sala' => 'required|string|max:50',
         ]);
 
-        $sala = Sala::where('codigo_sala', strtoupper(trim($request->codigo_sala)))->first();
+        $sala = Sala::where('nombre', trim($request->codigo_sala))->first();
 
         if (!$sala) {
             return back()->with('error', 'Código de sala no válido.')->withInput();

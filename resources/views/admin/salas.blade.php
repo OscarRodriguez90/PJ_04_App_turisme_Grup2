@@ -67,6 +67,18 @@
                         <div class="gimcana-header">
                             <span class="gimcana-code">{{ $sala->nombre }}</span>
                         </div>
+
+                        <div class="gimcana-estado-row">
+                            <label class="estado-label">Estado:</label>
+                            <select class="estado-select estado-{{ $sala->estado }}"
+                                    data-sala-id="{{ $sala->id }}"
+                                    onchange="cambiarEstado(this)">
+                                <option value="disponible" {{ $sala->estado === 'disponible' ? 'selected' : '' }}>Disponible</option>
+                                <option value="esperando" {{ $sala->estado === 'esperando' ? 'selected' : '' }}>Esperando</option>
+                                <option value="jugando" {{ $sala->estado === 'jugando' ? 'selected' : '' }}>Jugando</option>
+                                <option value="finalizada" {{ $sala->estado === 'finalizada' ? 'selected' : '' }}>Finalizada</option>
+                            </select>
+                        </div>
                         
                         @if($sala->descripcion)
                         <p style="margin: 0; font-size: 0.875rem; color: #64748b;">{{ $sala->descripcion }}</p>
@@ -88,7 +100,7 @@
                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                 </svg>
                             </a>
-                            <button class="btn-action btn-delete" onclick="handleDeleteClick({{ $sala->id }}, '{{ $sala->codigo_sala }}')" title="Eliminar Gimcana">
+                            <button class="btn-action btn-delete" onclick="handleDeleteClick({{ $sala->id }}, '{{ $sala->nombre }}')" title="Eliminar Gimcana">
                                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="3 6 5 6 21 6"></polyline>
                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -109,5 +121,45 @@
     <script src="{{ asset('js/admin/admin_notifications.js') }}"></script>
     <script src="{{ asset('js/admin/validaciones_salas.js') }}"></script>
     <script src="{{ asset('js/admin/salas_alerts.js') }}"></script>
+    <script>
+        function cambiarEstado(selectEl) {
+            const salaId = selectEl.dataset.salaId;
+            const nuevoEstado = selectEl.value;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+            fetch(`/admin/salas/${salaId}/estado`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ estado: nuevoEstado })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Error del servidor');
+                return res.json();
+            })
+            .then(data => {
+                // Update select class for color
+                selectEl.className = 'estado-select estado-' + nuevoEstado;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Estado actualizado',
+                    text: `La gimcana ahora está "${nuevoEstado}".`,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            })
+            .catch(err => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo cambiar el estado.'
+                });
+            });
+        }
+    </script>
 </body>
 </html>
