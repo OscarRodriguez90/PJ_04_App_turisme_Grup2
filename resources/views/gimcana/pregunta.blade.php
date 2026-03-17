@@ -88,5 +88,6 @@
             </a>
         </nav>
     </div>
+    <script src="{{ asset('js/gimcana/pregunta.js') }}"></script>
 </body>
 </html>

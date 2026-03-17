@@ -1,7 +1,19 @@
 (function () {
     'use strict';
 
-    const config = window.gruposConfig;
+    const configNode = document.getElementById('grupos-config');
+    if (!configNode) return;
+
+    const config = {
+        storeUrl: configNode.dataset.storeUrl,
+        leaveUrl: configNode.dataset.leaveUrl,
+        joinByCodeUrl: configNode.dataset.joinByCodeUrl,
+        joinBaseUrl: configNode.dataset.joinBaseUrl,
+        csrfToken: configNode.dataset.csrfToken,
+        salaId: configNode.dataset.salaId && configNode.dataset.salaId !== 'null'
+            ? JSON.parse(configNode.dataset.salaId)
+            : null,
+    };
 
     async function postJson(url, payload) {
         const res = await fetch(url, {
@@ -136,6 +148,48 @@
         showToast(data.error || 'No se pudo unir al grupo', true);
     }
 
+    document.addEventListener('click', function (event) {
+        const trigger = event.target.closest('[data-action]');
+        if (!trigger) return;
+
+        const action = trigger.dataset.action;
+
+        if (action === 'abrir-modal') {
+            const modalId = trigger.dataset.modalId;
+            if (modalId === 'modalCrear') abrirModalCrear();
+            if (modalId === 'modalCodigo') abrirModalCodigo();
+            return;
+        }
+
+        if (action === 'cerrar-modal') {
+            const modalId = trigger.dataset.modalId;
+            if (modalId) cerrarModal(modalId);
+            return;
+        }
+
+        if (action === 'crear-grupo') {
+            crearGrupo();
+            return;
+        }
+
+        if (action === 'unirse-grupo') {
+            const equipoId = Number(trigger.dataset.equipoId);
+            if (Number.isFinite(equipoId) && equipoId > 0) {
+                unirseGrupo(equipoId);
+            }
+            return;
+        }
+
+        if (action === 'unirse-codigo') {
+            unirseConCodigo();
+            return;
+        }
+
+        if (action === 'salir-grupo') {
+            salirGrupo();
+        }
+    });
+
     const overlay = document.getElementById('modalCrear');
     if (overlay) {
         overlay.addEventListener('click', function (event) {
@@ -153,12 +207,4 @@
             }
         });
     }
-
-    window.abrirModalCrear = abrirModalCrear;
-    window.abrirModalCodigo = abrirModalCodigo;
-    window.cerrarModal = cerrarModal;
-    window.crearGrupo = crearGrupo;
-    window.unirseGrupo = unirseGrupo;
-    window.unirseConCodigo = unirseConCodigo;
-    window.salirGrupo = salirGrupo;
 })();

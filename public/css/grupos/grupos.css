@@ -139,6 +139,24 @@ body {
 
 .btn:hover { background: var(--primary-dark); }
 
+.actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .6rem;
+}
+
+.btn-code {
+    background: #6366f1;
+}
+
+.btn-code:hover {
+    background: #4f46e5;
+}
+
+.btn-plain-link {
+    text-decoration: none;
+}
+
 .btn-outline {
     width: auto;
     background: transparent;
@@ -204,6 +222,11 @@ body {
     border-radius: 10px;
     padding: .7rem .8rem;
     font: inherit;
+}
+
+.input-code {
+    letter-spacing: .1em;
+    text-transform: uppercase;
 }
 
 .input.input-error {

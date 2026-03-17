@@ -102,5 +102,6 @@
             </a>
         </nav>
     </div>
+    <script src="{{ asset('js/gimcana/progreso.js') }}"></script>
 </body>
 </html>

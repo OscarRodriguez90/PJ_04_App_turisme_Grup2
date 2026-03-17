@@ -32,7 +32,7 @@
                 </div>
                 <h3 class="group-name">{{ $miEquipo->nombre_equipo }}</h3>
                 <p class="group-meta">Integrantes: {{ $miEquipo->integrantes->count() }}</p>
-                <button class="btn btn-danger" onclick="salirGrupo()">Salir del grupo</button>
+                <button class="btn btn-danger" data-action="salir-grupo">Salir del grupo</button>
             </section>
         @else
             <section class="card">
@@ -40,12 +40,12 @@
                     <h2>Sin grupo</h2>
                 </div>
                 <p class="group-meta">Crea un grupo o unete a uno existente.</p>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
-                    <button class="btn" onclick="abrirModalCrear()">
+                <div class="actions-grid">
+                    <button class="btn" data-action="abrir-modal" data-modal-id="modalCrear">
                         <i class="bi bi-plus-circle"></i>
                         Crear
                     </button>
-                    <button class="btn" style="background:#6366f1" onclick="abrirModalCodigo()">
+                    <button class="btn btn-code" data-action="abrir-modal" data-modal-id="modalCodigo">
                         <i class="bi bi-key"></i>
                         Código
                     </button>
@@ -58,7 +58,7 @@
                 <h2>Vista de prueba</h2>
             </div>
             <p class="group-meta">Pantalla demo para visualizar una pregunta de la gimcana (sin funcionalidad).</p>
-            <a href="{{ route('gimcana.pregunta') }}" class="btn" style="text-decoration:none">
+            <a href="{{ route('gimcana.pregunta') }}" class="btn btn-plain-link">
                 <i class="bi bi-ticket-perforated"></i>
                 Abrir pregunta demo
             </a>
@@ -82,7 +82,7 @@
                     @if($esMio)
                         <span class="mine-pill">Tu grupo</span>
                     @elseif(!$miEquipo)
-                        <button class="btn btn-outline" onclick="unirseGrupo({{ $equipo->id }})">Unirme</button>
+                        <button class="btn btn-outline" data-action="unirse-grupo" data-equipo-id="{{ $equipo->id }}">Unirme</button>
                     @endif
                 </article>
             @empty
@@ -97,12 +97,12 @@
         <div class="modal">
             <div class="modal-head">
                 <h3>Crear grupo</h3>
-                <button class="btn-icon" onclick="cerrarModal('modalCrear')"><i class="bi bi-x-lg"></i></button>
+                <button class="btn-icon" data-action="cerrar-modal" data-modal-id="modalCrear"><i class="bi bi-x-lg"></i></button>
             </div>
             <label for="input-nombre-grupo">Nombre del grupo</label>
             <input id="input-nombre-grupo" type="text" maxlength="50" placeholder="Ej: Aventureros" class="input">
             <span class="field-error" id="error-nombre-grupo"></span>
-            <button class="btn" onclick="crearGrupo()">Crear</button>
+            <button class="btn" data-action="crear-grupo">Crear</button>
         </div>
     </div>
 
@@ -110,27 +110,27 @@
         <div class="modal">
             <div class="modal-head">
                 <h3>Unirse con código</h3>
-                <button class="btn-icon" onclick="cerrarModal('modalCodigo')"><i class="bi bi-x-lg"></i></button>
+                <button class="btn-icon" data-action="cerrar-modal" data-modal-id="modalCodigo"><i class="bi bi-x-lg"></i></button>
             </div>
             <label for="input-codigo-grupo">Código del grupo</label>
-            <input id="input-codigo-grupo" type="text" maxlength="6" placeholder="000000" class="input" inputmode="numeric" style="letter-spacing:.1em;text-transform:uppercase">
+            <input id="input-codigo-grupo" type="text" maxlength="6" placeholder="000000" class="input input-code" inputmode="numeric">
             <span class="field-error" id="error-codigo-grupo"></span>
-            <button class="btn" onclick="unirseConCodigo()">Unirse</button>
+            <button class="btn" data-action="unirse-codigo">Unirse</button>
         </div>
     </div>
 
     <div class="toast" id="toast"></div>
 
-    <script>
-        window.gruposConfig = {
-            storeUrl: '{{ $salaId ? route('sala.grupos.store', $salaId) : route('grupos.store') }}',
-            leaveUrl: '{{ $salaId ? route('sala.grupos.leave', $salaId) : route('grupos.leave') }}',
-            joinByCodeUrl: '{{ $salaId ? route('sala.grupos.joinByCode', $salaId) : route('grupos.joinByCode') }}',
-            joinBaseUrl: '{{ $salaId ? route('sala.grupos.index', $salaId) : url('/grupos') }}',
-            csrfToken: '{{ csrf_token() }}',
-            salaId: @json($salaId)
-        };
-    </script>
+    <div
+        id="grupos-config"
+        data-store-url="{{ $salaId ? route('sala.grupos.store', $salaId) : route('grupos.store') }}"
+        data-leave-url="{{ $salaId ? route('sala.grupos.leave', $salaId) : route('grupos.leave') }}"
+        data-join-by-code-url="{{ $salaId ? route('sala.grupos.joinByCode', $salaId) : route('grupos.joinByCode') }}"
+        data-join-base-url="{{ $salaId ? route('sala.grupos.index', $salaId) : url('/grupos') }}"
+        data-csrf-token="{{ csrf_token() }}"
+        data-sala-id='@json($salaId)'
+        hidden
+    ></div>
     <script src="{{ asset('js/grupos/grupos.js') }}"></script>
 </body>
 </html>
