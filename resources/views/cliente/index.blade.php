@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('css/cliente/cliente.css') }}">
     <link rel="stylesheet" href="{{ asset('css/cliente/acceso-sala.css') }}">
 </head>
@@ -29,6 +30,10 @@
                     <button type="submit" class="btn btn-ghost">Salir</button>
                 </form>
             </div>
+
+            <button type="button" class="btn btn-secondary mobile-only-btn" id="closeSidebarBtn" style="margin-top: 0.5rem; justify-content: center;">
+                ← Volver al mapa
+            </button>
 
             <div class="user-card">
                 <div class="avatar">{{ strtoupper(substr($usuario->nombre, 0, 1)) }}</div>
@@ -66,6 +71,11 @@
                     @foreach ($categorias as $categoria)
                         <label class="chip-option">
                             <input type="checkbox" class="category-filter" value="{{ $categoria->id }}" checked>
+                            <span class="chip-icon" style="color: {{ $categoria->color_marcador ?? '#0ea5a4' }}; display: flex; align-items: center;">
+                                @if($categoria->icono_url)
+                                    <i class="{{ $categoria->icono_url }}"></i>
+                                @endif
+                            </span>
                             <span>{{ $categoria->nombre }}</span>
                         </label>
                     @endforeach
@@ -123,7 +133,11 @@
                     <p>Verás aquí el resumen, la dirección, la categoría y el acceso a la ruta desde tu posición.</p>
                 </div>
 
-                <article class="detail-card hidden" id="placeDetail">
+                <article class="detail-card hidden" id="placeDetail" style="position: relative;">
+                    <button type="button" id="closeDetailButton" style="position: absolute; top: 1.5rem; right: 1.5rem; background: rgba(0,0,0,0.5); color: #fff; border: 0; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: .2s; z-index: 10;" onmouseover="this.style.background='rgba(0,0,0,0.7)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    <img id="detailImage" src="" alt="Imagen del lugar" style="width: 100%; height: 180px; object-fit: cover; border-radius: .5rem; margin-bottom: 1rem; border: 1px solid var(--border);">
                     <div class="detail-header">
                         <div>
                             <p class="eyebrow" id="detailCategory">Categoría</p>
