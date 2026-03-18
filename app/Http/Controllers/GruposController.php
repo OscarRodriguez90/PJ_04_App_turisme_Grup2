@@ -11,6 +11,9 @@ use Illuminate\View\View;
 
 class GruposController extends Controller
 {
+    private const MAX_GRUPOS_POR_SALA = 5;
+    private const MAX_INTEGRANTES_POR_GRUPO = 8;
+
     public function index(Request $request): View
     {
         $salaId = $this->resolveSalaId($request);
@@ -42,6 +45,15 @@ class GruposController extends Controller
             return response()->json(['error' => 'Ya estas en un grupo.'], 422);
         }
 
+        if ($salaId !== null) {
+            $totalGruposSala = Equipo::where('numero_equipo', $salaId)->count();
+            if ($totalGruposSala >= self::MAX_GRUPOS_POR_SALA) {
+                return response()->json([
+                    'error' => 'Esta sala ya tiene el maximo de ' . self::MAX_GRUPOS_POR_SALA . ' grupos.',
+                ], 422);
+            }
+        }
+
         DB::transaction(function () use ($request, $usuario, $salaId): void {
             $numeroEquipo = $salaId ?? $this->generarCodigoEquipo();
             $equipo = Equipo::create([
@@ -67,6 +79,12 @@ class GruposController extends Controller
         $this->applyScopeToEquiposQuery($yaEnEquipo, $salaId);
         if ($yaEnEquipo->exists()) {
             return response()->json(['error' => 'Ya estas en un grupo.'], 422);
+        }
+
+        if ($equipoModel->integrantes()->count() >= self::MAX_INTEGRANTES_POR_GRUPO) {
+            return response()->json([
+                'error' => 'Este grupo ya alcanzo el maximo de ' . self::MAX_INTEGRANTES_POR_GRUPO . ' personas.',
+            ], 422);
         }
 
         $equipoModel->integrantes()->syncWithoutDetaching([$usuario->id]);
@@ -144,6 +162,12 @@ class GruposController extends Controller
         $this->applyScopeToEquiposQuery($yaEnEquipo, $salaId);
         if ($yaEnEquipo->exists()) {
             return response()->json(['error' => 'Ya estás en un grupo.'], 422);
+        }
+
+        if ($equipoModel->integrantes()->count() >= self::MAX_INTEGRANTES_POR_GRUPO) {
+            return response()->json([
+                'error' => 'Este grupo ya alcanzo el maximo de ' . self::MAX_INTEGRANTES_POR_GRUPO . ' personas.',
+            ], 422);
         }
 
         $equipoModel->integrantes()->syncWithoutDetaching([$usuario->id]);

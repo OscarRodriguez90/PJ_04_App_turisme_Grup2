@@ -164,6 +164,14 @@ body {
     border: 1px solid var(--primary);
 }
 
+.btn-outline:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+    background: #eef2ff;
+    color: #64748b;
+    border-color: #cbd5e1;
+}
+
 .btn-danger {
     background: transparent;
     color: var(--danger);

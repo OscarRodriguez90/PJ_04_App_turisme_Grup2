@@ -568,6 +568,27 @@ class AdminController extends Controller
                     'error' => 'No se puede iniciar la partida porque no hay grupos en esta sala.',
                 ], 422);
             }
+
+            if ($totalGrupos > 5) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No se puede iniciar la partida: una sala puede tener como maximo 5 grupos.',
+                ], 422);
+            }
+
+            $gruposInsuficientes = $sala->equipos()
+                ->withCount('integrantes')
+                ->get()
+                ->filter(fn ($equipo) => (int) $equipo->integrantes_count < 2)
+                ->map(fn ($equipo) => $equipo->nombre_equipo . ' (' . (int) $equipo->integrantes_count . ')')
+                ->values();
+
+            if ($gruposInsuficientes->isNotEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No se puede iniciar la partida: cada grupo debe tener al menos 2 personas. Grupos incompletos: ' . $gruposInsuficientes->implode(', ') . '.',
+                ], 422);
+            }
         }
 
         $sala->update(['estado' => $request->estado]);

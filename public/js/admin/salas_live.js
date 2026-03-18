@@ -37,9 +37,18 @@
             list.innerHTML = grupos.map((grupo) => {
                 const nombre = escapeHtml(grupo.nombre || 'Grupo');
                 const count = Number.isFinite(grupo.integrantes_count) ? grupo.integrantes_count : 0;
-                const etiqueta = count === 1 ? 'jugador' : 'jugadores';
+                let etiqueta = 'jugadores';
+                let extraClass = '';
 
-                return '<li><span>' + nombre + '</span><span class="grupo-count">' + count + ' ' + etiqueta + '</span></li>';
+                if (count < 2) {
+                    etiqueta = 'incompleto';
+                    extraClass = ' grupo-count--warn';
+                } else if (count >= 8) {
+                    etiqueta = 'lleno';
+                    extraClass = ' grupo-count--full';
+                }
+
+                return '<li><span>' + nombre + '</span><span class="grupo-count' + extraClass + '">' + count + '/8 ' + etiqueta + '</span></li>';
             }).join('');
         });
     }
