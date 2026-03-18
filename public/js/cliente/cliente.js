@@ -313,6 +313,12 @@
         }
         state.routeTargetId = null;
         updateDetailButtonState();
+        
+        if (state.selectedLugarId) {
+            els.routeNote.textContent = state.userLocation
+                ? 'Tu ubicación está activa. Ya puedes mostrar la ruta hasta este lugar.'
+                : 'Necesitaremos tu ubicación actual para calcular la ruta.';
+        }
     }
 
     function drawRouteToSelected() {
@@ -345,6 +351,18 @@
                 styles: [{ color: '#0b6ef6', opacity: 0.85, weight: 5 }],
             },
             createMarker: () => null,
+        }).on('routesfound', function(e) {
+            const routes = e.routes;
+            if (routes && routes.length > 0) {
+                const distance = routes[0].summary.totalDistance; // en metros
+                const time = Math.round(routes[0].summary.totalTime / 60); // en minutos
+                
+                let distText = distance < 1000 
+                    ? `${Math.round(distance)} metros` 
+                    : `${(distance / 1000).toFixed(2)} km`;
+                    
+                els.routeNote.innerHTML = `<span style="color:var(--primary); font-weight:600;">Distancia a la ruta: ${distText}</span> (Aprox. ${time} min)`;
+            }
         }).addTo(map);
 
         state.routeTargetId = state.selectedLugarId;
