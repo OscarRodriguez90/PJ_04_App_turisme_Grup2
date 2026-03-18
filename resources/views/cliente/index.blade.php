@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('css/cliente/cliente.css') }}">
     <link rel="stylesheet" href="{{ asset('css/cliente/acceso-sala.css') }}">
 </head>
@@ -29,6 +30,10 @@
                     <button type="submit" class="btn btn-ghost">Salir</button>
                 </form>
             </div>
+
+            <button type="button" class="btn btn-secondary mobile-only-btn" id="closeSidebarBtn" style="margin-top: 0.5rem; justify-content: center;">
+                ← Volver al mapa
+            </button>
 
             <div class="user-card">
                 <div class="avatar">{{ strtoupper(substr($usuario->nombre, 0, 1)) }}</div>
@@ -66,6 +71,11 @@
                     @foreach ($categorias as $categoria)
                         <label class="chip-option">
                             <input type="checkbox" class="category-filter" value="{{ $categoria->id }}" checked>
+                            <span class="chip-icon" style="color: {{ $categoria->color_marcador ?? '#0ea5a4' }}; display: flex; align-items: center;">
+                                @if($categoria->icono_url)
+                                    <i class="{{ $categoria->icono_url }}"></i>
+                                @endif
+                            </span>
                             <span>{{ $categoria->nombre }}</span>
                         </label>
                     @endforeach

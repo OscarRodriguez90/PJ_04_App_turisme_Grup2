@@ -73,6 +73,8 @@
         };
         // CSRF Token for fetch
         window.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        // Current User ID
+        window.currentUserId = {{ isset($user) ? $user->id : 'null' }};
     </script>
     
     <script src="{{ asset('js/admin/usuarios_filtrar.js') }}"></script>

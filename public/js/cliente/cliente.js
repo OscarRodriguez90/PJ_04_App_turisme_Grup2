@@ -29,6 +29,7 @@
         categoryFilters: [...document.querySelectorAll('.category-filter')],
         locateMeButton: document.getElementById('locateMeButton'),
         toggleSidebar: document.getElementById('toggleSidebar'),
+        closeSidebarBtn: document.getElementById('closeSidebarBtn'),
         sidebar: document.querySelector('.sidebar'),
         mapMessage: document.getElementById('mapMessage'),
         emptyState: document.getElementById('emptyState'),
@@ -133,18 +134,25 @@
         });
     }
 
-    function markerHtml(color, active) {
+    function markerHtml(color, active, iconClass) {
         return `
             <div style="
-                width: 18px;
-                height: 18px;
+                width: 24px;
+                height: 24px;
                 border-radius: 999px;
                 background: ${color};
-                border: 3px solid white;
-                box-shadow: 0 8px 18px rgba(20,33,61,.22);
-                transform: ${active ? 'scale(1.15)' : 'scale(1)'};
+                color: #fff;
+                border: 2px solid white;
+                box-shadow: 0 4px 10px rgba(0,0,0,.2);
+                transform: ${active ? 'scale(1.2)' : 'scale(1)'};
                 transition: .2s ease;
-            "></div>
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 13px;
+            ">
+                ${iconClass ? `<i class="${escapeHtml(iconClass)}"></i>` : ''}
+            </div>
         `;
     }
 
@@ -152,9 +160,9 @@
         const marker = L.marker([lugar.latitud, lugar.longitud], {
             icon: L.divIcon({
                 className: 'custom-place-marker',
-                html: markerHtml(lugar.categoria?.color_marcador || '#0b6ef6', active),
-                iconSize: [18, 18],
-                iconAnchor: [9, 9],
+                html: markerHtml(lugar.categoria?.color_marcador || '#0b6ef6', active, lugar.categoria?.icono_url),
+                iconSize: [24, 24],
+                iconAnchor: [12, 12],
             }),
         });
 
@@ -181,9 +189,9 @@
 
             marker.setIcon(L.divIcon({
                 className: 'custom-place-marker',
-                html: markerHtml(lugar.categoria?.color_marcador || '#0b6ef6', isActive),
-                iconSize: [18, 18],
-                iconAnchor: [9, 9],
+                html: markerHtml(lugar.categoria?.color_marcador || '#0b6ef6', isActive, lugar.categoria?.icono_url),
+                iconSize: [24, 24],
+                iconAnchor: [12, 12],
             }));
 
             if (isVisible && !map.hasLayer(marker)) {
@@ -211,7 +219,9 @@
             button.innerHTML = `
                 <div class="place-card__top">
                     <div style="display:flex; gap:.75rem; align-items:flex-start;">
-                        <span class="place-color" style="background:${escapeHtml(lugar.categoria?.color_marcador || '#0b6ef6')}"></span>
+                        <span class="place-color" style="background:${escapeHtml(lugar.categoria?.color_marcador || '#0b6ef6')}">
+                           ${lugar.categoria?.icono_url ? `<i class="${escapeHtml(lugar.categoria.icono_url)}" style="font-size: 13px;"></i>` : ''}
+                        </span>
                         <div>
                             <h4>${escapeHtml(lugar.nombre)}</h4>
                             <p>${escapeHtml(lugar.descripcion || 'Sin descripción disponible.')}</p>
@@ -228,6 +238,13 @@
                 state.selectedLugarId = lugar.id;
                 render();
                 map.flyTo([lugar.latitud, lugar.longitud], 16, { duration: 0.8 });
+                
+                // Ocultar sidebar para ver el mapa directamente en móviles
+                if (window.innerWidth < 1100 && state.isSidebarOpen) {
+                    state.isSidebarOpen = false;
+                    els.sidebar?.classList.remove('is-open');
+                    document.body.classList.remove('sidebar-is-open');
+                }
             });
             els.placesList.appendChild(button);
         });
@@ -243,7 +260,14 @@
         els.emptyState.classList.add('hidden');
         els.placeDetail.classList.remove('hidden');
         els.detailName.textContent = lugar.nombre;
-        els.detailCategory.textContent = lugar.categoria?.nombre || 'Sin categoría';
+        
+        if (lugar.categoria) {
+            const iconHtml = lugar.categoria.icono_url ? `<i class="${escapeHtml(lugar.categoria.icono_url)}" style="margin-right: 4px;"></i>` : '';
+            els.detailCategory.innerHTML = `<span style="color: ${escapeHtml(lugar.categoria.color_marcador || 'var(--primary)')}">${iconHtml}${escapeHtml(lugar.categoria.nombre)}</span>`;
+        } else {
+            els.detailCategory.textContent = 'Sin categoría';
+        }
+        
         els.detailDescription.textContent = lugar.descripcion || 'Este lugar todavía no tiene descripción detallada.';
         els.detailAddress.textContent = lugar.direccion_completa || 'Dirección no disponible';
         els.detailCoordinates.textContent = `${lugar.latitud.toFixed(5)}, ${lugar.longitud.toFixed(5)}`;
@@ -371,7 +395,7 @@
         const filteredLugares = getFilteredLugares();
         const selectedLugarStillVisible = filteredLugares.some((lugar) => lugar.id === state.selectedLugarId);
         if (!selectedLugarStillVisible) {
-            state.selectedLugarId = filteredLugares[0]?.id ?? null;
+            state.selectedLugarId = null;
         }
 
         syncMarkers(filteredLugares);
@@ -407,6 +431,12 @@
     els.toggleSidebar?.addEventListener('click', () => {
         state.isSidebarOpen = !state.isSidebarOpen;
         els.sidebar?.classList.toggle('is-open', state.isSidebarOpen);
+        document.body.classList.toggle('sidebar-is-open', state.isSidebarOpen);
+    });
+    els.closeSidebarBtn?.addEventListener('click', () => {
+        state.isSidebarOpen = false;
+        els.sidebar?.classList.remove('is-open');
+        document.body.classList.remove('sidebar-is-open');
     });
 
     render();
