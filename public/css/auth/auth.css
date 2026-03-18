@@ -21,17 +21,29 @@
 body {
     font-family: 'Inter', sans-serif;
     color: var(--text-main);
-    background-color: var(--bg-mobile);
+    background-color: #064e3b;
     min-height: 100dvh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, #0ea5a4 0%, #064e3b 100%);
+    z-index: -2;
 }
 
 /* ── Layout ── */
 .auth-layout {
     display: grid;
     grid-template-columns: 1fr;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #0ea5a4 0%, #064e3b 100%);
+    min-height: 100dvh;
+    background: transparent;
     position: relative;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 /* Shapes over background for mobile */
@@ -101,10 +113,36 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 2rem 1.5rem;
+    padding: 3rem 1.5rem 2rem;
     position: relative;
     z-index: 2;
-    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+}
+
+/* Back Home Button */
+.back-home {
+    align-self: center;
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.9); /* On mobile it's over dark bg */
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+    z-index: 10;
+}
+.back-home svg {
+    width: 18px;
+    height: 18px;
+}
+.back-home:hover {
+    color: white;
 }
 
 /* Mobile Brand */
@@ -262,6 +300,26 @@ input:focus {
     color: var(--primary-dark);
 }
 
+/* ── Input error & JS validation ── */
+.input-error {
+    background: #fef2f2 !important;
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15) !important;
+    color: var(--danger) !important;
+}
+
+.input-wrapper:has(.input-error) .input-icon {
+    color: var(--danger);
+}
+
+.field-error {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--danger);
+    font-weight: 600;
+}
+
 /* Error/Success Cards */
 .error-card, .success-card {
     display: flex;
@@ -290,6 +348,12 @@ input:focus {
 
 /* Responsive Desktop */
 @media (min-width: 900px) {
+    body {
+        background-color: #f8fafc;
+    }
+    body::before {
+        display: none;
+    }
     .auth-layout {
         grid-template-columns: 1.1fr 0.9fr;
         background: none;
@@ -306,5 +370,11 @@ input:focus {
     .auth-form-container {
         background: #f8fafc; /* Solid background on right side */
         min-height: auto;
+    }
+    .back-home {
+        color: var(--text-muted); /* Darker on solid white background */
+    }
+    .back-home:hover {
+        color: var(--primary);
     }
 }
