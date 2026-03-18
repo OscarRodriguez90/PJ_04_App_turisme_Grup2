@@ -174,9 +174,9 @@
     align-items: center;
 }
 
-/* 
+/*
  * ----------------------------------------
- * Styles for the List View (salas.blade.php) 
+ * Styles for the List View (salas.blade.php)
  * ----------------------------------------
  */
 
@@ -240,6 +240,53 @@
     border-bottom: none;
 }
 
+.grupos-live-block {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.6rem;
+    padding: 0.65rem 0.75rem;
+}
+
+.grupos-live-title {
+    display: block;
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-bottom: 0.45rem;
+}
+
+.grupos-live-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.grupos-live-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: #334155;
+}
+
+.grupo-count {
+    font-size: 0.74rem;
+    color: #475569;
+    background: #e2e8f0;
+    border-radius: 999px;
+    padding: 0.15rem 0.45rem;
+    white-space: nowrap;
+}
+
+.grupos-empty {
+    color: #94a3b8;
+    font-style: italic;
+}
+
 /* Estado Select */
 .gimcana-estado-row {
     display: flex;
@@ -293,4 +340,72 @@
     background-color: #f1f5f9;
     color: #475569;
     border-color: #cbd5e1;
+}
+
+/* Estado solo lectura */
+.estado-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 2px solid transparent;
+    line-height: 1;
+}
+
+.estado-badge.estado-disponible {
+    background-color: #d1fae5;
+    color: #065f46;
+    border-color: #6ee7b7;
+}
+
+.estado-badge.estado-esperando {
+    background-color: #fef3c7;
+    color: #92400e;
+    border-color: #fcd34d;
+}
+
+.estado-badge.estado-jugando {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border-color: #93c5fd;
+}
+
+.estado-badge.estado-finalizada {
+    background-color: #f1f5f9;
+    color: #475569;
+    border-color: #cbd5e1;
+}
+
+.btn-start {
+    color: #0ea5a4;
+    border-color: #99f6e4;
+    background: #ecfeff;
+}
+
+.btn-start:hover {
+    background: #ccfbf1;
+    border-color: #5eead4;
+}
+
+.btn-start:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.btn-reset {
+    color: #b45309;
+    border-color: #fde68a;
+    background: #fffbeb;
+}
+
+.btn-reset:hover {
+    background: #fef3c7;
+    border-color: #fcd34d;
+}
+
+.btn-reset:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
 }

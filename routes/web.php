@@ -38,6 +38,7 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::get('/sala', [SalaController::class, 'index'])->name('sala.index');
     Route::get('/sala/{id}/entrar', [SalaController::class, 'entrar'])->name('sala.entrar');
     Route::get('/sala/{id}', [SalaController::class, 'show'])->name('sala.show');
+    Route::get('/sala/{id}/estado-live', [SalaController::class, 'estadoLive'])->name('sala.estado.live');
     Route::get('/sala/{id}/grupos', [GruposController::class, 'index'])->name('sala.grupos.index');
     Route::post('/sala/{id}/grupos', [GruposController::class, 'store'])->name('sala.grupos.store');
     Route::post('/sala/{id}/grupos/unirse-codigo', [GruposController::class, 'joinByCode'])->name('sala.grupos.joinByCode');
@@ -81,6 +82,7 @@ Route::post('/logout', function () {
 
 // Rutas de Salas (Gimcanas)
 Route::get('/admin/salas', [AdminController::class, 'salas'])->name('admin.salas');
+Route::get('/admin/salas/live-grupos', [AdminController::class, 'salasLiveGrupos'])->name('admin.salas.liveGrupos');
 Route::get('/admin/salas/create', [AdminController::class, 'createSala'])->name('admin.salas.create');
 Route::post('/admin/salas', [AdminController::class, 'storeSala'])->name('admin.salas.store');
 Route::get('/admin/salas/{id}/edit', [AdminController::class, 'editSala'])->name('admin.salas.edit');
