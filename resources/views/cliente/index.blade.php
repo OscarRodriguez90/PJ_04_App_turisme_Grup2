@@ -133,7 +133,11 @@
                     <p>Verás aquí el resumen, la dirección, la categoría y el acceso a la ruta desde tu posición.</p>
                 </div>
 
-                <article class="detail-card hidden" id="placeDetail">
+                <article class="detail-card hidden" id="placeDetail" style="position: relative;">
+                    <button type="button" id="closeDetailButton" style="position: absolute; top: 1.5rem; right: 1.5rem; background: rgba(0,0,0,0.5); color: #fff; border: 0; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: .2s; z-index: 10;" onmouseover="this.style.background='rgba(0,0,0,0.7)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    <img id="detailImage" src="" alt="Imagen del lugar" style="width: 100%; height: 180px; object-fit: cover; border-radius: .5rem; margin-bottom: 1rem; border: 1px solid var(--border);">
                     <div class="detail-header">
                         <div>
                             <p class="eyebrow" id="detailCategory">Categoría</p>

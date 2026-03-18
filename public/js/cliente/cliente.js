@@ -35,6 +35,8 @@
         mapMessage: document.getElementById('mapMessage'),
         emptyState: document.getElementById('emptyState'),
         placeDetail: document.getElementById('placeDetail'),
+        closeDetailButton: document.getElementById('closeDetailButton'),
+        detailImage: document.getElementById('detailImage'),
         detailName: document.getElementById('detailName'),
         detailCategory: document.getElementById('detailCategory'),
         detailDescription: document.getElementById('detailDescription'),
@@ -262,6 +264,9 @@
         els.placeDetail.classList.remove('hidden');
         els.detailName.textContent = lugar.nombre;
         
+        let imgName = lugar.imagen ? lugar.imagen : 'default_lugar.jpg';
+        els.detailImage.src = `/img/lugares/${imgName}`;
+        
         if (lugar.categoria) {
             const iconHtml = lugar.categoria.icono_url ? `<i class="${escapeHtml(lugar.categoria.icono_url)}" style="margin-right: 4px;"></i>` : '';
             els.detailCategory.innerHTML = `<span style="color: ${escapeHtml(lugar.categoria.color_marcador || 'var(--primary)')}">${iconHtml}${escapeHtml(lugar.categoria.nombre)}</span>`;
@@ -452,6 +457,14 @@
             map.flyTo([lugar.latitud, lugar.longitud], 16, { duration: 0.8 });
         }
     });
+    
+    els.closeDetailButton?.addEventListener('click', () => {
+        state.selectedLugarId = null;
+        clearRoute();
+        els.mapMessage.textContent = 'Has deseleccionado el lugar.';
+        render();
+    });
+
     els.detailFavoriteButton.addEventListener('click', () => {
         if (state.selectedLugarId) {
             toggleFavorito(state.selectedLugarId);
