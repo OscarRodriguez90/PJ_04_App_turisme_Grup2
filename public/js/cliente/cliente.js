@@ -12,6 +12,7 @@
         userLocation: null,
         markers: new Map(),
         routingControl: null,
+        routeTargetId: null,
         isSidebarOpen: false,
     };
 
@@ -276,6 +277,8 @@
         els.routeNote.textContent = state.userLocation
             ? 'Tu ubicación está activa. Ya puedes mostrar la ruta hasta este lugar.'
             : 'Necesitaremos tu ubicación actual para calcular la ruta.';
+
+        updateDetailButtonState();
     }
 
     function updateCounters(filteredLugares) {
@@ -285,11 +288,26 @@
         els.radiusValue.textContent = els.radiusRange.value;
     }
 
+    function updateDetailButtonState() {
+        if (!els.routeButton) return;
+        if (state.routingControl && state.routeTargetId === state.selectedLugarId) {
+            els.routeButton.textContent = 'Dejar de mostrar la ruta';
+            els.routeButton.classList.remove('btn-primary');
+            els.routeButton.classList.add('btn-secondary'); // Se usa btn-secondary para denotar accíón alternativa
+        } else {
+            els.routeButton.textContent = 'Mostrar ruta';
+            els.routeButton.classList.remove('btn-secondary');
+            els.routeButton.classList.add('btn-primary');
+        }
+    }
+
     function clearRoute() {
         if (state.routingControl) {
             map.removeControl(state.routingControl);
             state.routingControl = null;
         }
+        state.routeTargetId = null;
+        updateDetailButtonState();
     }
 
     function drawRouteToSelected() {
@@ -324,6 +342,8 @@
             createMarker: () => null,
         }).addTo(map);
 
+        state.routeTargetId = state.selectedLugarId;
+        updateDetailButtonState();
         els.mapMessage.textContent = `Ruta calculada hasta ${lugar.nombre}.`;
     }
 
@@ -416,7 +436,16 @@
     els.searchInput.addEventListener('input', render);
     els.categoryFilters.forEach((checkbox) => checkbox.addEventListener('change', render));
     els.locateMeButton.addEventListener('click', () => locateUser(render));
-    els.routeButton.addEventListener('click', drawRouteToSelected);
+    
+    els.routeButton.addEventListener('click', () => {
+        if (state.routingControl && state.routeTargetId === state.selectedLugarId) {
+            clearRoute();
+            els.mapMessage.textContent = 'La ruta se ha ocultado.';
+        } else {
+            drawRouteToSelected();
+        }
+    });
+
     els.centerButton.addEventListener('click', () => {
         const lugar = getLugarById(state.selectedLugarId);
         if (lugar) {
