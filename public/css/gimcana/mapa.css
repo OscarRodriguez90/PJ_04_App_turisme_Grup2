@@ -1,13 +1,12 @@
 :root {
-    --bg: #f3f4f6;
     --surface: #ffffff;
     --text: #1f2937;
     --muted: #6b7280;
     --primary: #11a8ad;
     --primary-dark: #0e868b;
-    --border: #e5e7eb;
     --ok-bg: #eafaf0;
     --ok-border: #b7ebcc;
+    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.16);
 }
 
 * {
@@ -16,119 +15,238 @@
 
 html,
 body {
+    width: 100%;
+    height: 100%;
     margin: 0;
-    min-height: 100%;
     font-family: 'Inter', sans-serif;
-    background: radial-gradient(circle at 10% 10%, #ffffff 0%, #f3f4f6 55%, #eceff3 100%);
     color: var(--text);
+    overflow: hidden;
 }
 
-body {
+.mapa-screen {
+    position: relative;
+    width: 100vw;
+    height: 100dvh;
+    background: #dbeafe;
+}
+
+#reto-map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Move Leaflet zoom controls away from top overlays. */
+#reto-map .leaflet-top.leaflet-left {
+    top: auto;
+    bottom: 224px;
+    left: 10px;
+}
+
+.mapa-topbar {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    z-index: 1000;
     display: flex;
-    justify-content: center;
-}
-
-.gimcana-app {
-    width: min(100%, 420px);
-    min-height: 100vh;
-    background: var(--bg);
-    border-inline: 1px solid var(--border);
-}
-
-.screen-header {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    display: grid;
-    grid-template-columns: 44px 1fr 44px;
     align-items: center;
-    padding: 16px 18px 12px;
-    background: rgba(243, 244, 246, 0.95);
-    backdrop-filter: blur(8px);
-}
-
-.screen-header h1 {
-    margin: 0;
-    text-align: center;
-    font-size: 1.08rem;
-    font-weight: 800;
-}
-
-.header-back,
-.header-spacer {
-    width: 36px;
-    height: 36px;
+    gap: 10px;
 }
 
 .header-back {
+    width: 42px;
+    height: 42px;
     display: grid;
     place-items: center;
-    border-radius: 10px;
+    border-radius: 12px;
     text-decoration: none;
-    color: var(--text);
-    background: var(--surface);
-    border: 1px solid var(--border);
+    color: #0f172a;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(4px);
 }
 
-.screen-content {
-    padding: 0 18px 20px;
-    display: grid;
-    gap: 12px;
+.topbar-title {
+    min-width: 0;
+    flex: 1;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(4px);
+}
+
+.topbar-title h1 {
+    margin: 0;
+    font-size: 0.96rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .eyebrow {
-    margin: 0 0 0.35rem;
+    margin: 0 0 0.28rem;
     color: var(--primary-dark);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 800;
 }
 
 .alert-ok {
+    position: absolute;
+    z-index: 1000;
+    left: 12px;
+    right: 12px;
+    top: 76px;
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px;
+    padding: 10px 12px;
     border-radius: 12px;
-    background: var(--ok-bg);
+    background: rgba(234, 250, 240, 0.96);
     border: 1px solid var(--ok-border);
     color: #0f6f3f;
-    margin-top: 8px;
+    box-shadow: var(--shadow-soft);
 }
 
-.status-card,
-.hint-card,
-.map-card,
-.location-card {
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    padding: 14px;
+.hint-card {
+    position: absolute;
+    z-index: 900;
+    left: 12px;
+    right: 12px;
+    top: 76px;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(4px);
 }
 
-.status-card h2,
-.location-card h3 {
-    margin: 0;
-}
-
-.status-card p,
-.location-card p {
-    margin: 6px 0 0;
-    color: var(--muted);
+.alert-ok + .hint-card {
+    top: 124px;
 }
 
 .hint-text {
     margin: 0;
     color: #0f172a;
-    line-height: 1.55;
+    line-height: 1.35;
+    font-size: 0.88rem;
     font-weight: 500;
 }
 
-#reto-map {
-    width: 100%;
-    height: 260px;
+.btn-locate-me {
+    position: absolute;
+    right: 12px;
+    bottom: 192px;
+    z-index: 1000;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
     border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.84rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+}
+
+.btn-locate-me:hover {
+    background: var(--primary-dark);
+}
+
+.map-message {
+    position: absolute;
+    z-index: 1000;
+    left: 12px;
+    right: 12px;
+    bottom: 202px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    display: none;
+    box-shadow: var(--shadow-soft);
+}
+
+.map-message--success {
+    background: #d4f8d4;
+    color: #1b5e20;
+    display: block;
+}
+
+.map-message--error {
+    background: #ffe0e0;
+    color: #b91c1c;
+    display: block;
+}
+
+.map-message--info {
+    background: #e3f2fd;
+    color: #0d47a1;
+    display: block;
+}
+
+.mapa-bottomsheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 950;
+    background: rgba(255, 255, 255, 0.98);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.location-head {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.location-head > div {
+    min-width: 0;
+    flex: 1;
+}
+
+.location-head h3 {
+    margin: 0;
+    font-size: 0.96rem;
+    line-height: 1.2;
+}
+
+.location-head p {
+    margin: 3px 0 0;
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.distance-info {
+    max-width: 120px;
+    text-align: center;
+    border-left: 1px solid #e5e7eb;
+    padding-left: 10px;
+}
+
+.distance-text {
+    margin: 0;
+    font-weight: 700;
+    color: var(--primary-dark);
+    font-size: 1rem;
+}
+
+.mapa-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
 }
 
 .btn-primary,
@@ -141,7 +259,7 @@ body {
     justify-content: center;
     gap: 8px;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 0.94rem;
     text-decoration: none;
 }
 
@@ -155,94 +273,38 @@ body {
     color: #12888e;
 }
 
-    .map-card {
-        position: relative;
+@media (min-width: 900px) {
+    .mapa-topbar,
+    .hint-card,
+    .alert-ok,
+    .map-message {
+        left: 20px;
+        right: auto;
+        width: min(520px, calc(100vw - 40px));
+    }
+
+    .mapa-topbar {
+        right: auto;
+    }
+
+    .mapa-bottomsheet {
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
+        border-radius: 16px;
     }
 
     .btn-locate-me {
-        position: absolute;
-        bottom: 12px;
-        right: 12px;
-        z-index: 10;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 12px;
-        background: var(--primary);
-        color: #ffffff;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 8px rgba(17, 168, 173, 0.3);
+        right: 28px;
+        bottom: 206px;
     }
 
-    .btn-locate-me:hover {
-        background: var(--primary-dark);
-        box-shadow: 0 4px 12px rgba(17, 168, 173, 0.4);
+    #reto-map .leaflet-top.leaflet-left {
+        bottom: 170px;
+        left: 18px;
     }
 
-    .btn-locate-me:active {
-        transform: scale(0.95);
+    .mapa-actions {
+        grid-template-columns: 1fr 1fr;
     }
-
-    .map-message {
-        padding: 12px;
-        border-radius: 10px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        display: none;
-        margin-bottom: 12px;
-    }
-
-    .map-message--success {
-        background: #d4f8d4;
-        color: #1b5e20;
-        display: block;
-    }
-
-    .map-message--error {
-        background: #ffe0e0;
-        color: #b91c1c;
-        display: block;
-    }
-
-    .map-message--info {
-        background: #e3f2fd;
-        color: #0d47a1;
-        display: block;
-    }
-
-    .location-info {
-        display: flex;
-        gap: 1rem;
-    }
-
-    .location-info > div {
-        flex: 1;
-    }
-
-    .location-info h3 {
-        margin: 0;
-        font-size: 1rem;
-    }
-
-    .location-info p {
-        margin: 0;
-        font-size: 0.85rem;
-    }
-
-    .distance-info {
-        text-align: center;
-        padding: 0 0 0 1rem;
-        border-left: 1px solid var(--border);
-    }
-
-    .distance-text {
-        margin: 0;
-        font-weight: 600;
-        color: var(--primary);
-        font-size: 1.1rem;
-    }
+}

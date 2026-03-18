@@ -13,73 +13,68 @@
     <link rel="stylesheet" href="{{ asset('css/gimcana/mapa.css') }}">
 </head>
 <body>
-    <div class="gimcana-app">
-        <header class="screen-header">
+    <div class="mapa-screen" aria-label="Mapa del destino">
+        <div
+            id="reto-map"
+            data-lat="{{ (float) ($retoActual->lugar->latitud ?? 41.3874) }}"
+            data-lng="{{ (float) ($retoActual->lugar->longitud ?? 2.1686) }}"
+            data-nombre="{{ $retoActual->lugar->nombre ?? 'Destino' }}"
+        ></div>
+
+        <header class="mapa-topbar">
             <a href="{{ route('sala.show', $sala->id) }}" class="header-back" aria-label="Volver a sala">
                 <i class="bi bi-arrow-left"></i>
             </a>
-            <h1>Siguiente punto</h1>
-            <span class="header-spacer" aria-hidden="true"></span>
+            <div class="topbar-title">
+                <p class="eyebrow">Equipo {{ $equipo->nombre_equipo }}</p>
+                <h1>Reto {{ $retoActual->orden }} de {{ $sala->pruebas()->count() }}</h1>
+            </div>
         </header>
 
-        <main class="screen-content">
-            @if(session('success'))
-                <div class="alert-ok">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>{{ session('success') }}</span>
+        @if(session('success'))
+            <div class="alert-ok">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
+        <section class="hint-card">
+            <p class="eyebrow">Pista del reto</p>
+            <p class="hint-text">{{ $retoActual->pista }}</p>
+        </section>
+
+        <button type="button" id="locateMeButton" class="btn-locate-me" aria-label="Mi ubicación">
+            <i class="bi bi-crosshair2"></i>
+            Mi ubicación
+        </button>
+
+        <div id="mapMessage" class="map-message"></div>
+
+        <section class="mapa-bottomsheet">
+            <div class="location-head">
+                <div>
+                    <p class="eyebrow">Destino actual</p>
+                    <h3>{{ $retoActual->lugar->nombre ?? 'Lugar del reto' }}</h3>
+                    <p>{{ $retoActual->lugar->direccion_completa ?? 'Dirección no disponible' }}</p>
                 </div>
-            @endif
-
-            <section class="status-card">
-                <p class="eyebrow">Equipo</p>
-                <h2>{{ $equipo->nombre_equipo }}</h2>
-                <p>Reto {{ $retoActual->orden }} de {{ $sala->pruebas()->count() }}</p>
-            </section>
-
-            <section class="hint-card">
-                <p class="eyebrow">Pista del reto</p>
-                <p class="hint-text">{{ $retoActual->pista }}</p>
-            </section>
-
-            <section class="map-card" aria-label="Mapa del destino">
-                <div
-                    id="reto-map"
-                    data-lat="{{ (float) ($retoActual->lugar->latitud ?? 41.3874) }}"
-                    data-lng="{{ (float) ($retoActual->lugar->longitud ?? 2.1686) }}"
-                    data-nombre="{{ $retoActual->lugar->nombre ?? 'Destino' }}"
-                ></div>
-                <button type="button" id="locateMeButton" class="btn-locate-me" aria-label="Mi ubicación">
-                    <i class="bi bi-crosshair2"></i>
-                    Mi ubicación
-                </button>
-            </section>
-
-            <section class="location-card">
-                <div class="location-info">
-                    <div>
-                        <p class="eyebrow">Destino actual</p>
-                        <h3>{{ $retoActual->lugar->nombre ?? 'Lugar del reto' }}</h3>
-                        <p>{{ $retoActual->lugar->direccion_completa ?? 'Dirección no disponible' }}</p>
-                    </div>
-                    <div class="distance-info">
-                        <p class="eyebrow">Distancia</p>
-                        <p id="distanceDisplay" class="distance-text">Obtén tu ubicación</p>
-                    </div>
+                <div class="distance-info">
+                    <p class="eyebrow">Distancia</p>
+                    <p id="distanceDisplay" class="distance-text">Obtén tu ubicación</p>
                 </div>
-            </section>
+            </div>
 
-            <div id="mapMessage" class="map-message"></div>
+            <div class="mapa-actions">
+                <a href="{{ route('gimcana.pregunta', ['reto' => $retoActual->id]) }}" class="btn-primary">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    Ya hemos llegado
+                </a>
 
-            <a href="{{ route('gimcana.pregunta', ['reto' => $retoActual->id]) }}" class="btn-primary">
-                <i class="bi bi-geo-alt-fill"></i>
-                Ya hemos llegado
-            </a>
-
-            <a href="{{ route('gimcana.progreso') }}" class="btn-ghost">
-                <i class="bi bi-list-check"></i>
-                Ver progreso
-            </a>
-        </main>
+                <a href="{{ route('gimcana.progreso') }}" class="btn-ghost">
+                    <i class="bi bi-list-check"></i>
+                    Ver progreso
+                </a>
+            </div>
+        </section>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
