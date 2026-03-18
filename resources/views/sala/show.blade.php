@@ -61,10 +61,6 @@
                             <i class="bi bi-arrow-counterclockwise"></i> Volver a empezar retos
                         </button>
                     </form>
-                @else
-                    <a href="{{ route('gimcana.mapa') }}" class="btn-outline-small btn-start-retos">
-                        <i class="bi bi-play-circle"></i> Empezar retos
-                    </a>
                 @endif
             </div>
         </section>
@@ -162,9 +158,17 @@
         window.salaConfig = {
             crearUrl:  '{{ route('sala.equipo.crear', $sala->id) }}',
             salirUrl:  '{{ route('sala.equipo.salir', $sala->id) }}',
+            estadoLiveUrl: '{{ route('sala.estado.live', $sala->id) }}',
+            mapaUrl: '{{ route('gimcana.mapa') }}',
             csrfToken: '{{ csrf_token() }}',
             salaId:    @json($salaId),
-            miEquipoId: @json($miEquipoId)
+            miEquipoId: @json($miEquipoId),
+            salaEstado: @json($sala->estado)
+        };
+
+        window.salaFlash = {
+            success: @json(session('success')),
+            error: @json(session('error'))
         };
     </script>
     <script src="{{ asset('js/sala/sala.js') }}"></script>

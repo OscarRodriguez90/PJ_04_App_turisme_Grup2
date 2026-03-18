@@ -42,6 +42,54 @@
         setTimeout(() => location.reload(), 600);
     }
 
+    function mostrarFlashServidorSiExiste() {
+        if (!window.salaFlash) return;
+
+        if (window.salaFlash.success) {
+            mostrarNotificacion(window.salaFlash.success, false);
+            return;
+        }
+
+        if (window.salaFlash.error) {
+            mostrarNotificacion(window.salaFlash.error, true);
+        }
+    }
+
+    function activarAutoEntradaGimcana() {
+        if (!config || !config.miEquipoId || !config.estadoLiveUrl || !config.mapaUrl) {
+            return;
+        }
+
+        if (config.salaEstado === 'jugando') {
+            window.location.href = config.mapaUrl;
+            return;
+        }
+
+        const checkEstado = async () => {
+            try {
+                const res = await fetch(config.estadoLiveUrl, {
+                    headers: {
+                        Accept: 'application/json',
+                    },
+                });
+
+                if (!res.ok) {
+                    return;
+                }
+
+                const payload = await res.json();
+                if (payload && payload.estado === 'jugando' && payload.miEquipoId) {
+                    window.location.href = config.mapaUrl;
+                }
+            } catch (_) {
+                // Keep polling in next cycle.
+            }
+        };
+
+        checkEstado();
+        window.setInterval(checkEstado, 5000);
+    }
+
     // ── Modal helpers ────────────────────────────────────────
     function abrirModalCrear() {
         const modal = document.getElementById('modalCrear');
@@ -116,5 +164,8 @@
     window.crearEquipo     = crearEquipo;
     window.unirseEquipo    = unirseEquipo;
     window.salirEquipo     = salirEquipo;
+
+    mostrarFlashServidorSiExiste();
+    activarAutoEntradaGimcana();
 
 }());

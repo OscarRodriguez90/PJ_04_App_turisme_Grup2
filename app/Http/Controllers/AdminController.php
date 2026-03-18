@@ -354,10 +354,43 @@ class AdminController extends Controller
     public function salas()
     {
         $user = Usuario::first();
-        $salas = Sala::with(['pruebas.lugar'])->get();
+        $salas = Sala::with([
+            'pruebas.lugar',
+            'equipos' => fn ($query) => $query->withCount('integrantes')->orderBy('id'),
+        ])->get();
         $totalSalas = $salas->count();
 
         return view('admin.salas', compact('salas', 'user', 'totalSalas'));
+    }
+
+    public function salasLiveGrupos()
+    {
+        $salas = Sala::query()
+            ->select('id')
+            ->with([
+                'equipos' => fn ($query) => $query
+                    ->select('id', 'numero_equipo', 'nombre_equipo')
+                    ->withCount('integrantes')
+                    ->orderBy('id'),
+            ])
+            ->get();
+
+        $payload = $salas->map(function (Sala $sala) {
+            return [
+                'id' => $sala->id,
+                'grupos' => $sala->equipos->map(function ($equipo) {
+                    return [
+                        'id' => $equipo->id,
+                        'nombre' => $equipo->nombre_equipo,
+                        'integrantes_count' => (int) $equipo->integrantes_count,
+                    ];
+                })->values(),
+            ];
+        })->values();
+
+        return response()->json([
+            'salas' => $payload,
+        ]);
     }
 
     public function createSala()
@@ -525,6 +558,17 @@ class AdminController extends Controller
         $request->validate([
             'estado' => 'required|in:disponible,esperando,jugando,finalizada',
         ]);
+
+        if ($request->estado === 'jugando') {
+            $totalGrupos = $sala->equipos()->count();
+
+            if ($totalGrupos === 0) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No se puede iniciar la partida porque no hay grupos en esta sala.',
+                ], 422);
+            }
+        }
 
         $sala->update(['estado' => $request->estado]);
 
