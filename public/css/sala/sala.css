@@ -206,6 +206,14 @@ body {
 
 .btn-outline-small:hover { background: var(--primary-light); }
 
+.btn-outline-small:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #64748b;
+}
+
 .btn-start-retos {
     margin-top: 0.6rem;
     text-decoration: none;

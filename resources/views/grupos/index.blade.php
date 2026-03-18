@@ -73,18 +73,23 @@
             </div>
 
             @forelse($equipos as $equipo)
-                @php $esMio = $miEquipo && $miEquipo->id === $equipo->id; @endphp
+                @php
+                    $esMio = $miEquipo && $miEquipo->id === $equipo->id;
+                    $equipoLleno = (int) $equipo->integrantes_count >= 8;
+                @endphp
                 <article class="group-card {{ $esMio ? 'is-mine' : '' }}">
                     <div>
                         <strong>{{ $equipo->nombre_equipo }}</strong>
                         <p>Codigo: #{{ $equipo->codigo_invitacion }}</p>
                         <p>Lider: {{ $equipo->lider->nombre ?? 'Sin lider' }}</p>
-                        <p>Miembros: {{ $equipo->integrantes_count }}</p>
+                        <p>Miembros: {{ $equipo->integrantes_count }}/8</p>
                     </div>
                     @if($esMio)
                         <span class="mine-pill">Tu grupo</span>
                     @elseif(!$miEquipo)
-                        <button class="btn btn-outline" data-action="unirse-grupo" data-equipo-id="{{ $equipo->id }}">Unirme</button>
+                        <button class="btn btn-outline" data-action="unirse-grupo" data-equipo-id="{{ $equipo->id }}" {{ $equipoLleno ? 'disabled' : '' }}>
+                            {{ $equipoLleno ? 'Grupo lleno' : 'Unirme' }}
+                        </button>
                     @endif
                 </article>
             @empty

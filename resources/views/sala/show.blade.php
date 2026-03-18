@@ -85,12 +85,15 @@
             </h2>
 
             @forelse($equipos as $equipo)
-                @php $esMio = $miEquipo && $miEquipo->id === $equipo->id; @endphp
+                @php
+                    $esMio = $miEquipo && $miEquipo->id === $equipo->id;
+                    $equipoLleno = (int) $equipo->integrantes_count >= 8;
+                @endphp
                 <div class="equipo-card {{ $esMio ? 'equipo-card--mine' : '' }}">
                     <div class="equipo-card-header">
                         <span class="equipo-nombre">{{ $equipo->nombre_equipo }}</span>
                         <span class="equipo-count">
-                            <i class="bi bi-person"></i> {{ $equipo->integrantes_count }}
+                            <i class="bi bi-person"></i> {{ $equipo->integrantes_count }}/8
                         </span>
                     </div>
                     <p class="equipo-lider">
@@ -98,8 +101,9 @@
                         Líder: {{ $equipo->lider->nombre ?? '–' }}
                     </p>
                     @if(!$miEquipo)
-                        <button class="btn-outline-small" onclick="unirseEquipo({{ $equipo->id }})">
-                            <i class="bi bi-person-plus"></i> Unirse
+                        <button class="btn-outline-small" onclick="unirseEquipo({{ $equipo->id }})" {{ $equipoLleno ? 'disabled' : '' }}>
+                            <i class="bi {{ $equipoLleno ? 'bi-lock-fill' : 'bi-person-plus' }}"></i>
+                            {{ $equipoLleno ? 'Grupo lleno' : 'Unirse' }}
                         </button>
                     @elseif($esMio)
                         <span class="badge-mine"><i class="bi bi-check-circle-fill"></i> Tu equipo</span>

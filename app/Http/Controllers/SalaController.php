@@ -13,6 +13,9 @@ use Illuminate\View\View;
 
 class SalaController extends Controller
 {
+    private const MAX_GRUPOS_POR_SALA = 5;
+    private const MAX_INTEGRANTES_POR_EQUIPO = 8;
+
     public function index(): View
     {
         $salas = Sala::where('estado', '!=', 'finalizada')
@@ -104,6 +107,13 @@ class SalaController extends Controller
             return response()->json(['error' => 'Ya estás en un equipo en esta sala.'], 422);
         }
 
+        $totalEquiposSala = Equipo::where('numero_equipo', $sala->id)->count();
+        if ($totalEquiposSala >= self::MAX_GRUPOS_POR_SALA) {
+            return response()->json([
+                'error' => 'Esta sala ya tiene el máximo de ' . self::MAX_GRUPOS_POR_SALA . ' grupos.',
+            ], 422);
+        }
+
         DB::transaction(function () use ($request, $sala, $usuario) {
             $equipo = Equipo::create([
                 'numero_equipo' => $sala->id,
@@ -131,6 +141,13 @@ class SalaController extends Controller
 
         if ($yaEnEquipo) {
             return response()->json(['error' => 'Ya estás en un equipo en esta sala.'], 422);
+        }
+
+        $integrantesCount = $equipoModel->integrantes()->count();
+        if ($integrantesCount >= self::MAX_INTEGRANTES_POR_EQUIPO) {
+            return response()->json([
+                'error' => 'Este grupo ya alcanzó el máximo de ' . self::MAX_INTEGRANTES_POR_EQUIPO . ' personas.',
+            ], 422);
         }
 
         $equipoModel->integrantes()->syncWithoutDetaching([$usuario->id]);

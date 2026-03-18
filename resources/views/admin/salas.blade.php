@@ -90,9 +90,22 @@
                             <strong class="grupos-live-title">Grupos en la sala (en vivo)</strong>
                             <ul class="grupos-live-list js-grupos-live-list">
                                 @forelse($sala->equipos as $equipo)
+                                    @php
+                                        $count = (int) $equipo->integrantes_count;
+                                        $statusClass = $count < 2 ? 'grupo-count--warn' : ($count >= 8 ? 'grupo-count--full' : '');
+                                    @endphp
                                     <li>
                                         <span>{{ $equipo->nombre_equipo }}</span>
-                                        <span class="grupo-count">{{ $equipo->integrantes_count }} jugadores</span>
+                                        <span class="grupo-count {{ $statusClass }}">
+                                            {{ $count }}/8
+                                            @if($count < 2)
+                                                incompleto
+                                            @elseif($count >= 8)
+                                                lleno
+                                            @else
+                                                jugadores
+                                            @endif
+                                        </span>
                                     </li>
                                 @empty
                                     <li class="grupos-empty">Sin grupos en esta sala</li>
