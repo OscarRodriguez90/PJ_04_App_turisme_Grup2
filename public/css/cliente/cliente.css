@@ -384,12 +384,26 @@ input[type="range"] {
     border-radius: 0.625rem;
 }
 
-.switch-card,
-.chip-option {
+.switch-card {
     display: flex;
     align-items: center;
     gap: .7rem;
     padding: .9rem 1rem;
+}
+
+.chip-option {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .6rem .5rem;
+    min-width: 0;
+}
+
+.chip-option span:last-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.85rem;
 }
 
 .chips-grid {
@@ -457,11 +471,15 @@ input[type="range"] {
 }
 
 .place-color {
-    width: 12px;
-    height: 12px;
-    border-radius: 999px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
     flex-shrink: 0;
-    margin-top: .4rem;
+    margin-top: .15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
 }
 
 .content-area {
@@ -469,6 +487,12 @@ input[type="range"] {
     grid-template-rows: auto minmax(320px, 50vh) auto;
     gap: 1rem;
     padding: 1rem;
+}
+
+@media (max-width: 1099px) {
+    body.sidebar-is-open .content-area {
+        display: none;
+    }
 }
 
 .mobile-topbar {
@@ -553,6 +577,10 @@ input[type="range"] {
     display: none;
 }
 
+.mobile-only-btn {
+    display: flex;
+}
+
 @media (min-width: 768px) {
     .landing-hero {
         grid-template-columns: 1.1fr .9fr;
@@ -581,6 +609,10 @@ input[type="range"] {
         overflow: hidden;
         position: sticky;
         top: 0;
+    }
+
+    .mobile-only-btn {
+        display: none !important;
     }
 
     .content-area {
