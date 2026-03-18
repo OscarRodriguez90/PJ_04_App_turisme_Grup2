@@ -258,6 +258,11 @@ class GimcanaController extends Controller
             return redirect()->route('sala.index')->with('error', 'Sala no valida para este equipo.');
         }
 
+        if ($sala->estado === 'esperando') {
+            return redirect()->route('sala.show', $sala->id)
+                ->with('success', 'La partida ha sido reiniciada por el administrador. Volved a entrar cuando os avisen.');
+        }
+
         $pivotId = DB::table('tbl_equipo_usuarios')
             ->where('id_equipo', $equipo->id)
             ->where('id_usuario', $usuario->id)

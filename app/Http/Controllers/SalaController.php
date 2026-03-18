@@ -72,6 +72,21 @@ class SalaController extends Controller
         return view('sala.show', compact('sala', 'miEquipo', 'equipos', 'retosCompletados'));
     }
 
+    public function estadoLive(Request $request, int $id): JsonResponse
+    {
+        $sala = Sala::findOrFail($id);
+        $usuario = Auth::user();
+
+        $miEquipoId = Equipo::where('numero_equipo', $sala->id)
+            ->whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id))
+            ->value('id');
+
+        return response()->json([
+            'estado' => $sala->estado,
+            'miEquipoId' => $miEquipoId ? (int) $miEquipoId : null,
+        ]);
+    }
+
     public function crearEquipo(Request $request, int $id): JsonResponse
     {
         $sala = Sala::findOrFail($id);

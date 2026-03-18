@@ -70,20 +70,13 @@
 
                         <div class="gimcana-estado-row">
                             <label class="estado-label">Estado:</label>
-                            <select class="estado-select estado-{{ $sala->estado }}"
-                                    data-sala-id="{{ $sala->id }}"
-                                    onchange="cambiarEstado(this)">
-                                <option value="disponible" {{ $sala->estado === 'disponible' ? 'selected' : '' }}>Disponible</option>
-                                <option value="esperando" {{ $sala->estado === 'esperando' ? 'selected' : '' }}>Esperando</option>
-                                <option value="jugando" {{ $sala->estado === 'jugando' ? 'selected' : '' }}>Jugando</option>
-                                <option value="finalizada" {{ $sala->estado === 'finalizada' ? 'selected' : '' }}>Finalizada</option>
-                            </select>
+                            <span class="estado-badge estado-{{ $sala->estado }}">{{ ucfirst($sala->estado) }}</span>
                         </div>
-                        
+
                         @if($sala->descripcion)
                         <p style="margin: 0; font-size: 0.875rem; color: #64748b;">{{ $sala->descripcion }}</p>
                         @endif
-                        
+
                         <div>
                             <strong style="font-size: 0.8rem; color: #64748b; text-transform: uppercase;">Lugares Asignados ({{ $sala->pruebas->count() }}/5)</strong>
                             <ul class="lugar-list" style="margin-top: 0.5rem;">
@@ -93,7 +86,46 @@
                             </ul>
                         </div>
 
+                        <div class="grupos-live-block" data-sala-id="{{ $sala->id }}">
+                            <strong class="grupos-live-title">Grupos en la sala (en vivo)</strong>
+                            <ul class="grupos-live-list js-grupos-live-list">
+                                @forelse($sala->equipos as $equipo)
+                                    <li>
+                                        <span>{{ $equipo->nombre_equipo }}</span>
+                                        <span class="grupo-count">{{ $equipo->integrantes_count }} jugadores</span>
+                                    </li>
+                                @empty
+                                    <li class="grupos-empty">Sin grupos en esta sala</li>
+                                @endforelse
+                            </ul>
+                        </div>
+
                         <div class="lugar-actions" style="position: static; opacity: 1; transform: none; display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: auto;">
+                            @if($sala->estado !== 'jugando')
+                            <button
+                                type="button"
+                                class="btn-action btn-start"
+                                onclick="empezarGimcana(this, {{ $sala->id }})"
+                                title="Empezar Gimcana"
+                            >
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </button>
+                            @endif
+                            @if($sala->estado === 'jugando')
+                            <button
+                                type="button"
+                                class="btn-action btn-reset"
+                                onclick="reiniciarPartida(this, {{ $sala->id }})"
+                                title="Reiniciar partida"
+                            >
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="1 4 1 10 7 10"></polyline>
+                                    <path d="M3.51 15a9 9 0 1 0 .49-9.5L1 10"></path>
+                                </svg>
+                            </button>
+                            @endif
                             <a href="{{ route('admin.salas.edit', $sala->id) }}" class="btn-action btn-edit" title="Editar Gimcana" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
                                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -108,7 +140,7 @@
                             </button>
                         </div>
 
-                        
+
                     </div>
                     @endforeach
                 </div>
@@ -122,44 +154,11 @@
     <script src="{{ asset('js/admin/validaciones_salas.js') }}"></script>
     <script src="{{ asset('js/admin/salas_alerts.js') }}"></script>
     <script>
-        function cambiarEstado(selectEl) {
-            const salaId = selectEl.dataset.salaId;
-            const nuevoEstado = selectEl.value;
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-
-            fetch(`/admin/salas/${salaId}/estado`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ estado: nuevoEstado })
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('Error del servidor');
-                return res.json();
-            })
-            .then(data => {
-                // Update select class for color
-                selectEl.className = 'estado-select estado-' + nuevoEstado;
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Estado actualizado',
-                    text: `La gimcana ahora está "${nuevoEstado}".`,
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-            })
-            .catch(err => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'No se pudo cambiar el estado.'
-                });
-            });
-        }
+        window.adminSalasConfig = {
+            liveGruposUrl: '{{ route('admin.salas.liveGrupos') }}',
+            updateEstadoBaseUrl: '{{ url('/admin/salas') }}'
+        };
     </script>
+    <script src="{{ asset('js/admin/salas_live.js') }}"></script>
 </body>
 </html>
