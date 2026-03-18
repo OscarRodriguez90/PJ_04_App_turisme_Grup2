@@ -21,6 +21,14 @@
 
         <!-- Lado Formulario -->
         <div class="auth-form-container">
+            <a href="{{ url('/') }}" class="back-home">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Volver al INICIO
+            </a>
+
             <!-- Brand visible solo en móvil -->
             <a href="{{ route('home') }}" class="brand mobile-brand">
                 <img src="{{ asset('img/admin/logo.png') }}" alt="GeoTurismo">
@@ -65,8 +73,11 @@
                                     <polyline points="22,6 12,13 2,6"/>
                                 </svg>
                             </span>
-                            <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="tu@correo.com" autocomplete="email">
+                            <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="tu@correo.com" autocomplete="email" class="{{ $errors->has('email') ? 'input-error' : '' }}">
                         </div>
+                        @if ($errors->has('email'))
+                            <span class="field-error">{{ $errors->first('email') }}</span>
+                        @endif
                     </div>
 
                     <!-- Contraseña -->
@@ -79,8 +90,11 @@
                                     <path d="M7 11V7a5 5 0 0110 0v4"/>
                                 </svg>
                             </span>
-                            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password">
+                            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" class="{{ $errors->has('password') ? 'input-error' : '' }}">
                         </div>
+                        @if ($errors->has('password'))
+                            <span class="field-error">{{ $errors->first('password') }}</span>
+                        @endif
                     </div>
 
                     <div class="form-row">
@@ -88,7 +102,7 @@
                             <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
                             Recordarme
                         </label>
-                        <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                        
                     </div>
 
                     <button type="submit" class="btn-primary">Iniciar sesión</button>
