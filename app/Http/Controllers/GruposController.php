@@ -83,10 +83,40 @@ class GruposController extends Controller
         $equipo = $query->first();
 
         if ($equipo) {
-            $equipo->integrantes()->detach($usuario->id);
-            if ($equipo->integrantes()->count() === 0) {
-                $equipo->delete();
-            }
+            DB::transaction(function () use ($equipo, $usuario): void {
+                $pivotId = DB::table('tbl_equipo_usuarios')
+                    ->where('id_equipo', $equipo->id)
+                    ->where('id_usuario', $usuario->id)
+                    ->value('id');
+
+                if (!$pivotId) {
+                    return;
+                }
+
+                // Remove challenge progress linked to this membership before deleting the pivot row.
+                DB::table('tbl_progreso_retos')
+                    ->where('id_equipo_usuario', $pivotId)
+                    ->delete();
+
+                $equipo->integrantes()->detach($usuario->id);
+
+                if ($equipo->integrantes()->count() === 0) {
+                    $equipo->delete();
+                    return;
+                }
+
+                if ((int) $equipo->id_lider === (int) $usuario->id) {
+                    $nuevoLiderId = DB::table('tbl_equipo_usuarios')
+                        ->where('id_equipo', $equipo->id)
+                        ->orderBy('id')
+                        ->value('id_usuario');
+
+                    if ($nuevoLiderId) {
+                        $equipo->id_lider = $nuevoLiderId;
+                        $equipo->save();
+                    }
+                }
+            });
         }
 
         return response()->json(['success' => true]);
