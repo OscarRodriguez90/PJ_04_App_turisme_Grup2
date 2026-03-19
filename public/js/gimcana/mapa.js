@@ -54,7 +54,8 @@
         routingControl: null,
         selectedLugarId: null,
         activeRouteId: null, // ID del lugar hacia el que hay una ruta dibujada
-        isFirstLocate: true
+        isFirstLocate: true,
+        lastUpdate: 0 // Para throttling de 7s
     };
 
     const DISTANCIA_PROXIMIDAD = 150; // Metros para activar la pregunta
@@ -267,7 +268,14 @@
         );
     }
 
-    function onLocationUpdate(position) {
+    async function onLocationUpdate(position) {
+        const now = Date.now();
+        // Solo procesar si han pasado al menos 7 segundos o es la primera vez
+        if (now - state.lastUpdate < 7000 && !state.isFirstLocate) {
+            return;
+        }
+        state.lastUpdate = now;
+
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
         state.userLocation = { lat, lng };
@@ -275,6 +283,25 @@
         checkProximity();
         updateDistanceInDetail();
         
+        // --- NUEVO: Sincronizar con el servidor y ver si alguien ha ganado ---
+        try {
+            const resp = await fetch(DATA.ubicacionUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ lat, lng })
+            });
+            const result = await resp.json();
+            if (result.gameOver && result.redirectUrl) {
+                window.location.href = result.redirectUrl;
+                return;
+            }
+        } catch (e) {
+            console.error("Error actualizando ubicación en servidor:", e);
+        }
+
         // Manejar ?locate=user
         if (state.isFirstLocate) {
             const urlParams = new URLSearchParams(window.location.search);

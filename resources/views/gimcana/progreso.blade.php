@@ -86,10 +86,17 @@
                                     </div>
                                 @endif
 
-                                <a href="{{ route('gimcana.mapa', ['locate' => 'user']) }}" class="btn-location" style="width: 100%;">
-                                    <i class="bi bi-geo-alt"></i>
-                                    Ver tu ubicación
-                                </a>
+                                @if($userWaiting)
+                                    <a href="{{ route('gimcana.espera') }}" class="btn-location" style="width: 100%; background: var(--warning); color: #fff; border: none;">
+                                        <i class="bi bi-hourglass-split"></i>
+                                        Esperar equipo
+                                    </a>
+                                @else
+                                    <a href="{{ route('gimcana.mapa', ['locate' => 'user']) }}" class="btn-location" style="width: 100%;">
+                                        <i class="bi bi-geo-alt"></i>
+                                        Ver tu ubicación
+                                    </a>
+                                @endif
                             @endif
                         </div>
                     </li>
@@ -97,16 +104,6 @@
             </ol>
         </main>
 
-        <nav class="bottom-nav" aria-label="Navegacion principal">
-            <a href="{{ route('gimcana.mapa') }}" class="nav-item">
-                <i class="bi bi-ticket-perforated"></i>
-                <span>Reto Actual</span>
-            </a>
-            <a href="{{ route('gimcana.progreso') }}" class="nav-item active" aria-current="page">
-                <i class="bi bi-list-check"></i>
-                <span>Mi Progreso</span>
-            </a>
-        </nav>
     </div>
     <script src="{{ asset('js/gimcana/progreso.js') }}"></script>
 </body>

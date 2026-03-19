@@ -173,6 +173,7 @@
             },
             lugares: @json($lugares),
             resolverUrl: "{{ route('gimcana.pregunta.resolver', ['reto' => $retoActual->id]) }}",
+            ubicacionUrl: "{{ route('gimcana.ubicacion.actualizar') }}",
             csrfToken: "{{ csrf_token() }}"
         };
     </script>

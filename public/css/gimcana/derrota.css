@@ -1,0 +1,100 @@
+:root {
+    --defeat-bg: #fdf2f2;
+}
+
+.defeat-page {
+    min-height: 100vh;
+    background: var(--defeat-bg);
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+}
+
+.defeat-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.broken-heart-icon {
+    font-size: 5rem;
+    color: #ef4444;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.defeat-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    color: #b91c1c;
+}
+
+.winner-announce-card {
+    width: 100%;
+    max-width: 500px;
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.1);
+    margin-bottom: 30px;
+    border: 2px solid #fee2e2;
+}
+
+.winner-announce-card h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #ef4444;
+    margin: 0 0 15px 0;
+    letter-spacing: 0.05em;
+}
+
+.winner-team-name {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
+
+.winner-players {
+    font-size: 0.95rem;
+    color: #64748b;
+}
+
+.personal-stats-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    color: #475569;
+}
+
+/* Reusing some classes from victory for consistency if needed, but styling specifically */
+.personal-stats-container {
+    width: 100%;
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 24px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.btn-lobby {
+    background: #475569;
+    color: white;
+    text-decoration: none;
+    padding: 16px;
+    border-radius: 16px;
+    font-weight: 700;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+    transition: opacity 0.2s;
+}
+
+.btn-lobby:active {
+    opacity: 0.9;
+}

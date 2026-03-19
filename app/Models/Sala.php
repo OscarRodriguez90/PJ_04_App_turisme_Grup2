@@ -13,7 +13,7 @@ class Sala extends Model
     protected $table = 'tbl_salas';
     public $timestamps = false;
 
-    protected $fillable = ['nombre', 'descripcion', 'estado'];
+    protected $fillable = ['nombre', 'descripcion', 'estado', 'fecha_inicio'];
 
     public function equipos()
     {
