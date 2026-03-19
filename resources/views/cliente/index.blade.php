@@ -36,7 +36,7 @@
             </button>
 
             <div class="user-card">
-                <div class="avatar">{{ strtoupper(substr($usuario->nombre, 0, 1)) }}</div>
+                <img src="{{ $avatarUrl }}" alt="Foto de perfil de {{ $usuario->nombre }}" class="avatar-photo">
                 <div>
                     <strong>{{ $usuario->nombre }} {{ $usuario->apellido1 }}</strong>
                     <p>{{ '@' . $usuario->username }}</p>
