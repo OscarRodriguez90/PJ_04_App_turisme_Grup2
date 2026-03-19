@@ -8,6 +8,7 @@
     --accent: #f59e0b;
     --danger: #ef4444;
     --success: #10b981;
+    --border: #e2e8f0;
     --radius-lg: 18px;
     --radius-full: 9999px;
     --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -91,7 +92,6 @@ html, body {
     backdrop-filter: blur(4px);
 }
 
-.topbar-title h1 {
 .logo-box h1 {
     font-size: 1rem;
     font-weight: 800;

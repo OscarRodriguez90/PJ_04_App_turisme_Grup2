@@ -35,19 +35,20 @@
     <!-- D-Pad Simulación (Copiado de DescubreMap) -->
     <div class="dev-dpad-wrapper" id="dev-dpad-wrapper">
         <button id="btn-toggle-dpad" class="dpad-toggle-btn" title="Joystick de simulación">🎮</button>
+
+        @if(session('success'))
+            <div class="alert-ok">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
         <div class="dev-dpad hidden" id="dev-dpad">
             <div class="dpad-row">
                 <button id="btn-up-left" class="dpad-btn">↖</button>
                 <button id="btn-up" class="dpad-btn">▲</button>
                 <button id="btn-up-right" class="dpad-btn">↗</button>
             </div>
-            <img src="{{ $avatarUrl }}" alt="Foto de perfil" class="profile-avatar">
-        </header>
-
-        @if(session('success'))
-            <div class="alert-ok">
-                <i class="bi bi-check-circle-fill"></i>
-                <span>{{ session('success') }}</span>
             <div class="dpad-row">
                 <button id="btn-left" class="dpad-btn">◀</button>
                 <div class="dpad-btn dpad-center"></div>
