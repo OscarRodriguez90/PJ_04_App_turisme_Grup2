@@ -422,6 +422,13 @@ body {
     flex-shrink: 0;
 }
 
+.miembro-avatar--foto {
+    display: block;
+    object-fit: cover;
+    background: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
 .lider-icon {
     color: #f59e0b;
     font-size: 0.68rem;

@@ -43,7 +43,13 @@
                 <div class="equipo-miembros">
                     @foreach($miEquipo->integrantes as $integrante)
                         <div class="miembro-chip">
-                            <div class="miembro-avatar">{{ strtoupper(substr($integrante->nombre, 0, 1)) }}</div>
+                            <img
+                                src="{{ !empty($integrante->foto) ? asset('img/usuarios/' . $integrante->foto) : asset('img/usuarios/default_user.png') }}"
+                                alt="Foto de {{ $integrante->nombre }}"
+                                class="miembro-avatar miembro-avatar--foto"
+                                loading="lazy"
+                                onerror="this.onerror=null;this.src='{{ asset('img/usuarios/default_user.png') }}';"
+                            >
                             <span>{{ $integrante->nombre }}</span>
                             @if($integrante->id === $miEquipo->id_lider)
                                 <i class="bi bi-star-fill lider-icon" title="Líder"></i>
