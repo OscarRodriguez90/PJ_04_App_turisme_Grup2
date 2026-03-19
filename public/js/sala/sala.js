@@ -142,15 +142,59 @@
     }
 
     // ── Salir del equipo ─────────────────────────────────────
-    async function salirEquipo() {
+    async function salirEquipo(confirmar = true) {
+        if (confirmar) {
+            const result = await Swal.fire({
+                title: '¿Abandonar equipo?',
+                text: 'Si sales, perderás tu lugar en este equipo. Si eres el último integrante, el equipo se eliminará.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#0ea5a4',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, salir',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (!result.isConfirmed) return false;
+        }
+
         const { status, data } = await postJson(config.salirUrl, {});
 
         if (data.success || status < 300) {
             mostrarNotificacion('Has salido del equipo.');
+            if (!confirmar) return true; // Para uso en el botón de la cabecera
             reloadSoon();
         } else {
             mostrarNotificacion(data.error ?? 'No se pudo salir del equipo.', true);
+            return false;
         }
+    }
+
+    // Interceptar botón de salir de la sala en la cabecera
+    const btnLeaveRoom = document.getElementById('btn-leave-room');
+    if (btnLeaveRoom) {
+        btnLeaveRoom.addEventListener('click', async function (e) {
+            if (config.miEquipoId) {
+                e.preventDefault();
+                const result = await Swal.fire({
+                    title: '¿Salir de la sala?',
+                    text: 'Actualmente estás en un equipo. Si sales de la sala, abandonarás también el equipo.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0ea5a4',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Salir y abandonar',
+                    cancelButtonText: 'Cancelar'
+                });
+
+                if (result.isConfirmed) {
+                    const ok = await salirEquipo(false);
+                    if (ok) {
+                        window.location.href = btnLeaveRoom.href;
+                    }
+                }
+            }
+        });
     }
 
     // ── Close modal on backdrop click ────────────────────────

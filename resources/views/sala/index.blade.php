@@ -14,6 +14,8 @@
 <body class="salas-body">
 
     <div class="salas-container">
+        <a href="{{ route('cliente.index') }}" class="btn-back">Volver</a>
+
         <div class="salas-header">
             <h1>🗺️ GeoTurismo</h1>
             <p>Elige una gimcana para comenzar tu aventura</p>

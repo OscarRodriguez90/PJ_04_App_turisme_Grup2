@@ -18,10 +18,12 @@
             <span class="sala-code-badge">{{ $sala->nombre }}</span>
             <span class="sala-estado sala-estado--{{ $sala->estado }}">{{ ucfirst($sala->estado) }}</span>
         </div>
-        <a href="{{ route('sala.index') }}" class="btn-ghost-small">
+        <a href="{{ route('sala.index') }}" class="btn-ghost-small" id="btn-leave-room">
             <i class="bi bi-box-arrow-left"></i> Salir
         </a>
     </header>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     {{-- ── Main ── --}}
     <main class="sala-main">
