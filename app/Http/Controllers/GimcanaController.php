@@ -19,7 +19,7 @@ class GimcanaController extends Controller
             return $context;
         }
 
-        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId] = $context;
+        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId, 'usuario' => $usuario] = $context;
         $state = $this->buildTeamProgressState($equipo, $sala, $pivotId);
 
         if ($state['allTeamRetosCompleted']) {
@@ -39,6 +39,7 @@ class GimcanaController extends Controller
             'equipo' => $equipo,
             'sala' => $sala,
             'retoActual' => $retoActual,
+            'avatarUrl' => $this->avatarUrl($usuario),
         ]);
     }
 
@@ -49,7 +50,7 @@ class GimcanaController extends Controller
             return $context;
         }
 
-        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId] = $context;
+        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId, 'usuario' => $usuario] = $context;
         $state = $this->buildTeamProgressState($equipo, $sala, $pivotId);
 
         if ($state['allTeamRetosCompleted']) {
@@ -76,6 +77,7 @@ class GimcanaController extends Controller
             'sala' => $sala,
             'retoActual' => $retoActual,
             'integrantesEnReto' => $integrantesEnReto,
+            'avatarUrl' => $this->avatarUrl($usuario),
         ]);
     }
 
@@ -142,7 +144,7 @@ class GimcanaController extends Controller
             return $context;
         }
 
-        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId] = $context;
+        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId, 'usuario' => $usuario] = $context;
         $state = $this->buildTeamProgressState($equipo, $sala, $pivotId);
 
         if ($state['allTeamRetosCompleted']) {
@@ -160,6 +162,7 @@ class GimcanaController extends Controller
             'integrantesCompletados' => $state['integrantesCompletadosCurrent'],
             'totalIntegrantes' => $state['teamMemberCount'],
             'miembrosPendientes' => max(0, $state['teamMemberCount'] - $state['integrantesCompletadosCurrent']),
+            'avatarUrl' => $this->avatarUrl($usuario),
         ]);
     }
 
@@ -170,7 +173,7 @@ class GimcanaController extends Controller
             return $context;
         }
 
-        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId] = $context;
+        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId, 'usuario' => $usuario] = $context;
         $state = $this->buildTeamProgressState($equipo, $sala, $pivotId);
 
         if (!$state['allTeamRetosCompleted']) {
@@ -187,6 +190,7 @@ class GimcanaController extends Controller
             'sala' => $sala,
             'retosTotales' => $retosTotales,
             'retosCompletados' => $retosCompletados,
+            'avatarUrl' => $this->avatarUrl($usuario),
         ]);
     }
 
@@ -221,7 +225,7 @@ class GimcanaController extends Controller
             return $context;
         }
 
-        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId] = $context;
+        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId, 'usuario' => $usuario] = $context;
 
         $retos = Prueba::with('lugar')
             ->where('id_sala', $sala->id)
@@ -237,6 +241,7 @@ class GimcanaController extends Controller
             'retos' => $retos,
             'completadosIds' => $completadosIds,
             'ordenActual' => $ordenActual,
+            'avatarUrl' => $this->avatarUrl($usuario),
         ]);
     }
 
@@ -276,7 +281,15 @@ class GimcanaController extends Controller
             'equipo' => $equipo,
             'sala' => $sala,
             'pivotId' => (int) $pivotId,
+            'usuario' => $usuario,
         ];
+    }
+
+    private function avatarUrl($usuario): string
+    {
+        return !empty($usuario->foto)
+            ? asset('img/usuarios/' . $usuario->foto)
+            : asset('img/usuarios/default_user.png');
     }
 
     private function buildTeamProgressState(Equipo $equipo, Sala $sala, int $pivotId): array

@@ -13,6 +13,7 @@
 <body>
     <main class="final-shell">
         <section class="final-card">
+            <img src="{{ $avatarUrl }}" alt="Foto de perfil" class="final-profile-avatar">
             <div class="final-icon" aria-hidden="true">
                 <i class="bi bi-trophy-fill"></i>
             </div>

@@ -29,6 +29,7 @@
                 <p class="eyebrow">Equipo {{ $equipo->nombre_equipo }}</p>
                 <h1>Reto {{ $retoActual->orden }} de {{ $sala->pruebas()->count() }}</h1>
             </div>
+            <img src="{{ $avatarUrl }}" alt="Foto de perfil" class="profile-avatar">
         </header>
 
         @if(session('success'))

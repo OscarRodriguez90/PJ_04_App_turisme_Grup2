@@ -12,6 +12,9 @@ class ClienteController extends Controller
     public function index(Request $request)
     {
         $usuario = $request->user();
+        $avatarUrl = !empty($usuario->foto)
+            ? asset('img/usuarios/' . $usuario->foto)
+            : asset('img/usuarios/default_user.png');
 
         $categorias = Categoria::orderBy('nombre')->get();
         $favoritosIds = $usuario->favoritos()->pluck('tbl_lugares.id')->map(fn ($id) => (int) $id)->values();
@@ -42,6 +45,7 @@ class ClienteController extends Controller
 
         return view('cliente.index', [
             'usuario' => $usuario,
+            'avatarUrl' => $avatarUrl,
             'categorias' => $categorias,
             'favoritosIds' => $favoritosIds,
             'lugares' => $lugares,

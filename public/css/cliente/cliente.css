@@ -330,6 +330,23 @@ button, input {
     font-weight: 800;
 }
 
+.avatar-photo {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #d7e3f0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
+    flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+    .avatar-photo {
+        width: 46px;
+        height: 46px;
+    }
+}
+
 .section-title-row,
 .switch-row,
 .detail-actions {
