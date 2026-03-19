@@ -17,7 +17,7 @@
                 <i class="bi bi-arrow-left"></i>
             </a>
             <h1>Resolver reto</h1>
-            <span class="header-spacer" aria-hidden="true"></span>
+            <img src="{{ $avatarUrl }}" alt="Foto de perfil" class="profile-avatar">
         </header>
 
         <main class="screen-content">

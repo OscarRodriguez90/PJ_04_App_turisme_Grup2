@@ -36,7 +36,7 @@
             </button>
 
             <div class="user-card">
-                <div class="avatar">{{ strtoupper(substr($usuario->nombre, 0, 1)) }}</div>
+                <img src="{{ $avatarUrl }}" alt="Foto de perfil de {{ $usuario->nombre }}" class="avatar-photo">
                 <div>
                     <strong>{{ $usuario->nombre }} {{ $usuario->apellido1 }}</strong>
                     <p>{{ '@' . $usuario->username }}</p>
@@ -93,14 +93,7 @@
                 </div>
             </section>
 
-            <section class="panel-section sala-access-panel">
-                <a href="{{ route('sala.index') }}" class="btn btn-primary sala-access-btn">
-                    🎯 Entrar a Sala
-                </a>
-                <p class="sala-access-help">
-                    Usa este acceso cuando te hayan compartido un codigo de sala para empezar la gimcana.
-                </p>
-            </section>
+
 
             <section class="panel-section list-section">
                 <div class="section-title-row">
@@ -117,7 +110,10 @@
                     <p class="eyebrow">Explorar</p>
                     <h2>Mapa interactivo</h2>
                 </div>
-                <button type="button" class="btn btn-secondary" id="toggleSidebar">Filtros</button>
+                <div class="mobile-topbar-actions">
+                    <a href="{{ route('sala.index') }}" class="btn btn-jugar" id="playButton">Jugar</a>
+                    <button type="button" class="btn btn-secondary" id="toggleSidebar">Filtros</button>
+                </div>
             </header>
 
             <section class="map-wrapper">

@@ -608,7 +608,11 @@ class AdminController extends Controller
             }
         }
 
-        $sala->update(['estado' => $request->estado]);
+        $updateData = ['estado' => $request->estado];
+        if ($request->estado === 'jugando' && !$sala->fecha_inicio) {
+            $updateData['fecha_inicio'] = now();
+        }
+        $sala->update($updateData);
 
         return response()->json(['success' => true, 'estado' => $sala->estado]);
     }

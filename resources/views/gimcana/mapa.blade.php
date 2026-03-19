@@ -35,6 +35,14 @@
     <!-- D-Pad Simulación (Copiado de DescubreMap) -->
     <div class="dev-dpad-wrapper" id="dev-dpad-wrapper">
         <button id="btn-toggle-dpad" class="dpad-toggle-btn" title="Joystick de simulación">🎮</button>
+
+        @if(session('success'))
+            <div class="alert-ok">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
         <div class="dev-dpad hidden" id="dev-dpad">
             <div class="dpad-row">
                 <button id="btn-up-left" class="dpad-btn">↖</button>
@@ -165,6 +173,7 @@
             },
             lugares: @json($lugares),
             resolverUrl: "{{ route('gimcana.pregunta.resolver', ['reto' => $retoActual->id]) }}",
+            ubicacionUrl: "{{ route('gimcana.ubicacion.actualizar') }}",
             csrfToken: "{{ csrf_token() }}"
         };
     </script>

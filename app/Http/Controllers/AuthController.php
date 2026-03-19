@@ -56,6 +56,7 @@ class AuthController extends Controller
             'username'  => ['required', 'string', 'min:3', 'max:25', 'regex:/^[a-zA-Z0-9_]+$/', 'unique:tbl_usuarios,username'],
             'email'     => ['required', 'email', 'max:100', 'unique:tbl_usuarios,email'],
             'password'  => ['required', 'string', 'min:8', 'confirmed'],
+            'foto'      => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [
             'nombre.required'    => 'El nombre es obligatorio.',
             'nombre.min'         => 'El nombre debe tener al menos 3 caracteres.',
@@ -74,7 +75,15 @@ class AuthController extends Controller
             'password.required'  => 'La contraseña es obligatoria.',
             'password.min'       => 'La contraseña debe tener al menos 8 caracteres.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
+            'foto.image'         => 'La foto de perfil debe ser una imagen válida.',
+            'foto.mimes'         => 'La foto de perfil debe ser JPG, PNG o WEBP.',
+            'foto.max'           => 'La foto de perfil no puede superar 2MB.',
         ]);
+
+        $rutaFoto = null;
+        if ($request->hasFile('foto')) {
+            $rutaFoto = $request->file('foto')->store('perfiles', 'public');
+        }
 
         Usuario::create([
             'nombre'    => $request->nombre,
@@ -84,6 +93,7 @@ class AuthController extends Controller
             'email'     => $request->email,
             'password'  => Hash::make($request->password),
             'id_rol'    => 2,
+            'foto'      => $rutaFoto,
         ]);
 
         return redirect()->route('login')->with('success', 'Cuenta creada correctamente. Ya puedes iniciar sesión.');

@@ -1,100 +1,150 @@
 :root {
-    --bg: #f3f4f6;
-    --surface: #ffffff;
-    --text: #1f2937;
-    --muted: #6b7280;
-    --primary: #11a8ad;
-    --primary-dark: #0e868b;
-    --border: #e5e7eb;
-    --ok-bg: #eafaf0;
-    --ok-border: #b7ebcc;
+    --gold: #fbbf24;
+    --gold-dark: #d97706;
+    --victory-bg: #f8fafc;
 }
 
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    margin: 0;
-    min-height: 100%;
-    font-family: 'Inter', sans-serif;
-    background: radial-gradient(circle at 10% 10%, #ffffff 0%, #f3f4f6 55%, #eceff3 100%);
-    color: var(--text);
-}
-
-.final-shell {
+.victory-page {
     min-height: 100vh;
-    display: grid;
-    place-items: center;
-    padding: 20px;
+    background: var(--victory-bg);
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
 }
 
-.final-card {
-    width: min(100%, 460px);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 26px 20px;
+.victory-header {
     text-align: center;
-    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+    margin-bottom: 40px;
 }
 
-.final-icon {
-    width: 72px;
-    height: 72px;
-    margin: 0 auto 12px;
-    border-radius: 999px;
-    display: grid;
-    place-items: center;
-    color: #ffffff;
-    background: linear-gradient(180deg, #22c55e, #16a34a);
-    font-size: 1.8rem;
+.trophy-icon {
+    font-size: 5rem;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 10px;
+    animation: trophy-bounce 2s infinite ease-in-out;
 }
 
-.eyebrow {
-    margin: 0 0 6px;
-    color: var(--primary-dark);
+@keyframes trophy-bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-15px) scale(1.1); }
+}
+
+.victory-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, var(--primary), #0ea5e9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stats-container {
+    width: 100%;
+    max-width: 500px;
+    background: white;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.total-time-card {
+    background: linear-gradient(135deg, var(--primary), #06b6d4);
+    border-radius: 20px;
+    padding: 25px;
+    color: white;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.total-time-card h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    margin: 0 0 10px 0;
+    opacity: 0.9;
+}
+
+.total-time-value {
+    font-size: 3rem;
     font-weight: 800;
 }
 
-h1 {
+.reto-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.reto-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: #f1f5f9;
+    border-radius: 12px;
+}
+
+.reto-number {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.reto-info {
+    flex-grow: 1;
+}
+
+.reto-info h4 {
     margin: 0;
-    font-size: 1.65rem;
-}
-
-.subtitle {
-    margin: 12px 0 0;
-    line-height: 1.55;
-    color: var(--muted);
-}
-
-.flash-ok {
-    margin: 12px 0 0;
-    padding: 10px 12px;
-    border-radius: 10px;
-    background: var(--ok-bg);
-    border: 1px solid var(--ok-border);
-    color: #0f6f3f;
+    font-size: 0.95rem;
     font-weight: 600;
 }
 
-.btn-primary {
-    margin-top: 16px;
-    border: 0;
-    border-radius: 10px;
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0 16px;
+.reto-info p {
+    margin: 2px 0 0 0;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.reto-time {
     font-weight: 700;
-    font-size: 1rem;
+    color: var(--primary);
+}
+
+.victory-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.btn-finish {
+    background: #1e293b;
+    color: white;
     text-decoration: none;
-    color: #ffffff;
-    background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+    padding: 16px;
+    border-radius: 16px;
+    font-weight: 700;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.btn-finish:active {
+    transform: scale(0.98);
 }

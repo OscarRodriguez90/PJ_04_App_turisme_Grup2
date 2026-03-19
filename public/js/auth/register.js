@@ -4,6 +4,10 @@
     var form             = document.getElementById('register-form');
     var checkUsernameUrl = form.dataset.checkUsername;
     var checkEmailUrl    = form.dataset.checkEmail;
+    var avatarInput      = document.getElementById('foto');
+    var avatarBtn        = document.getElementById('avatar-upload-btn');
+    var avatarPreview    = document.getElementById('avatar-preview');
+    var avatarError      = document.getElementById('avatar-error');
 
     // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -41,6 +45,25 @@
             }
         };
         xhr.send();
+    }
+
+    function clearAvatarError() {
+        if (avatarError) avatarError.textContent = '';
+    }
+
+    function showAvatarError(message) {
+        if (avatarError) avatarError.textContent = message;
+    }
+
+    function resetAvatarPreview() {
+        if (!avatarPreview) return;
+        avatarPreview.classList.remove('has-image');
+        avatarPreview.style.backgroundImage = '';
+        avatarPreview.innerHTML = '' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>' +
+                '<circle cx="12" cy="7" r="4"/>' +
+            '</svg>';
     }
 
     // ── Nombre ───────────────────────────────────────────────────────────────
@@ -108,6 +131,52 @@
         if (v !== pass) return showError('password_confirmation', 'Las contraseñas no coinciden.');
     };
 
+    // ── Avatar (subida real + preview) ─────────────────────────────────────
+
+    if (avatarBtn && avatarInput) {
+        avatarBtn.onclick = function () {
+            avatarInput.click();
+        };
+    }
+
+    if (avatarInput) {
+        avatarInput.onchange = function () {
+            clearAvatarError();
+
+            if (!avatarInput.files || !avatarInput.files.length) {
+                resetAvatarPreview();
+                return;
+            }
+
+            var file = avatarInput.files[0];
+            var allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            var maxSizeBytes = 2 * 1024 * 1024;
+
+            if (allowedTypes.indexOf(file.type) === -1) {
+                avatarInput.value = '';
+                resetAvatarPreview();
+                showAvatarError('La imagen debe ser JPG, PNG o WEBP.');
+                return;
+            }
+
+            if (file.size > maxSizeBytes) {
+                avatarInput.value = '';
+                resetAvatarPreview();
+                showAvatarError('La imagen no puede superar 2MB.');
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                if (!avatarPreview) return;
+                avatarPreview.classList.add('has-image');
+                avatarPreview.style.backgroundImage = 'url("' + e.target.result + '")';
+                avatarPreview.innerHTML = '';
+            };
+            reader.readAsDataURL(file);
+        };
+    }
+
     // ── Guard de envío ───────────────────────────────────────────────────────
 
     form.onsubmit = function (e) {
@@ -126,4 +195,6 @@
 
         if (hasErrors) e.preventDefault();
     };
+
+    resetAvatarPreview();
 }());

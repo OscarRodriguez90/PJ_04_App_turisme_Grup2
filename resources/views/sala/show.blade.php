@@ -18,10 +18,12 @@
             <span class="sala-code-badge">{{ $sala->nombre }}</span>
             <span class="sala-estado sala-estado--{{ $sala->estado }}">{{ ucfirst($sala->estado) }}</span>
         </div>
-        <a href="{{ route('sala.index') }}" class="btn-ghost-small">
+        <a href="{{ route('sala.index') }}" class="btn-ghost-small" id="btn-leave-room">
             <i class="bi bi-box-arrow-left"></i> Salir
         </a>
     </header>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     {{-- ── Main ── --}}
     <main class="sala-main">
@@ -43,7 +45,13 @@
                 <div class="equipo-miembros">
                     @foreach($miEquipo->integrantes as $integrante)
                         <div class="miembro-chip">
-                            <div class="miembro-avatar">{{ strtoupper(substr($integrante->nombre, 0, 1)) }}</div>
+                            <img
+                                src="{{ !empty($integrante->foto) ? asset('img/usuarios/' . $integrante->foto) : asset('img/usuarios/default_user.png') }}"
+                                alt="Foto de {{ $integrante->nombre }}"
+                                class="miembro-avatar miembro-avatar--foto"
+                                loading="lazy"
+                                onerror="this.onerror=null;this.src='{{ asset('img/usuarios/default_user.png') }}';"
+                            >
                             <span>{{ $integrante->nombre }}</span>
                             @if($integrante->id === $miEquipo->id_lider)
                                 <i class="bi bi-star-fill lider-icon" title="Líder"></i>

@@ -20,7 +20,7 @@ class GimcanaController extends Controller
             return $context;
         }
 
-        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId] = $context;
+        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId, 'usuario' => $usuario] = $context;
         $state = $this->buildTeamProgressState($equipo, $sala, $pivotId);
 
         if ($state['allTeamRetosCompleted']) {
@@ -43,6 +43,7 @@ class GimcanaController extends Controller
             'usuario'    => $request->user(),
             'sala'       => $sala,
             'retoActual' => $retoActual,
+            'avatarUrl' => $this->avatarUrl($usuario),
             'lugares'    => $lugares,
         ]);
     }
@@ -54,7 +55,7 @@ class GimcanaController extends Controller
             return $context;
         }
 
-        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId] = $context;
+        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId, 'usuario' => $usuario] = $context;
         $state = $this->buildTeamProgressState($equipo, $sala, $pivotId);
 
         if ($state['allTeamRetosCompleted']) {
@@ -81,6 +82,7 @@ class GimcanaController extends Controller
             'sala' => $sala,
             'retoActual' => $retoActual,
             'integrantesEnReto' => $integrantesEnReto,
+            'avatarUrl' => $this->avatarUrl($usuario),
         ]);
     }
 
@@ -141,7 +143,7 @@ class GimcanaController extends Controller
             } elseif ($stateAfter['userWaiting']) {
                 $redirect = route('gimcana.espera');
             }
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Reto completado.',
@@ -167,7 +169,7 @@ class GimcanaController extends Controller
             return $context;
         }
 
-        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId] = $context;
+        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId, 'usuario' => $usuario] = $context;
         $state = $this->buildTeamProgressState($equipo, $sala, $pivotId);
 
         if ($state['allTeamRetosCompleted']) {
@@ -185,6 +187,7 @@ class GimcanaController extends Controller
             'integrantesCompletados' => $state['integrantesCompletadosCurrent'],
             'totalIntegrantes' => $state['teamMemberCount'],
             'miembrosPendientes' => max(0, $state['teamMemberCount'] - $state['integrantesCompletadosCurrent']),
+            'avatarUrl' => $this->avatarUrl($usuario),
             'integrantesPendientes' => $state['integrantesPendientes'],
         ]);
     }
@@ -196,24 +199,159 @@ class GimcanaController extends Controller
             return $context;
         }
 
-        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId] = $context;
+        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId, 'usuario' => $usuario] = $context;
         $state = $this->buildTeamProgressState($equipo, $sala, $pivotId);
 
         if (!$state['allTeamRetosCompleted']) {
+            if (isset($state['winner']) && $state['winner']) {
+                return redirect()->route('gimcana.derrota');
+            }
             return $state['userWaiting']
                 ? redirect()->route('gimcana.espera')
                 : redirect()->route('gimcana.mapa');
         }
 
-        $retosTotales = Prueba::where('id_sala', $sala->id)->count();
-        $retosCompletados = $retosTotales;
+        $teamPivotIds = DB::table('tbl_equipo_usuarios')
+            ->where('id_equipo', $equipo->id)
+            ->pluck('id')
+            ->all();
+
+        $stats = $this->buildGameStats($equipo, $sala, $teamPivotIds);
 
         return view('gimcana.final', [
             'equipo' => $equipo,
             'sala' => $sala,
-            'retosTotales' => $retosTotales,
-            'retosCompletados' => $retosCompletados,
+            'stats' => $stats,
+            'avatarUrl' => $this->avatarUrl($usuario),
         ]);
+    }
+
+    public function derrota(Request $request): View|RedirectResponse
+    {
+        $context = $this->resolveContext($request);
+        if ($context instanceof RedirectResponse) {
+            return $context;
+        }
+
+        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId, 'usuario' => $usuario] = $context;
+        $state = $this->buildTeamProgressState($equipo, $sala, $pivotId);
+
+        if (!$state['winner']) {
+            return redirect()->route('gimcana.mapa');
+        }
+
+        if ($state['winner']['id'] === $equipo->id) {
+            return redirect()->route('gimcana.final');
+        }
+
+        $teamPivotIds = DB::table('tbl_equipo_usuarios')
+            ->where('id_equipo', $equipo->id)
+            ->pluck('id')
+            ->all();
+
+        $stats = $this->buildGameStats($equipo, $sala, $teamPivotIds);
+
+        return view('gimcana.derrota', [
+            'equipo' => $equipo,
+            'sala' => $sala,
+            'winner' => $state['winner'],
+            'stats' => $stats,
+            'avatarUrl' => $this->avatarUrl($usuario),
+        ]);
+    }
+
+    public function actualizarUbicacion(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $context = $this->resolveContext($request);
+        if ($context instanceof RedirectResponse) {
+            return response()->json(['error' => 'No context'], 403);
+        }
+
+        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId] = $context;
+        $state = $this->buildTeamProgressState($equipo, $sala, $pivotId);
+
+        $gameOver = false;
+        $redirectUrl = null;
+
+        if ($state['winner']) {
+            $gameOver = true;
+            $redirectUrl = ($state['winner']['id'] === $equipo->id) 
+                ? route('gimcana.final') 
+                : route('gimcana.derrota');
+        }
+
+        return response()->json([
+            'gameOver' => $gameOver,
+            'redirectUrl' => $redirectUrl,
+        ]);
+    }
+
+    private function buildGameStats(Equipo $equipo, Sala $sala, array $teamPivotIds): array
+    {
+        $retos = Prueba::with('lugar')
+            ->where('id_sala', $sala->id)
+            ->orderBy('orden')
+            ->get();
+
+        $statsByReto = [];
+        $startTime = $sala->fecha_inicio ? \Carbon\Carbon::parse($sala->fecha_inicio) : null;
+        $lastRetoTime = $startTime;
+
+        foreach ($retos as $index => $reto) {
+            $maxFecha = DB::table('tbl_progreso_retos')
+                ->where('id_reto', $reto->id)
+                ->whereIn('id_equipo_usuario', $teamPivotIds)
+                ->where('completado', true)
+                ->max('fecha_completado');
+
+            if ($maxFecha) {
+                $maxFecha = \Carbon\Carbon::parse($maxFecha);
+                $durationInSeconds = $lastRetoTime ? $maxFecha->diffInSeconds($lastRetoTime) : 0;
+                
+                $statsByReto[] = [
+                    'orden' => $reto->orden,
+                    'lugar' => $reto->lugar->nombre,
+                    'finalizado_at' => $maxFecha->format('H:i:s'),
+                    'duracion' => $this->formatDuration($durationInSeconds),
+                    'segundos' => $durationInSeconds,
+                ];
+                $lastRetoTime = $maxFecha;
+            } else {
+                $statsByReto[] = [
+                    'orden' => $reto->orden,
+                    'lugar' => $reto->lugar->nombre,
+                    'finalizado_at' => '-',
+                    'duracion' => 'Pendiente',
+                    'segundos' => 0,
+                ];
+            }
+        }
+
+        $totalSeconds = 0;
+        if ($startTime && $lastRetoTime && $lastRetoTime->gt($startTime)) {
+            $totalSeconds = $lastRetoTime->diffInSeconds($startTime);
+        }
+
+        return [
+            'totalTime' => $this->formatDuration($totalSeconds),
+            'totalSeconds' => $totalSeconds,
+            'retos' => $statsByReto,
+        ];
+    }
+
+    private function formatDuration(int $seconds): string
+    {
+        if ($seconds <= 0) return '0s';
+        $h = floor($seconds / 3600);
+        $m = floor(($seconds % 3600) / 60);
+        $s = $seconds % 60;
+
+        $parts = [];
+        if ($h > 0) $parts[] = $h . 'h';
+        if ($m > 0) $parts[] = $m . 'm';
+        if ($s > 0 || empty($parts)) $parts[] = $s . 's';
+
+        return implode(' ', $parts);
     }
 
     public function reiniciar(Request $request): RedirectResponse
@@ -247,7 +385,7 @@ class GimcanaController extends Controller
             return $context;
         }
 
-        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId] = $context;
+        ['equipo' => $equipo, 'sala' => $sala, 'pivotId' => $pivotId, 'usuario' => $usuario] = $context;
 
         $retos = Prueba::with('lugar')
             ->where('id_sala', $sala->id)
@@ -258,14 +396,18 @@ class GimcanaController extends Controller
         $completadosIds = $state['teamCompletedRetoIds'];
         $ordenActual = $state['currentReto']?->orden;
         $integrantesPendientes = $state['integrantesPendientes'];
-        
+
+        $userWaiting = $state['userWaiting'];
+
         return view('gimcana.progreso', [
             'sala' => $sala,
             'usuario' => $request->user(),
             'retos' => $retos,
             'completadosIds' => $completadosIds,
             'ordenActual' => $ordenActual,
+            'avatarUrl' => $this->avatarUrl($usuario),
             'integrantesPendientes' => $integrantesPendientes,
+            'userWaiting' => $userWaiting,
         ]);
     }
 
@@ -305,7 +447,15 @@ class GimcanaController extends Controller
             'equipo' => $equipo,
             'sala' => $sala,
             'pivotId' => (int) $pivotId,
+            'usuario' => $usuario,
         ];
+    }
+
+    private function avatarUrl($usuario): string
+    {
+        return !empty($usuario->foto)
+            ? asset('img/usuarios/' . $usuario->foto)
+            : asset('img/usuarios/default_user.png');
     }
 
     private function buildTeamProgressState(Equipo $equipo, Sala $sala, int $pivotId): array
@@ -369,6 +519,34 @@ class GimcanaController extends Controller
 
         $allTeamRetosCompleted = $retos->count() > 0 && count($teamCompletedRetoIds) >= $retos->count();
 
+        // --- DETECTAR GANADOR GLOBAL (Cualquier equipo de la sala que haya completado todo) ---
+        $winnerInfo = null;
+        $equiposSala = $sala->equipos()->with('integrantes')->get();
+        
+        foreach ($equiposSala as $eq) {
+            $eqPivotIds = DB::table('tbl_equipo_usuarios')
+                ->where('id_equipo', $eq->id)
+                ->pluck('id')
+                ->all();
+            
+            if (empty($eqPivotIds)) continue;
+
+            $completedCount = DB::table('tbl_progreso_retos')
+                ->whereIn('id_equipo_usuario', $eqPivotIds)
+                ->where('completado', true)
+                ->distinct('id_reto')
+                ->count('id_reto');
+            
+            if ($completedCount >= $retos->count()) {
+                $winnerInfo = [
+                    'id' => $eq->id,
+                    'nombre' => $eq->nombre_equipo,
+                    'jugadores' => $eq->integrantes->pluck('nombre')->implode(', '),
+                ];
+                break; // El primero que gane
+            }
+        }
+
         // Obtener integrantes del equipo que NO han completado el reto actual
         $integrantesPendientes = [];
         if ($currentReto && !$allTeamRetosCompleted) {
@@ -399,6 +577,7 @@ class GimcanaController extends Controller
             'userWaiting' => $userWaiting,
             'allTeamRetosCompleted' => $allTeamRetosCompleted,
             'integrantesPendientes' => $integrantesPendientes,
+            'winner' => $winnerInfo, // info del ganador (si existe)
         ];
     }
 
