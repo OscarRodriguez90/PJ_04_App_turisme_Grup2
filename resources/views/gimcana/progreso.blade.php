@@ -63,12 +63,32 @@
                                     <span class="tl-status tl-status--locked">• BLOQUEADO</span>
                                 @endif
                             </p>
-                            <p class="tl-name">{{ $bloqueado ? 'Desconocido' : ($reto->lugar->nombre ?? 'Lugar del reto') }}</p>
+                            <p class="tl-name">{{ $completado ? ($reto->lugar->nombre ?? 'Lugar del reto') : 'Lugar por descubrir' }}</p>
 
                             @if($actual)
-                                <a href="{{ route('gimcana.mapa') }}" class="btn-location">
-                                    <i class="bi bi-send"></i>
-                                    Ir al punto
+                                @if(count($integrantesPendientes) > 0)
+                                    <div class="tl-pending-box">
+                                        <p class="tl-pending-title">
+                                            <i class="bi bi-people-fill"></i>
+                                            Equipo pendiente ({{ count($integrantesPendientes) }})
+                                        </p>
+                                        <div class="tl-pending-list">
+                                            @foreach($integrantesPendientes as $integrante)
+                                                <div class="tl-pending-user">
+                                                    <img src="{{ $integrante->foto ? asset('storage/' . $integrante->foto) : asset('img/usuarios/default_user.png') }}" 
+                                                         alt="{{ $integrante->nombre }}" 
+                                                         class="tl-pending-photo">
+                                                    <span>{{ $integrante->nombre }}</span>
+                                                    <span class="tl-pending-status">PENDIENTE</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <a href="{{ route('gimcana.mapa', ['locate' => 'user']) }}" class="btn-location" style="width: 100%;">
+                                    <i class="bi bi-geo-alt"></i>
+                                    Ver tu ubicación
                                 </a>
                             @endif
                         </div>
@@ -78,21 +98,13 @@
         </main>
 
         <nav class="bottom-nav" aria-label="Navegacion principal">
-            <a href="{{ route('cliente.index') }}" class="nav-item">
-                <i class="bi bi-map"></i>
-                <span>Mapa</span>
-            </a>
-            <a href="{{ route('cliente.index') }}" class="nav-item">
-                <i class="bi bi-heart"></i>
-                <span>Favoritos</span>
-            </a>
-            <a href="{{ route('gimcana.mapa') }}" class="nav-item active" aria-current="page">
+            <a href="{{ route('gimcana.mapa') }}" class="nav-item">
                 <i class="bi bi-ticket-perforated"></i>
-                <span>Gimcana</span>
+                <span>Reto Actual</span>
             </a>
-            <a href="{{ route('cliente.index') }}" class="nav-item">
-                <i class="bi bi-person"></i>
-                <span>Perfil</span>
+            <a href="{{ route('gimcana.progreso') }}" class="nav-item active" aria-current="page">
+                <i class="bi bi-list-check"></i>
+                <span>Mi Progreso</span>
             </a>
         </nav>
     </div>

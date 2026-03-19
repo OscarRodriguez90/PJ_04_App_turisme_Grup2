@@ -299,3 +299,60 @@ body {
         top: 36px;
     }
 }
+
+/* PENDING MEMBERS IN PROGRESS */
+.tl-pending-box {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #a5f3fc;
+}
+
+.tl-pending-title {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #0d9488;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tl-pending-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tl-pending-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    padding: 6px 12px 6px 6px;
+    border-radius: 12px;
+    border: 1px solid #ccfbf1;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #134e4a;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.tl-pending-photo {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary);
+}
+
+.tl-pending-status {
+    margin-left: auto;
+    font-size: 0.65rem;
+    background: #fee2e2;
+    color: #ef4444;
+    padding: 1px 6px;
+    border-radius: 99px;
+    font-weight: 800;
+}

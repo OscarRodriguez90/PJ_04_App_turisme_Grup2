@@ -46,6 +46,13 @@
         routeButton: document.getElementById('routeButton'),
         centerButton: document.getElementById('centerButton'),
         routeNote: document.getElementById('routeNote'),
+        detailPanel: document.getElementById('detailPanel'),
+        favOverlay: document.getElementById('favConfirmOverlay'),
+        favConfirmIcon: document.getElementById('favConfirmIcon'),
+        favConfirmTitle: document.getElementById('favConfirmTitle'),
+        favConfirmText: document.getElementById('favConfirmText'),
+        favConfirmOk: document.getElementById('favConfirmOk'),
+        favConfirmCancel: document.getElementById('favConfirmCancel'),
     };
 
     const defaultCenter = [41.3597, 2.0997];
@@ -66,6 +73,8 @@
         fillColor: '#0b6ef6',
         fillOpacity: 0.4,
     }).addTo(map);
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────
 
     function escapeHtml(value) {
         return String(value ?? '')
@@ -103,6 +112,59 @@
         return Math.round(R * c);
     }
 
+    /** Hace scroll suave hasta el mapa solo en responsive (< 1100 px). */
+    function scrollToMapIfMobile() {
+        if (window.innerWidth < 1100) {
+            els.map.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    /** Hace scroll suave hasta el panel de detalle en responsive (< 1100 px). */
+    function scrollToDetailIfMobile() {
+        if (window.innerWidth < 1100 && els.detailPanel) {
+            els.detailPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    /**
+     * Muestra el panel de confirmación personalizado.
+     * Devuelve una Promise<boolean>: true si confirma, false si cancela.
+     */
+    function mostrarPanelConfirmacion(titulo, texto, icono, esActivo) {
+        return new Promise((resolve) => {
+            els.favConfirmTitle.textContent = titulo;
+            els.favConfirmText.textContent = texto;
+            els.favConfirmIcon.textContent = icono;
+            els.favConfirmIcon.style.color = esActivo ? 'var(--danger)' : 'var(--primary)';
+
+            els.favOverlay.classList.add('is-visible');
+            els.favOverlay.setAttribute('aria-hidden', 'false');
+
+            function cerrar(resultado) {
+                els.favOverlay.classList.remove('is-visible');
+                els.favOverlay.setAttribute('aria-hidden', 'true');
+                // Limpiar listeners para evitar acumulación
+                els.favConfirmOk.removeEventListener('click', onOk);
+                els.favConfirmCancel.removeEventListener('click', onCancel);
+                els.favOverlay.removeEventListener('click', onOverlayClick);
+                resolve(resultado);
+            }
+
+            function onOk() { cerrar(true); }
+            function onCancel() { cerrar(false); }
+            function onOverlayClick(e) {
+                // Cerrar si se clica fuera del panel
+                if (e.target === els.favOverlay) { cerrar(false); }
+            }
+
+            els.favConfirmOk.addEventListener('click', onOk);
+            els.favConfirmCancel.addEventListener('click', onCancel);
+            els.favOverlay.addEventListener('click', onOverlayClick);
+        });
+    }
+
+    // ─── Filtros ──────────────────────────────────────────────────────────────
+
     function getFilteredLugares() {
         const search = els.searchInput.value.trim().toLowerCase();
         const categoryIds = new Set(getSelectedCategoryIds());
@@ -136,6 +198,8 @@
             return matchesSearch && matchesCategory && matchesFavorite && matchesNearby;
         });
     }
+
+    // ─── Marcadores ───────────────────────────────────────────────────────────
 
     function markerHtml(color, active, iconClass) {
         return `
@@ -207,6 +271,8 @@
         });
     }
 
+    // ─── Lista de lugares ─────────────────────────────────────────────────────
+
     function renderPlacesList(filteredLugares) {
         els.placesList.innerHTML = '';
 
@@ -241,17 +307,23 @@
                 state.selectedLugarId = lugar.id;
                 render();
                 map.flyTo([lugar.latitud, lugar.longitud], 16, { duration: 0.8 });
-                
-                // Ocultar sidebar para ver el mapa directamente en móviles
-                if (window.innerWidth < 1100 && state.isSidebarOpen) {
-                    state.isSidebarOpen = false;
-                    els.sidebar?.classList.remove('is-open');
-                    document.body.classList.remove('sidebar-is-open');
+
+                // En responsive: cerrar sidebar y desplazarse al panel de detalle
+                if (window.innerWidth < 1100) {
+                    if (state.isSidebarOpen) {
+                        state.isSidebarOpen = false;
+                        els.sidebar?.classList.remove('is-open');
+                        document.body.classList.remove('sidebar-is-open');
+                    }
+                    // Pequeño delay para que el DOM se actualice antes del scroll
+                    setTimeout(() => scrollToDetailIfMobile(), 80);
                 }
             });
             els.placesList.appendChild(button);
         });
     }
+
+    // ─── Panel de detalle ─────────────────────────────────────────────────────
 
     function updateDetail(lugar) {
         if (!lugar) {
@@ -260,20 +332,36 @@
             return;
         }
 
+        const wasHidden = els.placeDetail.classList.contains('hidden');
+
         els.emptyState.classList.add('hidden');
         els.placeDetail.classList.remove('hidden');
+
+        // Animación de entrada solo si el panel estaba oculto anteriormente
+        if (wasHidden) {
+            els.placeDetail.classList.remove('is-entering');
+            // Doble rAF para garantizar que el navegador detecta el cambio de clase
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    els.placeDetail.classList.add('is-entering');
+                });
+            });
+        }
+
         els.detailName.textContent = lugar.nombre;
-        
+
         let imgName = lugar.imagen ? lugar.imagen : 'default_lugar.jpg';
         els.detailImage.src = `/img/lugares/${imgName}`;
-        
+
         if (lugar.categoria) {
             const iconHtml = lugar.categoria.icono_url ? `<i class="${escapeHtml(lugar.categoria.icono_url)}" style="margin-right: 4px;"></i>` : '';
-            els.detailCategory.innerHTML = `<span style="color: ${escapeHtml(lugar.categoria.color_marcador || 'var(--primary)')}">${iconHtml}${escapeHtml(lugar.categoria.nombre)}</span>`;
+            els.detailCategory.innerHTML = `<span style="color: ${escapeHtml(lugar.categoria.color_marcador || 'var(--primary)')}">
+                ${iconHtml}${escapeHtml(lugar.categoria.nombre)}
+            </span>`;
         } else {
             els.detailCategory.textContent = 'Sin categoría';
         }
-        
+
         els.detailDescription.textContent = lugar.descripcion || 'Este lugar todavía no tiene descripción detallada.';
         els.detailAddress.textContent = lugar.direccion_completa || 'Dirección no disponible';
         els.detailCoordinates.textContent = `${lugar.latitud.toFixed(5)}, ${lugar.longitud.toFixed(5)}`;
@@ -298,13 +386,15 @@
         if (state.routingControl && state.routeTargetId === state.selectedLugarId) {
             els.routeButton.textContent = 'Dejar de mostrar la ruta';
             els.routeButton.classList.remove('btn-primary');
-            els.routeButton.classList.add('btn-secondary'); // Se usa btn-secondary para denotar accíón alternativa
+            els.routeButton.classList.add('btn-secondary');
         } else {
             els.routeButton.textContent = 'Mostrar ruta';
             els.routeButton.classList.remove('btn-secondary');
             els.routeButton.classList.add('btn-primary');
         }
     }
+
+    // ─── Ruta ─────────────────────────────────────────────────────────────────
 
     function clearRoute() {
         if (state.routingControl) {
@@ -313,7 +403,7 @@
         }
         state.routeTargetId = null;
         updateDetailButtonState();
-        
+
         if (state.selectedLugarId) {
             els.routeNote.textContent = state.userLocation
                 ? 'Tu ubicación está activa. Ya puedes mostrar la ruta hasta este lugar.'
@@ -354,13 +444,13 @@
         }).on('routesfound', function(e) {
             const routes = e.routes;
             if (routes && routes.length > 0) {
-                const distance = routes[0].summary.totalDistance; // en metros
-                const time = Math.round(routes[0].summary.totalTime / 60); // en minutos
-                
-                let distText = distance < 1000 
-                    ? `${Math.round(distance)} metros` 
+                const distance = routes[0].summary.totalDistance;
+                const time = Math.round(routes[0].summary.totalTime / 60);
+
+                let distText = distance < 1000
+                    ? `${Math.round(distance)} metros`
                     : `${(distance / 1000).toFixed(2)} km`;
-                    
+
                 els.routeNote.innerHTML = `<span style="color:var(--primary); font-weight:600;">Distancia a la ruta: ${distText}</span> (Aprox. ${time} min)`;
             }
         }).addTo(map);
@@ -368,7 +458,12 @@
         state.routeTargetId = state.selectedLugarId;
         updateDetailButtonState();
         els.mapMessage.textContent = `Ruta calculada hasta ${lugar.nombre}.`;
+
+        // En responsive, subir al mapa tras mostrar la ruta
+        scrollToMapIfMobile();
     }
+
+    // ─── Geolocalización ──────────────────────────────────────────────────────
 
     function locateUser(onSuccess) {
         if (!navigator.geolocation) {
@@ -400,6 +495,8 @@
             timeout: 10000,
         });
     }
+
+    // ─── Favoritos ────────────────────────────────────────────────────────────
 
     async function toggleFavorito(lugarId) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -434,6 +531,8 @@
         }
     }
 
+    // ─── Render principal ─────────────────────────────────────────────────────
+
     function render() {
         const filteredLugares = getFilteredLugares();
         const selectedLugarStillVisible = filteredLugares.some((lugar) => lugar.id === state.selectedLugarId);
@@ -447,6 +546,8 @@
         updateDetail(getLugarById(state.selectedLugarId));
     }
 
+    // ─── Event listeners ──────────────────────────────────────────────────────
+
     els.radiusRange.addEventListener('input', render);
     els.favoritesOnly.addEventListener('change', render);
     els.nearbyOnly.addEventListener('change', () => {
@@ -459,7 +560,7 @@
     els.searchInput.addEventListener('input', render);
     els.categoryFilters.forEach((checkbox) => checkbox.addEventListener('change', render));
     els.locateMeButton.addEventListener('click', () => locateUser(render));
-    
+
     els.routeButton.addEventListener('click', () => {
         if (state.routingControl && state.routeTargetId === state.selectedLugarId) {
             clearRoute();
@@ -473,9 +574,11 @@
         const lugar = getLugarById(state.selectedLugarId);
         if (lugar) {
             map.flyTo([lugar.latitud, lugar.longitud], 16, { duration: 0.8 });
+            // En responsive, subir al mapa tras centrar
+            scrollToMapIfMobile();
         }
     });
-    
+
     els.closeDetailButton?.addEventListener('click', () => {
         state.selectedLugarId = null;
         clearRoute();
@@ -483,16 +586,35 @@
         render();
     });
 
-    els.detailFavoriteButton.addEventListener('click', () => {
-        if (state.selectedLugarId) {
+    // Confirmación antes de toggle favoritos (panel visual)
+    els.detailFavoriteButton.addEventListener('click', async () => {
+        if (!state.selectedLugarId) return;
+
+        const esFav = isFavorito(state.selectedLugarId);
+        const lugar = getLugarById(state.selectedLugarId);
+        const nombre = lugar ? lugar.nombre : 'este lugar';        
+
+        const titulo = esFav ? '¿Quitar de favoritos?' : '¿Añadir a favoritos?';
+        const texto = esFav
+            ? `Se eliminará "${nombre}" de tu lista de favoritos.`
+            : `Se añadirá "${nombre}" a tu lista de favoritos.`;
+        const icono = esFav ? '♥' : '♡';
+
+        // Actualizar texto del botón Confirmar
+        els.favConfirmOk.textContent = esFav ? 'Sí, quitar' : 'Sí, añadir';
+
+        const confirmado = await mostrarPanelConfirmacion(titulo, texto, icono, esFav);
+        if (confirmado) {
             toggleFavorito(state.selectedLugarId);
         }
     });
+
     els.toggleSidebar?.addEventListener('click', () => {
         state.isSidebarOpen = !state.isSidebarOpen;
         els.sidebar?.classList.toggle('is-open', state.isSidebarOpen);
         document.body.classList.toggle('sidebar-is-open', state.isSidebarOpen);
     });
+
     els.closeSidebarBtn?.addEventListener('click', () => {
         state.isSidebarOpen = false;
         els.sidebar?.classList.remove('is-open');

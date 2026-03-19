@@ -106,12 +106,10 @@
                                 <label class="form-label">Respuesta Correcta</label>
                                 <input type="text" name="lugares[{{$i}}][respuesta_correcta]" class="form-input" placeholder="Ej: 1990" value="{{ old("lugares.$i.respuesta_correcta", $pruebaExistente ? $pruebaExistente->respuesta_correcta : '') }}">
                             </div>
-                            @if($i < 4)
                             <div class="form-group">
                                 <label class="form-label">Pista</label>
                                 <textarea name="lugares[{{$i}}][pista]" class="form-textarea" rows="2" placeholder="Ej: Es la última en la década de los 90" style="min-height: 80px;">{{ old("lugares.$i.pista", $pruebaExistente ? $pruebaExistente->pista : '') }}</textarea>
                             </div>
-                            @endif
                         </div>
                         @endfor
                     </div>
