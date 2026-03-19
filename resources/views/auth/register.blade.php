@@ -25,6 +25,32 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
+    <!-- Brand -->
+    <a href="{{ route('home') }}" class="brand">
+        <img src="{{ asset('img/admin/logo.png') }}" alt="GeoTurismo" class="brand-logo">
+        GeoTurismo
+    </a>
+
+    <!-- Card -->
+    <div class="card">
+
+        <h1 class="card-title">Crea tu cuenta</h1>
+        <p class="card-subtitle">Únete y descubre los mejores lugares turísticos</p>
+
+        <form id="register-form"
+              action="{{ route('register') }}"
+              method="POST"
+              enctype="multipart/form-data"
+              data-check-username="{{ route('check-username') }}"
+              data-check-email="{{ route('check-email') }}">
+            @csrf
+
+            @if($errors->any())
+            <div class="error-card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
                 Volver al INICIO
             </a>
@@ -34,6 +60,26 @@
                 <img src="{{ asset('img/admin/logo.png') }}" alt="GeoTurismo">
                 GeoTurismo
             </a>
+            <!-- Avatar upload -->
+            <div class="avatar-upload">
+                <input type="file"
+                       id="foto"
+                       name="foto"
+                       accept="image/png,image/jpeg,image/webp"
+                       class="avatar-file-input">
+
+                <div class="avatar-preview" id="avatar-preview" aria-live="polite">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+
+                <button type="button" class="avatar-upload-btn" id="avatar-upload-btn">
+                    Subir foto de perfil (opcional)
+                </button>
+            </div>
+            <span class="avatar-error" id="avatar-error"></span>
 
             <div class="card">
                 <h1 class="card-title">Crea tu cuenta</h1>

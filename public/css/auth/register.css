@@ -112,7 +112,11 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.35rem;
+}
+
+.avatar-file-input {
+    display: none;
 }
 
 .avatar-preview {
@@ -133,6 +137,12 @@
     height: 28px;
 }
 
+.avatar-preview.has-image {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 .avatar-upload-btn {
     flex: 1;
     padding: 0.625rem 1rem;
@@ -146,7 +156,20 @@
     transition: border-color 0.2s, color 0.2s;
 }
 
+button.avatar-upload-btn {
+    font-family: inherit;
+    appearance: none;
+}
+
 .avatar-upload-btn:hover {
     border-color: var(--primary);
     color: var(--primary);
+}
+
+.avatar-error {
+    display: block;
+    margin-bottom: 1rem;
+    min-height: 1rem;
+    color: #dc2626;
+    font-size: 0.75rem;
 }
