@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Equipo;
+use App\Models\Lugar;
 use App\Models\Prueba;
 use App\Models\Sala;
 use Illuminate\Http\RedirectResponse;
@@ -35,10 +36,14 @@ class GimcanaController extends Controller
             return redirect()->route('gimcana.final');
         }
 
+        $lugares = Lugar::with('categoria')->get();
+
         return view('gimcana.mapa', [
-            'equipo' => $equipo,
-            'sala' => $sala,
+            'equipo'     => $equipo,
+            'usuario'    => $request->user(),
+            'sala'       => $sala,
             'retoActual' => $retoActual,
+            'lugares'    => $lugares,
         ]);
     }
 
@@ -79,7 +84,7 @@ class GimcanaController extends Controller
         ]);
     }
 
-    public function resolverPregunta(Request $request, int $reto): RedirectResponse
+    public function resolverPregunta(Request $request, int $reto): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $context = $this->resolveContext($request);
         if ($context instanceof RedirectResponse) {
@@ -106,6 +111,11 @@ class GimcanaController extends Controller
             ->firstOrFail();
 
         if (!$this->answersMatch((string) $request->respuesta, (string) $retoModel->respuesta_correcta)) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'errors' => ['respuesta' => 'Respuesta incorrecta. Inténtalo de nuevo.']
+                ], 422);
+            }
             return back()->withErrors([
                 'respuesta' => 'Respuesta incorrecta. Intentalo de nuevo.',
             ])->withInput();
@@ -123,6 +133,21 @@ class GimcanaController extends Controller
         );
 
         $stateAfter = $this->buildTeamProgressState($equipo, $sala, $pivotId);
+
+        if ($request->expectsJson()) {
+            $redirect = route('gimcana.mapa');
+            if ($stateAfter['allTeamRetosCompleted']) {
+                $redirect = route('gimcana.final');
+            } elseif ($stateAfter['userWaiting']) {
+                $redirect = route('gimcana.espera');
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Reto completado.',
+                'redirect' => $redirect
+            ]);
+        }
 
         if ($stateAfter['allTeamRetosCompleted']) {
             return redirect()->route('gimcana.final')->with('success', 'Has completado toda la gimcana.');
@@ -160,6 +185,7 @@ class GimcanaController extends Controller
             'integrantesCompletados' => $state['integrantesCompletadosCurrent'],
             'totalIntegrantes' => $state['teamMemberCount'],
             'miembrosPendientes' => max(0, $state['teamMemberCount'] - $state['integrantesCompletadosCurrent']),
+            'integrantesPendientes' => $state['integrantesPendientes'],
         ]);
     }
 
@@ -231,12 +257,15 @@ class GimcanaController extends Controller
         $state = $this->buildTeamProgressState($equipo, $sala, $pivotId);
         $completadosIds = $state['teamCompletedRetoIds'];
         $ordenActual = $state['currentReto']?->orden;
-
+        $integrantesPendientes = $state['integrantesPendientes'];
+        
         return view('gimcana.progreso', [
             'sala' => $sala,
+            'usuario' => $request->user(),
             'retos' => $retos,
             'completadosIds' => $completadosIds,
             'ordenActual' => $ordenActual,
+            'integrantesPendientes' => $integrantesPendientes,
         ]);
     }
 
@@ -340,6 +369,27 @@ class GimcanaController extends Controller
 
         $allTeamRetosCompleted = $retos->count() > 0 && count($teamCompletedRetoIds) >= $retos->count();
 
+        // Obtener integrantes del equipo que NO han completado el reto actual
+        $integrantesPendientes = [];
+        if ($currentReto && !$allTeamRetosCompleted) {
+            $integrantesCompletadosIds = DB::table('tbl_progreso_retos')
+                ->where('id_reto', $currentReto->id)
+                ->where('completado', true)
+                ->whereIn('id_equipo_usuario', $teamPivotIds)
+                ->pluck('id_equipo_usuario')
+                ->all();
+
+            $integrantesPendientesIds = array_diff($teamPivotIds, $integrantesCompletadosIds);
+
+            if (!empty($integrantesPendientesIds)) {
+                $integrantesPendientes = DB::table('tbl_equipo_usuarios')
+                    ->join('tbl_usuarios', 'tbl_equipo_usuarios.id_usuario', '=', 'tbl_usuarios.id')
+                    ->whereIn('tbl_equipo_usuarios.id', $integrantesPendientesIds)
+                    ->select('tbl_usuarios.nombre', 'tbl_usuarios.foto')
+                    ->get();
+            }
+        }
+
         return [
             'teamCompletedRetoIds' => $teamCompletedRetoIds,
             'currentReto' => $currentReto,
@@ -348,6 +398,7 @@ class GimcanaController extends Controller
             'userCompletedCurrent' => $userCompletedCurrent,
             'userWaiting' => $userWaiting,
             'allTeamRetosCompleted' => $allTeamRetosCompleted,
+            'integrantesPendientes' => $integrantesPendientes,
         ];
     }
 

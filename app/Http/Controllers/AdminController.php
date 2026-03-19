@@ -431,6 +431,7 @@ class AdminController extends Controller
             'lugares.1.pista'              => 'required|string|min:5',
             'lugares.2.pista'              => 'required|string|min:5',
             'lugares.3.pista'              => 'required|string|min:5',
+            'lugares.4.pista'              => 'required|string|min:5',
         ], $messages);
 
         \DB::beginTransaction();
@@ -502,6 +503,7 @@ class AdminController extends Controller
             'lugares.1.pista'              => 'required|string|min:5',
             'lugares.2.pista'              => 'required|string|min:5',
             'lugares.3.pista'              => 'required|string|min:5',
+            'lugares.4.pista'              => 'required|string|min:5',
         ], $messages);
 
         \DB::beginTransaction();
@@ -512,17 +514,32 @@ class AdminController extends Controller
                 'descripcion' => $request->descripcion,
             ]);
 
-            Prueba::where('id_sala', $sala->id)->delete();
+            // En lugar de borrar y crear (que falla por claves foráneas si hay progreso), 
+            // buscamos los retos existentes por su orden y los actualizamos.
+            $existingPruebas = Prueba::where('id_sala', $sala->id)->get();
 
             foreach ($request->lugares as $index => $lugarData) {
-                Prueba::create([
-                    'id_sala'            => $sala->id,
-                    'id_lugar'           => $lugarData['id_lugar'],
-                    'orden'              => $index + 1,
-                    'pista'              => $lugarData['pista'] ?? '',
-                    'pregunta'           => $lugarData['pregunta'],
-                    'respuesta_correcta' => $lugarData['respuesta_correcta']
-                ]);
+                $orden = $index + 1;
+                $prueba = $existingPruebas->firstWhere('orden', $orden);
+
+                if ($prueba) {
+                    $prueba->update([
+                        'id_lugar'           => $lugarData['id_lugar'],
+                        'pista'              => $lugarData['pista'] ?? '',
+                        'pregunta'           => $lugarData['pregunta'],
+                        'respuesta_correcta' => $lugarData['respuesta_correcta']
+                    ]);
+                } else {
+                    // Por si acaso no existiera alguno de los retos obligatorios
+                    Prueba::create([
+                        'id_sala'            => $sala->id,
+                        'id_lugar'           => $lugarData['id_lugar'],
+                        'orden'              => $orden,
+                        'pista'              => $lugarData['pista'] ?? '',
+                        'pregunta'           => $lugarData['pregunta'],
+                        'respuesta_correcta' => $lugarData['respuesta_correcta']
+                    ]);
+                }
             }
 
             \DB::commit();

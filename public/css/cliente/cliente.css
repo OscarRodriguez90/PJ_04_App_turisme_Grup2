@@ -577,6 +577,89 @@ input[type="range"] {
     display: none;
 }
 
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.detail-card.is-entering {
+    animation: fadeInUp 0.35s ease forwards;
+}
+
+/* ── Panel de confirmación de favoritos ──────────────────────────── */
+.fav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    padding: 1.25rem;
+}
+
+.fav-overlay.is-visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.fav-confirm-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+    padding: 2rem 1.75rem 1.75rem;
+    width: min(420px, 100%);
+    text-align: center;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fav-overlay.is-visible .fav-confirm-panel {
+    transform: translateY(0) scale(1);
+}
+
+.fav-confirm__icon {
+    font-size: 2.8rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+    transition: color 0.2s;
+}
+
+.fav-confirm-panel h3 {
+    margin: 0 0 .5rem;
+    font-size: 1.2rem;
+}
+
+.fav-confirm-panel p {
+    color: var(--muted);
+    margin: 0 0 1.5rem;
+    line-height: 1.6;
+}
+
+.fav-confirm__actions {
+    display: flex;
+    gap: .75rem;
+    justify-content: center;
+}
+
+.fav-confirm__actions .btn {
+    flex: 1;
+    max-width: 160px;
+}
+
+
+
 .mobile-only-btn {
     display: flex;
 }

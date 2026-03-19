@@ -169,6 +169,19 @@
         </main>
     </div>
 
+    <!-- Panel confirmación favoritos -->
+    <div id="favConfirmOverlay" class="fav-overlay" aria-hidden="true">
+        <div class="fav-confirm-panel" role="dialog" aria-modal="true" aria-labelledby="favConfirmTitle">
+            <div class="fav-confirm__icon" id="favConfirmIcon">♡</div>
+            <h3 id="favConfirmTitle">¿Añadir a favoritos?</h3>
+            <p id="favConfirmText">Se añadirá este lugar a tu lista de favoritos.</p>
+            <div class="fav-confirm__actions">
+                <button type="button" class="btn btn-secondary" id="favConfirmCancel">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="favConfirmOk">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         window.geoTurismoData = {
             lugares: @json($lugares),

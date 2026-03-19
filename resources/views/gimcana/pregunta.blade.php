@@ -106,21 +106,13 @@
         </main>
 
         <nav class="bottom-nav" aria-label="Navegacion principal">
-            <a href="{{ route('cliente.index') }}" class="nav-item">
-                <i class="bi bi-map"></i>
-                <span>Mapa</span>
-            </a>
-            <a href="{{ route('cliente.index') }}" class="nav-item">
-                <i class="bi bi-heart"></i>
-                <span>Favoritos</span>
-            </a>
             <a href="{{ route('gimcana.mapa') }}" class="nav-item active" aria-current="page">
                 <i class="bi bi-ticket-perforated"></i>
-                <span>Gimcana</span>
+                <span>Reto Actual</span>
             </a>
-            <a href="{{ route('cliente.index') }}" class="nav-item">
-                <i class="bi bi-person"></i>
-                <span>Perfil</span>
+            <a href="{{ route('gimcana.progreso') }}" class="nav-item">
+                <i class="bi bi-list-check"></i>
+                <span>Mi Progreso</span>
             </a>
         </nav>
     </div>
