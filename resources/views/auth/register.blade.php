@@ -25,6 +25,7 @@
         <form id="register-form"
               action="{{ route('register') }}"
               method="POST"
+              enctype="multipart/form-data"
               data-check-username="{{ route('check-username') }}"
               data-check-email="{{ route('check-email') }}">
             @csrf
@@ -44,18 +45,26 @@
             </div>
             @endif
 
-            <!-- Avatar upload (visual only) -->
+            <!-- Avatar upload -->
             <div class="avatar-upload">
-                <div class="avatar-preview">
+                <input type="file"
+                       id="foto"
+                       name="foto"
+                       accept="image/png,image/jpeg,image/webp"
+                       class="avatar-file-input">
+
+                <div class="avatar-preview" id="avatar-preview" aria-live="polite">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
                         <circle cx="12" cy="7" r="4"/>
                     </svg>
                 </div>
-                <div class="avatar-upload-btn">
+
+                <button type="button" class="avatar-upload-btn" id="avatar-upload-btn">
                     Subir foto de perfil (opcional)
-                </div>
+                </button>
             </div>
+            <span class="avatar-error" id="avatar-error"></span>
 
             <!-- Nombre y apellidos -->
             <div class="form-row-cols">
