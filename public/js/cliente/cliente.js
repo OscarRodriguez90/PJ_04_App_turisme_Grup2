@@ -14,6 +14,8 @@
         routingControl: null,
         routeTargetId: null,
         isSidebarOpen: false,
+        watchId: null,
+        lastUpdate: 0,
     };
 
     const els = {
@@ -464,36 +466,85 @@
     }
 
     // ─── Geolocalización ──────────────────────────────────────────────────────
-
-    function locateUser(onSuccess) {
+    
+    function startTracking() {
         if (!navigator.geolocation) {
             els.mapMessage.textContent = 'Tu navegador no permite obtener la ubicación actual.';
             return;
         }
 
-        els.mapMessage.textContent = 'Obteniendo tu ubicación actual...';
+        if (state.watchId) return;
 
-        navigator.geolocation.getCurrentPosition((position) => {
-            state.userLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-            };
+        els.mapMessage.textContent = 'Iniciando seguimiento GPS...';
 
-            userMarker.setLatLng([state.userLocation.lat, state.userLocation.lng]);
-            userMarker.setStyle({ radius: 10 });
-            map.flyTo([state.userLocation.lat, state.userLocation.lng], 14, { duration: 0.8 });
-            els.mapMessage.textContent = 'Ubicación obtenida correctamente.';
-            render();
-
-            if (typeof onSuccess === 'function') {
-                onSuccess();
+        state.watchId = navigator.geolocation.watchPosition(
+            onLocationUpdate,
+            (err) => {
+                console.error('Error GPS:', err);
+                els.mapMessage.textContent = 'Error obteniendo ubicación. Revisa los permisos.';
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0,
             }
-        }, () => {
-            els.mapMessage.textContent = 'No se pudo obtener tu ubicación. Revisa los permisos del navegador.';
-        }, {
-            enableHighAccuracy: true,
-            timeout: 10000,
-        });
+        );
+    }
+
+    async function onLocationUpdate(position) {
+        const now = Date.now();
+        const shouldSync = (now - state.lastUpdate >= 7000);
+
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        state.userLocation = { lat, lng };
+
+        userMarker.setLatLng([lat, lng]);
+        userMarker.setStyle({ radius: 10 });
+        
+        if (shouldSync) {
+            state.lastUpdate = now;
+            await syncLocationWithServer(lat, lng);
+        }
+
+        if (!state.selectedLugarId) {
+             // map.flyTo([lat, lng], 14, { duration: 0.8 });
+        }
+
+        render();
+    }
+
+    async function syncLocationWithServer(lat, lng) {
+        if (!data.actualizarUbicacionUrl) return;
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        try {
+            await fetch(data.actualizarUbicacionUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || '',
+                },
+                body: JSON.stringify({ lat, lng }),
+            });
+        } catch (error) {
+            console.error('Error sincronizando ubicación:', error);
+        }
+    }
+
+    function locateUser(onSuccess) {
+        if (!state.watchId) {
+            startTracking();
+        } else if (state.userLocation) {
+            map.flyTo([state.userLocation.lat, state.userLocation.lng], 14, { duration: 0.8 });
+        }
+
+        if (typeof onSuccess === 'function' && state.userLocation) {
+            onSuccess();
+        }
     }
 
     // ─── Favoritos ────────────────────────────────────────────────────────────
@@ -622,4 +673,5 @@
     });
 
     render();
+    startTracking();
 })();
