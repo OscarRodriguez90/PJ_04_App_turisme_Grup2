@@ -555,6 +555,7 @@ class GimcanaController extends Controller
             $winnerRow = DB::table('tbl_historial')
                 ->where('id_sala', $sala->id)
                 ->where('resultado', 'victoria')
+                ->orderBy('created_at', 'desc')
                 ->first();
             
             if ($winnerRow && is_object($winnerRow)) {
@@ -631,7 +632,7 @@ class GimcanaController extends Controller
 
     private function snapshotHistorial(Sala $sala): void
     {
-        $totalRetos = Prueba::where('id_sala', $sala->id)->orderBy('orden')->get();
+        $totalRetos = Prueba::with('lugar')->where('id_sala', $sala->id)->orderBy('orden')->get();
         $startTime = $sala->fecha_inicio
             ? \Carbon\Carbon::parse($sala->fecha_inicio)
             : \Carbon\Carbon::parse($sala->created_at);
@@ -663,6 +664,7 @@ class GimcanaController extends Controller
                     ->where('id_sala', $sala->id)
                     ->where('id_equipo', $eq->id)
                     ->where('id_usuario', $pivot->id_usuario)
+                    ->where('fecha_inicio', $sala->fecha_inicio)
                     ->exists();
                 if ($already) continue;
 
@@ -676,7 +678,7 @@ class GimcanaController extends Controller
                         ->value('fecha_completado');
                     $retosSnapshot[] = [
                         'orden'            => $reto->orden,
-                        'nombre'           => $reto->lugar->nombre ?? ('Reto #' . $reto->orden),
+                        'nombre'           => $reto->lugar?->nombre ?? ('Reto #' . $reto->orden),
                         'completado'       => (bool) $fechaComp,
                         'fecha_completado' => $fechaComp,
                     ];

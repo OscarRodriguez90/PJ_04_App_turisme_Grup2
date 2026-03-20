@@ -1,0 +1,41 @@
+[
+    {
+        "id": 3,
+        "id_sala": 3,
+        "id_equipo": 7,
+        "id_usuario": 7,
+        "resultado": "victoria",
+        "tiempo_total_segundos": 141,
+        "fecha_inicio": "2026-03-20 19:50:49",
+        "fecha_fin": "2026-03-20 19:53:10",
+        "retos_completados": "[{\"orden\": 1, \"nombre\": \"Biblioteca Municipal Les Voltes\", \"completado\": true, \"fecha_completado\": \"2026-03-20 19:51:34\"}, {\"orden\": 2, \"nombre\": \"Estaci\u00f3 Can Ros (FGC)\", \"completado\": true, \"fecha_completado\": \"2026-03-20 19:52:20\"}, {\"orden\": 3, \"nombre\": \"Parc de la Foneria\", \"completado\": true, \"fecha_completado\": \"2026-03-20 19:52:41\"}, {\"orden\": 4, \"nombre\": \"CAP El Serral\", \"completado\": true, \"fecha_completado\": \"2026-03-20 19:52:59\"}, {\"orden\": 5, \"nombre\": \"Pla\u00e7a de Narc\u00eds Lunes\", \"completado\": true, \"fecha_completado\": \"2026-03-20 19:53:10\"}]",
+        "created_at": "2026-03-20 19:53:10",
+        "updated_at": "2026-03-20 19:53:10"
+    },
+    {
+        "id": 4,
+        "id_sala": 3,
+        "id_equipo": 8,
+        "id_usuario": 6,
+        "resultado": "derrota",
+        "tiempo_total_segundos": 0,
+        "fecha_inicio": "2026-03-20 19:50:49",
+        "fecha_fin": "2026-03-20 19:53:10",
+        "retos_completados": "[{\"orden\": 1, \"nombre\": \"Biblioteca Municipal Les Voltes\", \"completado\": false, \"fecha_completado\": null}, {\"orden\": 2, \"nombre\": \"Estaci\u00f3 Can Ros (FGC)\", \"completado\": false, \"fecha_completado\": null}, {\"orden\": 3, \"nombre\": \"Parc de la Foneria\", \"completado\": false, \"fecha_completado\": null}, {\"orden\": 4, \"nombre\": \"CAP El Serral\", \"completado\": false, \"fecha_completado\": null}, {\"orden\": 5, \"nombre\": \"Pla\u00e7a de Narc\u00eds Lunes\", \"completado\": false, \"fecha_completado\": null}]",
+        "created_at": "2026-03-20 19:53:10",
+        "updated_at": "2026-03-20 19:53:10"
+    },
+    {
+        "id": 5,
+        "id_sala": 3,
+        "id_equipo": 7,
+        "id_usuario": 9,
+        "resultado": "derrota",
+        "tiempo_total_segundos": 235,
+        "fecha_inicio": "2026-03-20 19:59:51",
+        "fecha_fin": "2026-03-20 20:05:31",
+        "retos_completados": "[{\"orden\": 1, \"nombre\": \"Biblioteca Municipal Les Voltes\", \"completado\": true, \"fecha_completado\": \"2026-03-20 20:00:32\"}, {\"orden\": 2, \"nombre\": \"Estaci\u00f3 Can Ros (FGC)\", \"completado\": true, \"fecha_completado\": \"2026-03-20 20:03:46\"}, {\"orden\": 3, \"nombre\": \"Parc de la Foneria\", \"completado\": false, \"fecha_completado\": null}, {\"orden\": 4, \"nombre\": \"CAP El Serral\", \"completado\": false, \"fecha_completado\": null}, {\"orden\": 5, \"nombre\": \"Pla\u00e7a de Narc\u00eds Lunes\", \"completado\": false, \"fecha_completado\": null}]",
+        "created_at": "2026-03-20 20:05:31",
+        "updated_at": "2026-03-20 20:05:31"
+    }
+]

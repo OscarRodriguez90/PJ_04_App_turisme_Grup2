@@ -228,7 +228,7 @@
 
     function activarAutoPolling() {
         checkEstado();
-        window.setInterval(checkEstado, 3000);
+        window.setInterval(checkEstado, 4000);
     }
 
     // ── Modal helpers ────────────────────────────────────────
