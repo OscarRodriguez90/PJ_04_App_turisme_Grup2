@@ -183,6 +183,7 @@
             lugares: @json($lugares),
             favoritosIds: @json($favoritosIds),
             toggleFavoritoUrl: "{{ url('/cliente/favoritos') }}",
+            actualizarUbicacionUrl: "{{ route('cliente.ubicacion.actualizar') }}",
             usuario: {
                 nombre: @json($usuario->nombre),
                 username: @json($usuario->username)

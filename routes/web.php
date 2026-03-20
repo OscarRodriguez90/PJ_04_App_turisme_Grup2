@@ -28,6 +28,7 @@ Route::get('/check-email',    [AuthController::class, 'checkEmail'])->name('chec
 Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::get('/cliente', [ClienteController::class, 'index'])->name('cliente.index');
     Route::post('/cliente/favoritos/{lugar}', [ClienteController::class, 'toggleFavorito'])->name('cliente.favoritos.toggle');
+    Route::post('/cliente/actualizar-ubicacion', [ClienteController::class, 'actualizarUbicacion'])->name('cliente.ubicacion.actualizar');
 
     Route::get('/grupos', [GruposController::class, 'index'])->name('grupos.index');
     Route::post('/grupos', [GruposController::class, 'store'])->name('grupos.store');

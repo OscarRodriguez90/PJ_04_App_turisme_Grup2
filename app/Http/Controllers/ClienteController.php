@@ -74,4 +74,19 @@ class ClienteController extends Controller
                 : 'Lugar añadido a tus favoritos.',
         ]);
     }
+
+    public function actualizarUbicacion(Request $request): JsonResponse
+    {
+        // Por ahora solo validamos y retornamos éxito. 
+        // Podríamos guardar la ubicación en la base de datos si fuera necesario.
+        $request->validate([
+            'lat' => 'required|numeric',
+            'lng' => 'required|numeric',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ubicación sincronizada correctamente.',
+        ]);
+    }
 }
