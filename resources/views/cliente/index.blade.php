@@ -111,8 +111,12 @@
                     <h2>Mapa interactivo</h2>
                 </div>
                 <div class="mobile-topbar-actions">
-                    <a href="{{ route('sala.index') }}" class="btn btn-jugar" id="playButton">Jugar</a>
-                    <button type="button" class="btn btn-secondary" id="toggleSidebar">Filtros</button>
+                    <a href="{{ route('sala.index') }}" class="btn btn-jugar" id="playButton">
+                        <i class="bi bi-controller"></i> Jugar
+                    </a>
+                    <button type="button" class="btn btn-secondary" id="toggleSidebar">
+                        <i class="bi bi-sliders"></i> Filtros
+                    </button>
                 </div>
             </header>
 
