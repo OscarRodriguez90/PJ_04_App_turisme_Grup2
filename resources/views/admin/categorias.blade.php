@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ asset('css/admin/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/admin_dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/categorias.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/responsive.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
@@ -14,12 +15,20 @@
     @include('admin.admin_sidebar')
 
     <main class="main-content">
+        @if(session('success'))
+            <input type="hidden" id="session-success-message" value="{{ session('success') }}">
+        @endif
+        @if(session('error'))
+            <input type="hidden" id="session-error-message" value="{{ session('error') }}">
+        @endif
 
-        <header class="categorias-header">
-            <div class="header-title">
-                <h1>Gestión de Categorías</h1>
-                <p>Añade, edita y organiza las categorías de los lugares turísticos.</p>
-            </div>
+        @include('admin.partials.admin_header', [
+            'title' => 'Gestión de Categorías',
+            'subtitle' => 'Añade, edita y organiza las categorías de los lugares turísticos.',
+            'user' => $user
+        ])
+
+        <div class="header-actions" style="margin-bottom: 2rem; display: flex; justify-content: flex-end;">
             <button class="btn-nueva-categoria" onclick="openCreate()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;">
                     <line x1="12" y1="5" x2="12" y2="19"/>
@@ -27,7 +36,7 @@
                 </svg>
                 Nueva Categoría
             </button>
-        </header>
+        </div>
 
         @if(session('success'))
             <div class="flash-success">{{ session('success') }}</div>
@@ -159,6 +168,7 @@
     </div>
 </div>
 
+<script src="{{ asset('js/admin/responsive.js') }}"></script>
 <script src="{{ asset('js/admin/categoria/categorias.js') }}"></script>
 
 </body>

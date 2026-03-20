@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ asset('css/admin/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/admin_dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/salas.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/responsive.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -15,12 +16,11 @@
         @include('admin.admin_sidebar')
 
         <main class="main-content">
-            <header class="dashboard-header" style="margin-bottom: 2rem;">
-                <div class="header-title">
-                    <h1>Gestión de Gimcanas</h1>
-                    <p>Modificando la gimnasia existente.</p>
-                </div>
-            </header>
+            @include('admin.partials.admin_header', [
+                'title' => 'Gestión de Gimcanas',
+                'subtitle' => 'Modificando la gimcana existente.',
+                'user' => $user
+            ])
 
 
             <div class="form-container">
@@ -61,7 +61,7 @@
                     <h3 style="margin: 2rem 0 1rem 0; color: #1e293b; font-size: 1.25rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;">Configuración de Retos (5 Obligatorios)</h3>
                     <span class="error-message-text" id="error-edit-lugares-total-{{ $sala->id }}" style="font-size: 0.9rem; margin-bottom: 1rem; font-weight:600;">Debes seleccionar exactamente 5 lugares distintos y rellenar completamentes sus retos y pistas.</span>
 
-                    <div id="edit-lugares-container-{{ $sala->id }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div id="edit-lugares-container-{{ $sala->id }}" class="lugares-grid-responsive">
                         @php
                             $pruebas = $sala->pruebas->sortBy('orden')->values();
                         @endphp
@@ -138,6 +138,7 @@
         </main>
     </div>
 
+    <script src="{{ asset('js/admin/responsive.js') }}"></script>
     <script src="{{ asset('js/admin/validaciones_salas.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
