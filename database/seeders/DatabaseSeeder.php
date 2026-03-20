@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             UsuariosSeeder::class,
             CategoriasSeeder::class,
             LugaresSeeder::class,
+            GimcanaSeeder::class,
         ]);
     }
 }
