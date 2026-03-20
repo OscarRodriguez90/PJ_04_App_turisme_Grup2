@@ -4,6 +4,10 @@
     --victory-bg: #f8fafc;
 }
 
+html, body {
+    overflow-y: auto !important;
+}
+
 .victory-page {
     min-height: 100vh;
     background: var(--victory-bg);
@@ -41,6 +45,48 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+.winner-announce-card {
+    width: 100%;
+    max-width: 500px;
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.1);
+    margin-bottom: 30px;
+    border: 2px solid #fef3c7;
+    text-align: center;
+}
+
+.winner-announce-card h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    margin: 0 0 15px 0;
+    letter-spacing: 0.05em;
+}
+
+.winner-team-name {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
+
+.winner-players {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.personal-stats-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    color: #475569;
 }
 
 .stats-container {

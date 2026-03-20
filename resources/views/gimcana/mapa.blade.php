@@ -70,6 +70,9 @@
         <button id="btn-locate" class="btn-side" title="Centrar en mi ubicación">
             <i class="bi bi-crosshair2"></i>
         </button>
+        <button id="btn-permissions" class="btn-side" title="Permisos de ubicación">
+            <i class="bi bi-geo-alt"></i>
+        </button>
     </div>
 
     <!-- Panel de detalle (Copiado de cliente.blade.php) -->
@@ -116,11 +119,6 @@
         </article>
     </aside>
 
-    <div class="bottom-bar hidden">
-        <button id="btn-status" class="main-action full-width">
-            Calculando ruta...
-        </button>
-    </div>
 
     <!-- Bottom Sheet para la Pregunta (Trigger automático a 150m) -->
     <div class="bottom-sheet-overlay" id="question-overlay"></div>

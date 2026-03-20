@@ -148,6 +148,23 @@ html, body {
     line-height: 1.4;
 }
 
+.alert-ok {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: #ecfdf5;
+    border: 1px solid #10b981;
+    color: #065f46;
+    border-radius: 12px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    width: 100%;
+    box-shadow: var(--shadow-soft);
+}
+
 /* JOYSTICK DEV (D-PAD) */
 .dev-dpad-wrapper {
     position: fixed;
@@ -314,6 +331,22 @@ html, body {
     position: relative;
     width: 30px;
     height: 30px;
+}
+
+.user-compass {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 70px;
+    height: 70px;
+    margin-top: -35px;
+    margin-left: -35px;
+    background: radial-gradient(circle at center, transparent 30%, rgba(14, 165, 164, 0.4) 50%, transparent 70%);
+    clip-path: polygon(50% 50%, 20% 0%, 80% 0%);
+    transform-origin: center;
+    transition: transform 0.1s linear;
+    z-index: 5;
+    pointer-events: none;
 }
 
 .user-dot {
@@ -637,6 +670,8 @@ html, body {
     font-weight: 600;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     transition: opacity 0.3s;
+    text-align: center;
+    max-width: 80%;
 }
 
 .toast.hidden { opacity: 0; pointer-events: none; }

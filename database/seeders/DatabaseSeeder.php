@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             CategoriasSeeder::class,
             LugaresSeeder::class,
             GimcanaSeeder::class,
+            SantVicencSeeder::class,
         ]);
     }
 }

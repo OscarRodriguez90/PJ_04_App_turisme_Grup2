@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Sala;
 
 class Equipo extends Model
 {
@@ -19,6 +20,11 @@ class Equipo extends Model
     public function lider()
     {
         return $this->belongsTo(Usuario::class, 'id_lider');
+    }
+
+    public function sala()
+    {
+        return $this->belongsTo(Sala::class, 'numero_equipo');
     }
 
     public function getCodigoInvitacionAttribute(): string
