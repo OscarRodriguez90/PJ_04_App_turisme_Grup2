@@ -13,11 +13,11 @@
     <main class="landing-shell">
         <section class="landing-hero">
             <div class="landing-copy">
-                <span class="eyebrow">Guía turística mobile-first</span>
-                <h1>Explora lugares de interés, guarda favoritos y llega con ruta guiada.</h1>
+                <span class="eyebrow">Guía turística</span>
+                <h1>Geoturismo: Tu próxima aventura comienza aquí.</h1>
                 <p>
-                    GeoTurismo te permite descubrir puntos de interés en un mapa interactivo, filtrar por categorías,
-                    ver tus favoritos personales y obtener la ruta desde tu ubicación actual.
+                    Explora puntos de interés únicos, organiza tus favoritos y navega con confianza. 
+                    GeoTurismo transforma tu dispositivo en el guía definitivo para descubrir cada rincón del mundo.
                 </p>
 
                 <div class="landing-actions">
@@ -34,23 +34,16 @@
             </div>
 
             <div class="landing-preview">
-                <div class="phone-frame">
-                    <div class="phone-screen">
-                        <div class="preview-header">
-                            <span>GeoTurismo</span>
-                            <span>En ruta</span>
+                <div class="logo-showcase">
+                    <div class="logo-stack">
+                        <div class="logo-wrapper">
+                            <img src="{{ asset('img/admin/logo.png') }}" alt="GeoTurismo Logo" class="main-logo">
                         </div>
-                        <div class="preview-map"></div>
-                        <div class="preview-card">
-                            <strong>Hotel Porta Fira</strong>
-                            <p>Activa tu ubicación y obtén la mejor ruta hasta el lugar elegido.</p>
-                            <div class="preview-tags">
-                                <span>Favoritos</span>
-                                <span>Hoteles</span>
-                                <span>500 m</span>
-                            </div>
+                        <div class="puntos-wrapper">
+                            <img src="{{ asset('img/admin/puntos.jpeg') }}" alt="Puntos Interés" class="puntos-img">
                         </div>
                     </div>
+                    <div class="logo-glow"></div>
                 </div>
             </div>
         </section>
