@@ -176,6 +176,15 @@ class AdminController extends Controller
     public function deleteLugar($id)
     {
         $lugar = Lugar::findOrFail($id);
+        
+        // Verificar si el lugar está en uso en algún reto/gimcana
+        if (Prueba::where('id_lugar', $id)->exists()) {
+            return redirect()->back()->with('error', 'No se puede eliminar este lugar porque forma parte de una o más gimcanas. Debes eliminarlo de la gimcana antes de borrarlo.');
+        }
+
+        // Desvincular de favoritos para evitar errores de integridad
+        $lugar->usuariosFavoritos()->detach();
+
         $lugar->delete();
 
         return redirect()->back()->with('success', 'Lugar eliminado correctamente.');

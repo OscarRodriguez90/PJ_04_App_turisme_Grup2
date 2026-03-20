@@ -10,32 +10,36 @@
     <!-- Reusing lugares css for grid layout, and specific one for salas -->
     <link rel="stylesheet" href="{{ asset('css/admin/lugares.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/salas.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/responsive.css') }}">
 </head>
 <body>
     <div class="admin-layout">
         @include('admin.admin_sidebar')
 
-        <main class="main-content">
-            <header class="dashboard-header">
-                <div class="header-title">
-                    <h1>Gestión de Gimcanas</h1>
-                    <p>Crea y administra las salas y sus retos de geolocalización.</p>
-                </div>
+        @if(session('success'))
+            <input type="hidden" id="session-success-message" value="{{ session('success') }}">
+        @endif
+        @if(session('error'))
+            <input type="hidden" id="session-error-message" value="{{ session('error') }}">
+        @endif
 
-                @if(session('success'))
-                    <input type="hidden" id="session-success-message" value="{{ session('success') }}">
-                @endif
-                <div class="header-actions">
-                    <a href="{{ route('admin.salas.create') }}" class="btn-add-lugar" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        Crear Gimcana
-                    </a>
-                    <span class="total-count-badge">Total de salas: <strong>{{ $totalSalas }}</strong></span>
-                </div>
-            </header>
+        <main class="main-content">
+            @include('admin.partials.admin_header', [
+                'title' => 'Gestión de Gimcanas',
+                'subtitle' => 'Crea y administra las salas y sus retos de geolocalización.',
+                'user' => $user
+            ])
+
+            <div class="header-actions" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <a href="{{ route('admin.salas.create') }}" class="btn-add-lugar" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Crear Gimcana
+                </a>
+                <span class="total-count-badge">Total de salas: <strong>{{ $totalSalas }}</strong></span>
+            </div>
 
             {{-- PHP-Driven Error Alert --}}
             @if($errors->any())
@@ -163,6 +167,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/admin/responsive.js') }}"></script>
     <script src="{{ asset('js/admin/admin_notifications.js') }}"></script>
     <script src="{{ asset('js/admin/validaciones_salas.js') }}"></script>
     <script src="{{ asset('js/admin/salas_alerts.js') }}"></script>

@@ -8,31 +8,38 @@
     <link rel="stylesheet" href="{{ asset('css/admin/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/admin_dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/usuarios.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/responsive.css') }}">
 </head>
 <body>
     <div class="admin-layout">
         @include('admin.admin_sidebar')
 
         <main class="main-content">
-            <header class="dashboard-header">
-                <div class="header-title">
-                    <h1>Gestión de Usuarios</h1>
-                    <p>Administra los usuarios de la plataforma y sus roles.</p>
-                </div>
+            @if(session('success'))
+                <input type="hidden" id="session-success-message" value="{{ session('success') }}">
+            @endif
+            @if(session('error'))
+                <input type="hidden" id="session-error-message" value="{{ session('error') }}">
+            @endif
 
-                <div class="header-actions">
-                    <button class="btn-add-usuario" onclick="window.abrirModalCrear()">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path>
-                            <circle cx="8.5" cy="7" r="4"></circle>
-                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                            <line x1="23" y1="11" x2="17" y2="11"></line>
-                        </svg>
-                        Añadir Nuevo Usuario
-                    </button>
-                    <span class="total-count-badge">Total de usuarios: <strong id="total-users">{{ $totalUsuarios }}</strong></span>
-                </div>
-            </header>
+            @include('admin.partials.admin_header', [
+                'title' => 'Gestión de Usuarios',
+                'subtitle' => 'Administra los usuarios de la plataforma y sus roles.',
+                'user' => $user
+            ])
+
+            <div class="header-actions" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <button class="btn-add-usuario" onclick="window.abrirModalCrear()">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                    </svg>
+                    Añadir Nuevo Usuario
+                </button>
+                <span class="total-count-badge">Total de usuarios: <strong id="total-users">{{ $totalUsuarios }}</strong></span>
+            </div>
 
             <div class="filters-bar">
                 <input type="text" id="filtroTexto" placeholder="Buscar por nombre o username..." onkeyup="window.filtrarUsuarios()">
@@ -43,7 +50,7 @@
                 </select>
             </div>
 
-            <div class="table-container">
+            <div class="responsive-table-container">
                 <table class="usuarios-table">
                     <thead>
                         <tr>
@@ -63,6 +70,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/admin/responsive.js') }}"></script>
     <script>
         // Store routes to use in external JS files
         window.routes = {

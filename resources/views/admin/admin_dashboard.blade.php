@@ -6,31 +6,18 @@
     <title>Dashboard - GeoTurismo Admin</title>
     <link rel="stylesheet" href="{{ asset('css/admin/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/admin_dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/responsive.css') }}">
 </head>
 <body>
     <div class="admin-layout">
         @include('admin.admin_sidebar')
 
         <main class="main-content">
-            <header class="dashboard-header">
-                <div class="header-title">
-                    <h1>Resumen General</h1>
-                    <p>Gestiona lugares, categorías, usuarios y rutas desde un solo panel.</p>
-                </div>
-                
-                <div class="user-profile">
-                    <div class="user-info">
-                        <span class="user-role">Administrador</span>
-                        <span class="user-email">{{ $user->email }}</span>
-                    </div>
-                    @php
-                        $avatarUrl = $user->foto 
-                            ? asset('img/usuarios/' . $user->foto) 
-                            : 'https://ui-avatars.com/api/?name=' . urlencode($user->nombre) . '&background=0ea5a4&color=fff';
-                    @endphp
-                    <img src="{{ $avatarUrl }}" alt="Avatar" class="user-avatar" style="border-radius: 50%;">
-                </div>
-            </header>
+            @include('admin.partials.admin_header', [
+                'title' => 'Resumen General',
+                'subtitle' => 'Gestiona lugares, categorías, usuarios y rutas desde un solo panel.',
+                'user' => $user
+            ])
 
             <section class="stats-grid">
                 <!-- Lugares -->
@@ -109,7 +96,7 @@
                     </a>
                 </div>
             </section>
-        </main>
-    </div>
+    <!-- Scripts -->
+    <script src="{{ asset('js/admin/responsive.js') }}"></script>
 </body>
 </html>

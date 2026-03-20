@@ -1,0 +1,235 @@
+/* ── Admin Responsiveness ──────────────────────────── */
+
+:root {
+    --header-height: 70px;
+    --sidebar-width: 260px;
+}
+
+/* Base Layout Changes */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex-grow: 1;
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    width: calc(100% - var(--sidebar-width));
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Header Component */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 0.75rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.sidebar-toggle {
+    display: none;
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    color: #64748b;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.sidebar-toggle:hover {
+    background: #f8fafc;
+    color: var(--primary-color);
+}
+
+.header-title-block h1 {
+    font-size: 1.25rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+.header-title-block p {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.user-profile-mini {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-info-text {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Responsive Table Wrapper */
+.responsive-table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 2rem;
+}
+
+/* Sidebar Responsive */
+@media (max-width: 1024px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 20px 0 50px rgba(0,0,0,0.1);
+    }
+
+    .sidebar.is-open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 1.25rem;
+    }
+
+    .sidebar-toggle {
+        display: block;
+    }
+
+    /* Sidebar Close Button */
+    .sidebar-close {
+        display: block !important;
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        background: #f1f5f9;
+        border: 0;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        color: #64748b;
+        cursor: pointer;
+    }
+}
+
+/* Sidebar Backdrop */
+.sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.sidebar-backdrop.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Dashboard & Grids */
+.stats-grid,
+.actions-grid,
+.lugares-grid,
+.categorias-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+    .lugares-grid,
+    .categorias-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid,
+    .actions-grid,
+    .lugares-grid,
+    .categorias-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header-title-block p {
+        display: none;
+    }
+
+    .user-info-text {
+        display: none;
+    }
+}
+
+.lugares-grid-responsive {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .lugares-grid-responsive {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .category-section h2 {
+        font-size: 1.1rem;
+    }
+    
+    .header-title-block h1 {
+        font-size: 1.1rem;
+    }
+}
+
+/* Force SweetAlert Modals to be responsive */
+.swal2-popup {
+    width: 95% !important;
+    max-width: 500px !important;
+    padding: 1.25rem !important;
+}
+
+@media (min-width: 768px) {
+    .swal2-popup {
+        width: 32rem !important;
+        padding: 2rem !important;
+    }
+}

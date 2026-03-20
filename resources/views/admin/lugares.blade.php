@@ -8,32 +8,36 @@
     <link rel="stylesheet" href="{{ asset('css/admin/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/admin_dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/lugares.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/responsive.css') }}">
 </head>
 <body>
     <div class="admin-layout">
         @include('admin.admin_sidebar')
 
         <main class="main-content">
-            <header class="dashboard-header">
-                <div class="header-title">
-                    <h1>Gestión de Lugares</h1>
-                    <p>Administra los puntos de interés turístico y sus categorías.</p>
-                </div>
+            @if(session('success'))
+                <input type="hidden" id="session-success-message" value="{{ session('success') }}">
+            @endif
+            @if(session('error'))
+                <input type="hidden" id="session-error-message" value="{{ session('error') }}">
+            @endif
 
-                @if(session('success'))
-                    <input type="hidden" id="session-success-message" value="{{ session('success') }}">
-                @endif
-                <div class="header-actions">
-                    <button class="btn-add-lugar" onclick="showAddModal()">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        Añadir Nuevo Lugar
-                    </button>
-                    <span class="total-count-badge">Total de lugares: <strong>{{ $totalLugares }}</strong></span>
-                </div>
-            </header>
+            @include('admin.partials.admin_header', [
+                'title' => 'Gestión de Lugares',
+                'subtitle' => 'Administra los puntos de interés turístico y sus categorías.',
+                'user' => $user
+            ])
+
+            <div class="header-actions" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <button class="btn-add-lugar" onclick="showAddModal()">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Añadir Nuevo Lugar
+                </button>
+                <span class="total-count-badge">Total de lugares: <strong>{{ $totalLugares }}</strong></span>
+            </div>
 
             {{-- PHP-Driven Error Alert --}}
             @if($errors->any())
@@ -138,6 +142,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/admin/responsive.js') }}"></script>
     <script src="{{ asset('js/admin/admin_notifications.js') }}"></script>
     <script src="{{ asset('js/admin/validaciones_lugares.js') }}"></script>
     <script src="{{ asset('js/admin/lugares_alerts.js') }}"></script>

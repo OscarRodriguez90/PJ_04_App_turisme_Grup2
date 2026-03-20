@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/admin/admin_dashboard.css') }}">
     <!-- Tailwind-like utilities mimicking the modal styles -->
     <link rel="stylesheet" href="{{ asset('css/admin/salas.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/responsive.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -16,12 +17,11 @@
         @include('admin.admin_sidebar')
 
         <main class="main-content">
-            <header class="dashboard-header" style="margin-bottom: 2rem;">
-                <div class="header-title">
-                    <h1>Gestión de Gimcanas</h1>
-                    <p>Crea una nueva sala interactiva y confígura sus retos.</p>
-                </div>
-            </header>
+            @include('admin.partials.admin_header', [
+                'title' => 'Gestión de Gimcanas',
+                'subtitle' => 'Crea una nueva sala interactiva y confígura sus retos.',
+                'user' => $user
+            ])
 
 
             <div class="form-container">
@@ -61,7 +61,7 @@
                     <h3 style="margin: 2rem 0 1rem 0; color: #1e293b; font-size: 1.25rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;">Configuración de Retos (5 Obligatorios)</h3>
                     <span class="error-message-text" id="error-add-lugares-total" style="font-size: 0.9rem; margin-bottom: 1rem; font-weight:600;">Debes seleccionar exactamente 5 lugares distintos y rellenar completamentes sus retos y pistas.</span>
 
-                    <div id="add-lugares-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 1.5rem;">
+                    <div id="add-lugares-container" class="lugares-grid-responsive">
                         @for($i = 0; $i < 5; $i++)
                         <div class="lugar-selector-container" id="add-lugar-block-{{ $i }}" style="margin-bottom: 0;">
                             <h4 style="margin: 0 0 1rem 0; color: #475569; font-size: 1.1rem;">Reto {{ $i + 1 }}</h4>
@@ -132,6 +132,7 @@
         </main>
     </div>
 
+    <script src="{{ asset('js/admin/responsive.js') }}"></script>
     <script src="{{ asset('js/admin/validaciones_salas.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ asset('css/admin/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/admin_dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/mi_perfil.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/responsive.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/admin/admin_notifications.js') }}" defer></script>
     <script src="{{ asset('js/admin/validaciones_lugares.js') }}" defer></script>
@@ -17,12 +18,11 @@
         @include('admin.admin_sidebar')
 
         <main class="main-content">
-            <header class="dashboard-header">
-                <div class="header-title">
-                    <h1>Configuración de Perfil</h1>
-                    <p>Actualiza tu información personal y foto de perfil.</p>
-                </div>
-            </header>
+            @include('admin.partials.admin_header', [
+                'title' => 'Configuración de Perfil',
+                'subtitle' => 'Actualiza tu información personal y foto de perfil.',
+                'user' => $user
+            ])
 
             <div class="profile-container">
                 @if(session('success'))
@@ -105,5 +105,6 @@
         </main>
     </div>
 
+    <script src="{{ asset('js/admin/responsive.js') }}"></script>
 </body>
 </html>
