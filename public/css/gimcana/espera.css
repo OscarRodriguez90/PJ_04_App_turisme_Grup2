@@ -80,6 +80,8 @@ body { display: flex; justify-content: center; }
 .alert-ok {
     display: flex;
     align-items: center;
+    justify-content: center;
+    text-align: center;
     gap: 8px;
     padding: 12px;
     border-radius: 12px;

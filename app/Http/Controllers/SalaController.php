@@ -25,12 +25,32 @@ class SalaController extends Controller
         return view('sala.index', compact('salas'));
     }
 
-    public function entrar(int $id): RedirectResponse
+    public function entrar(Request $request, int $id): RedirectResponse|JsonResponse
     {
         $sala = Sala::findOrFail($id);
 
         if ($sala->estado === 'finalizada') {
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Esta sala ya ha finalizado.'], 403);
+            }
             return back()->with('error', 'Esta sala ya ha finalizado.');
+        }
+
+        if ($sala->estado === 'jugando') {
+            $usuario = Auth::user();
+            $yaEnEquipo = Equipo::where('numero_equipo', $sala->id)
+                ->whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id))
+                ->exists();
+            if (!$yaEnEquipo) {
+                if ($request->expectsJson()) {
+                    return response()->json(['error' => 'Esta gimcana está en curso. No puedes unirte ahora.'], 403);
+                }
+                return back()->with('error', 'Esta gimcana está en curso. No puedes unirte ahora.');
+            }
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'redirect' => route('sala.show', $sala->id)]);
         }
 
         return redirect()->route('sala.show', $sala->id);
@@ -80,13 +100,52 @@ class SalaController extends Controller
         $sala = Sala::findOrFail($id);
         $usuario = Auth::user();
 
-        $miEquipoId = Equipo::where('numero_equipo', $sala->id)
-            ->whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id))
-            ->value('id');
+        // Equipos de la sala
+        $equipos = Equipo::where('numero_equipo', $sala->id)
+            ->withCount('integrantes')
+            ->with(['lider', 'integrantes'])
+            ->get();
+
+        $miEquipo = $equipos->first(function($eq) use ($usuario) {
+            return $eq->integrantes->contains('id', $usuario->id);
+        });
+
+        // Formatear equipos para el JSON
+        $equiposFormatted = $equipos->map(function($eq) use ($miEquipo) {
+            return [
+                'id' => $eq->id,
+                'nombre_equipo' => $eq->nombre_equipo,
+                'integrantes_count' => $eq->integrantes_count,
+                'lider_nombre' => $eq->lider->nombre ?? '–',
+                'es_mio' => $miEquipo && $miEquipo->id === $eq->id,
+            ];
+        });
+
+        // Formatear mi equipo
+        $miEquipoFormatted = null;
+        if ($miEquipo) {
+            $miEquipoFormatted = [
+                'id' => $miEquipo->id,
+                'nombre_equipo' => $miEquipo->nombre_equipo,
+                'id_lider' => $miEquipo->id_lider,
+                'integrantes' => $miEquipo->integrantes->map(function($user) {
+                    return [
+                        'id' => $user->id,
+                        'nombre' => $user->nombre,
+                        'foto' => !empty($user->foto) ? asset('img/usuarios/' . $user->foto) : asset('img/usuarios/default_user.png'),
+                    ];
+                }),
+            ];
+        }
 
         return response()->json([
+            'nombre' => $sala->nombre,
             'estado' => $sala->estado,
-            'miEquipoId' => $miEquipoId ? (int) $miEquipoId : null,
+            'miEquipoId' => $miEquipo ? $miEquipo->id : null,
+            'miEquipo' => $miEquipoFormatted,
+            'equipos' => $equiposFormatted,
+            'usuarioId' => $usuario->id,
+            'usuarioNombre' => $usuario->nombre,
         ]);
     }
 
@@ -99,12 +158,24 @@ class SalaController extends Controller
 
         $usuario = Auth::user();
 
+        if ($sala->estado === 'jugando') {
+            return response()->json(['error' => 'No puedes crear un equipo mientras la gimcana está en curso.'], 403);
+        }
+
         $yaEnEquipo = Equipo::where('numero_equipo', $sala->id)
             ->whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id))
             ->exists();
 
         if ($yaEnEquipo) {
             return response()->json(['error' => 'Ya estás en un equipo en esta sala.'], 422);
+        }
+
+        $nombreExistente = Equipo::where('numero_equipo', $sala->id)
+            ->where('nombre_equipo', $request->nombre_equipo)
+            ->exists();
+
+        if ($nombreExistente) {
+            return response()->json(['error' => 'Ya existe un grupo con este nombre en esta sala.'], 422);
         }
 
         $totalEquiposSala = Equipo::where('numero_equipo', $sala->id)->count();
@@ -132,6 +203,10 @@ class SalaController extends Controller
         $equipoModel = Equipo::where('id', $equipo)
             ->where('numero_equipo', $sala->id)
             ->firstOrFail();
+
+        if ($sala->estado === 'jugando') {
+            return response()->json(['error' => 'No puedes unirte a un equipo mientras la gimcana está en curso.'], 403);
+        }
 
         $usuario = Auth::user();
 
@@ -202,5 +277,34 @@ class SalaController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    public function historial(): View
+    {
+        $usuario = Auth::user();
+
+        $rows = DB::table('tbl_historial')
+            ->where('id_usuario', $usuario->id)
+            ->orderByDesc('created_at')
+            ->get();
+
+        $historial = $rows->map(function ($row) {
+            $sala = Sala::find($row->id_sala);
+            $equipo = Equipo::with('integrantes')->find($row->id_equipo);
+
+            return [
+                'sala'         => $sala,
+                'equipo'       => $equipo,
+                'resultado'    => $row->resultado,
+                'retos'        => json_decode($row->retos_completados, true),
+                'totalSeconds' => $row->tiempo_total_segundos,
+                'fecha'        => $row->fecha_fin ?? $row->created_at,
+            ];
+        })->filter(fn ($e) => $e['sala'] && $e['equipo'])->values();
+
+        return view('sala.historial', [
+            'historial' => $historial,
+            'usuario'   => $usuario,
+        ]);
     }
 }

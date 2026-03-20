@@ -40,7 +40,7 @@
                 let etiqueta = 'jugadores';
                 let extraClass = '';
 
-                if (count < 2) {
+                if (count < 1) {
                     etiqueta = 'incompleto';
                     extraClass = ' grupo-count--warn';
                 } else if (count >= 8) {

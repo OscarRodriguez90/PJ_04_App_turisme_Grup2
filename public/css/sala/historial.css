@@ -1,0 +1,221 @@
+:root {
+    --primary: #3b82f6;
+    --victory: #10b981;
+    --defeat: #ef4444;
+    --inactive: #94a3b8;
+    --bg: #f1f5f9;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+    overflow-y: auto;
+}
+
+.historial-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+}
+
+.historial-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.historial-header a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #475569;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    flex-shrink: 0;
+}
+
+.historial-header h1 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.historial-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+}
+
+.historial-empty i {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.historial-empty p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.historial-item {
+    background: white;
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    border-left: 4px solid var(--inactive);
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+}
+
+.historial-item:active {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.historial-item.victoria {
+    border-left-color: var(--victory);
+}
+.historial-item.derrota {
+    border-left-color: var(--defeat);
+}
+.historial-item.en_curso {
+    border-left-color: var(--primary);
+}
+
+.historial-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.historial-sala-name {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.historial-equipo-name {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.historial-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 99px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.badge-victoria {
+    background: #d1fae5;
+    color: #065f46;
+}
+.badge-derrota {
+    background: #fee2e2;
+    color: #991b1b;
+}
+.badge-en_curso {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.historial-meta {
+    display: flex;
+    gap: 18px;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.historial-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.reto-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    display: none;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.historial-item.expanded .reto-list {
+    display: flex;
+}
+
+.reto-mini-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+}
+
+.reto-mini-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.reto-mini-item.done .reto-mini-num {
+    background: var(--victory);
+    color: white;
+}
+
+.reto-mini-name {
+    flex-grow: 1;
+    color: #334155;
+    font-weight: 500;
+}
+
+.reto-mini-time {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.reto-mini-item.not-done .reto-mini-name,
+.reto-mini-item.not-done .reto-mini-time {
+    color: #94a3b8;
+}
+
+.expand-toggle {
+    font-size: 0.78rem;
+    color: var(--primary);
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    padding: 0;
+}

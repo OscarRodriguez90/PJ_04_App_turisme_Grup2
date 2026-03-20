@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('descripcion', 255)->nullable();
             $table->enum('estado', ['disponible', 'esperando', 'jugando', 'finalizada'])->default('disponible');
             $table->timestamp('fecha_creacion')->useCurrent();
+            $table->timestamp('fecha_inicio')->nullable();
+            $table->timestamp('fecha_fin')->nullable();
         });
     }
 

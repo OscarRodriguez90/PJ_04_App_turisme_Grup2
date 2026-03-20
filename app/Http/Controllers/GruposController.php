@@ -45,6 +45,12 @@ class GruposController extends Controller
             return response()->json(['error' => 'Ya estas en un grupo.'], 422);
         }
 
+        $nombreExistente = Equipo::where('nombre_equipo', trim($request->nombre_equipo));
+        $this->applyScopeToEquiposQuery($nombreExistente, $salaId);
+        if ($nombreExistente->exists()) {
+            return response()->json(['error' => 'Ya existe un grupo con este nombre en esta gimcana.'], 422);
+        }
+
         if ($salaId !== null) {
             $totalGruposSala = Equipo::where('numero_equipo', $salaId)->count();
             if ($totalGruposSala >= self::MAX_GRUPOS_POR_SALA) {

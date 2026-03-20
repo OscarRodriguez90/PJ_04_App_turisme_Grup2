@@ -605,14 +605,14 @@ class AdminController extends Controller
             $gruposInsuficientes = $sala->equipos()
                 ->withCount('integrantes')
                 ->get()
-                ->filter(fn ($equipo) => (int) $equipo->integrantes_count < 2)
+                ->filter(fn ($equipo) => (int) $equipo->integrantes_count < 1)
                 ->map(fn ($equipo) => $equipo->nombre_equipo . ' (' . (int) $equipo->integrantes_count . ')')
                 ->values();
 
             if ($gruposInsuficientes->isNotEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'error' => 'No se puede iniciar la partida: cada grupo debe tener al menos 2 personas. Grupos incompletos: ' . $gruposInsuficientes->implode(', ') . '.',
+                    'error' => 'No se puede iniciar la partida: cada grupo debe tener al menos 1 persona. Grupos incompletos: ' . $gruposInsuficientes->implode(', ') . '.',
                 ], 422);
             }
         }
@@ -620,7 +620,24 @@ class AdminController extends Controller
         $updateData = ['estado' => $request->estado];
         if ($request->estado === 'jugando' && !$sala->fecha_inicio) {
             $updateData['fecha_inicio'] = now();
+        } elseif ($request->estado === 'esperando') {
+            $updateData['fecha_inicio'] = null;
+            $updateData['fecha_fin'] = null;
+
+            $teamIds = $sala->equipos()->pluck('id');
+            if ($teamIds->isNotEmpty()) {
+                $teamPivotIds = \Illuminate\Support\Facades\DB::table('tbl_equipo_usuarios')
+                    ->whereIn('id_equipo', $teamIds)
+                    ->pluck('id');
+                
+                if ($teamPivotIds->isNotEmpty()) {
+                    \Illuminate\Support\Facades\DB::table('tbl_progreso_retos')
+                        ->whereIn('id_equipo_usuario', $teamPivotIds)
+                        ->delete();
+                }
+            }
         }
+        
         $sala->update($updateData);
 
         return response()->json(['success' => true, 'estado' => $sala->estado]);

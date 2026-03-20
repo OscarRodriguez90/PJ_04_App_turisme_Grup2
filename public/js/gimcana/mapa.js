@@ -12,8 +12,8 @@
         map: document.getElementById('map'),
         gpsOverlay: document.getElementById('gps-overlay'),
         btnStartGps: document.getElementById('btn-start-gps'),
-        btnStatus: document.getElementById('btn-status'),
         btnLocate: document.getElementById('btn-locate'),
+        btnPermissions: document.getElementById('btn-permissions'),
         btnToggleDpad: document.getElementById('btn-toggle-dpad'),
         devDpad: document.getElementById('dev-dpad'),
         questionSheet: document.getElementById('question-sheet'),
@@ -23,7 +23,6 @@
         answerError: document.getElementById('answer-error'),
         toast: document.getElementById('toast'),
         toastMessage: document.getElementById('toast-message'),
-        bottomBar: document.querySelector('.bottom-bar'),
         // Detail Panel
         detailPanel: document.getElementById('detailPanel'),
         placeDetail: document.getElementById('placeDetail'),
@@ -55,7 +54,8 @@
         selectedLugarId: null,
         activeRouteId: null, // ID del lugar hacia el que hay una ruta dibujada
         isFirstLocate: true,
-        lastUpdate: 0 // Para throttling de 7s
+        lastUpdate: 0, // Para throttling de 7s
+        syncIntervalId: null
     };
 
     const DISTANCIA_PROXIMIDAD = 150; // Metros para activar la pregunta
@@ -82,6 +82,7 @@
     function checkGpsPersistence() {
         if (sessionStorage.getItem('gps_active') === 'true') {
             els.gpsOverlay.classList.add('hidden');
+            initDeviceOrientation();
             startTracking();
         }
     }
@@ -90,6 +91,7 @@
         els.btnStartGps.onclick = () => {
             sessionStorage.setItem('gps_active', 'true');
             els.gpsOverlay.classList.add('hidden');
+            initDeviceOrientation();
             startTracking();
         };
 
@@ -101,11 +103,7 @@
         if (els.closeDetailBtn) {
             els.closeDetailBtn.onclick = () => {
                 els.detailPanel.classList.remove('is-visible');
-                // Si hay ruta, la barra inferior debe mostrarse. Si no, ocultarse.
-                if (els.bottomBar) {
-                    if (state.activeRouteId) els.bottomBar.classList.remove('hidden');
-                    else els.bottomBar.classList.add('hidden');
-                }
+
                 state.selectedLugarId = null;
             };
         }
@@ -200,6 +198,16 @@
                 }
             };
         }
+
+        if (els.btnPermissions) {
+            els.btnPermissions.onclick = () => {
+                sessionStorage.setItem('gps_active', 'true');
+                if (els.gpsOverlay) els.gpsOverlay.classList.add('hidden');
+                initDeviceOrientation();
+                startTracking();
+                showToast('Permisos de ubicación activados');
+            };
+        }
     }
 
     function removeRoute() {
@@ -208,7 +216,6 @@
             state.routingControl = null;
             state.activeRouteId = null;
         }
-        if (els.bottomBar) els.bottomBar.classList.add('hidden');
     }
 
     function drawRoute(id, lat, lng) {
@@ -237,9 +244,7 @@
                     ? `${Math.round(distance)} m`
                     : `${(distance / 1000).toFixed(2)} km`;
 
-                if (els.btnStatus) {
-                    els.btnStatus.innerHTML = `Llegada: <strong style="color: var(--primary); margin: 0 6px;">${distText}</strong> (${time} min)`;
-                }
+
             }
         }).addTo(state.map);
         
@@ -247,8 +252,7 @@
         showToast('Ruta trazada');
         els.detailPanel.classList.remove('is-visible');
         
-        // Mostrar barra inferior solo si hay ruta
-        if (els.bottomBar) els.bottomBar.classList.remove('hidden');
+
     }
 
     // ── Seguimiento GPS ──
@@ -257,33 +261,58 @@
             showToast('El GPS no es compatible');
             return;
         }
-        els.btnStatus.textContent = 'Buscando GPS...';
+
         state.watchId = navigator.geolocation.watchPosition(
             onLocationUpdate,
             (err) => {
                 console.error(err);
-                els.btnStatus.textContent = 'Error GPS: ' + err.message;
+
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
+
+        if (!state.syncIntervalId) {
+            state.syncIntervalId = window.setInterval(syncWithServer, 1000);
+        }
     }
 
-    async function onLocationUpdate(position) {
-        const now = Date.now();
-        // Solo procesar si han pasado al menos 7 segundos o es la primera vez
-        if (now - state.lastUpdate < 7000 && !state.isFirstLocate) {
-            return;
+    function initDeviceOrientation() {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            DeviceOrientationEvent.requestPermission()
+                .then(permissionState => {
+                    if (permissionState === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                    }
+                })
+                .catch(console.error);
+        } else {
+            window.addEventListener('deviceorientationabsolute', handleOrientation);
+            window.addEventListener('deviceorientation', handleOrientation);
         }
-        state.lastUpdate = now;
+    }
 
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        state.userLocation = { lat, lng };
-        updateUserMarker(lat, lng);
-        checkProximity();
-        updateDistanceInDetail();
+    function handleOrientation(event) {
+        let heading = null;
+        if (event.webkitCompassHeading) {
+            heading = event.webkitCompassHeading; // iOS
+        } else if (event.absolute === true && event.alpha !== null) {
+            heading = 360 - event.alpha; // Android
+        } else if (event.alpha !== null) {
+            heading = 360 - event.alpha; // Fallback
+        }
+
+        if (heading !== null) {
+            const compassEl = document.getElementById('user-compass');
+            if (compassEl) {
+                // Keep the center aligned, only rotate
+                compassEl.style.transform = `rotate(${heading}deg)`;
+            }
+        }
+    }
+
+    async function syncWithServer() {
+        const payloadCoords = state.userLocation ? state.userLocation : { lat: 0, lng: 0 };
         
-        // --- NUEVO: Sincronizar con el servidor y ver si alguien ha ganado ---
         try {
             const resp = await fetch(DATA.ubicacionUrl, {
                 method: 'POST',
@@ -291,27 +320,39 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({ lat, lng })
+                body: JSON.stringify(payloadCoords)
             });
             const result = await resp.json();
             if (result.gameOver && result.redirectUrl) {
                 window.location.href = result.redirectUrl;
-                return;
             }
         } catch (e) {
             console.error("Error actualizando ubicación en servidor:", e);
         }
+    }
 
-        // Manejar ?locate=user
+    async function onLocationUpdate(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        state.userLocation = { lat, lng };
+        updateUserMarker(lat, lng);
+        checkProximity();
+        updateDistanceInDetail();
+
+        // En la primera ubicación, centrar siempre en el usuario
         if (state.isFirstLocate) {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('locate') === 'user') {
-                state.map.flyTo([lat, lng], 17);
-            }
+            state.map.flyTo([lat, lng], 17);
             state.isFirstLocate = false;
         }
 
-        els.btnStatus.textContent = 'Calculando trayecto...';
+
+
+        const now = Date.now();
+        // Sincronizar locación con servidor para progreso del admin
+        if (now - state.lastUpdate >= 7000) {
+            state.lastUpdate = now;
+            syncWithServer();
+        }
     }
 
     function updateDistanceInDetail() {
@@ -332,7 +373,7 @@
         if (!state.userMarker) {
             const icon = L.divIcon({
                 className: 'custom-user-marker',
-                html: '<div class="user-marker-container"><div class="user-dot"></div><div class="user-ring"></div></div>',
+                html: '<div class="user-marker-container"><div class="user-compass" id="user-compass"></div><div class="user-dot"></div><div class="user-ring"></div></div>',
                 iconSize: [30, 30],
                 iconAnchor: [15, 15]
             });
@@ -429,7 +470,7 @@
         if (els.emptyState) els.emptyState.classList.add('hidden');
         if (els.placeDetail) els.placeDetail.classList.remove('hidden');
         if (els.detailPanel) els.detailPanel.classList.add('is-visible');
-        if (els.bottomBar) els.bottomBar.classList.add('hidden');
+
         
         if (els.detailDistanceRow) els.detailDistanceRow.classList.remove('hidden');
 

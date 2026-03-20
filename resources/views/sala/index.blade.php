@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('css/sala/sala.css') }}">
     <link rel="stylesheet" href="{{ asset('css/sala/index.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="salas-body">
 
@@ -50,9 +51,9 @@
                         </div>
 
                         <div class="sala-card-actions">
-                            <a href="{{ route('sala.entrar', $sala->id) }}" class="btn-unirse">
+                            <button data-url="{{ route('sala.entrar', $sala->id) }}" class="btn-unirse btn-entrar-ajax">
                                 <i class="bi bi-door-open"></i> Entrar
-                            </a>
+                            </button>
                         </div>
                     </div>
                 @endforeach
@@ -64,7 +65,10 @@
             </div>
         @endif
 
-        <div class="salas-footer">
+        <div class="salas-footer" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <a href="{{ route('sala.historial') }}" class="btn-logout" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; background: #475569;">
+                <i class="bi bi-clock-history"></i> Mi Historial
+            </a>
             <form method="POST" action="{{ route('logout') }}" class="logout-inline-form">
                 @csrf
                 <button type="submit" class="btn-logout">
@@ -74,5 +78,6 @@
         </div>
     </div>
 
+    <script src="{{ asset('js/sala/sala_index.js') }}"></script>
 </body>
 </html>

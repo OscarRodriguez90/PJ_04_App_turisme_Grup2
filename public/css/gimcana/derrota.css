@@ -2,6 +2,10 @@
     --defeat-bg: #fdf2f2;
 }
 
+html, body {
+    overflow-y: auto !important;
+}
+
 .defeat-page {
     min-height: 100vh;
     background: var(--defeat-bg);

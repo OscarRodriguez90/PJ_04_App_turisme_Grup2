@@ -47,47 +47,188 @@
 
         if (window.salaFlash.success) {
             mostrarNotificacion(window.salaFlash.success, false);
+            window.salaFlash.success = null;
             return;
         }
 
         if (window.salaFlash.error) {
             mostrarNotificacion(window.salaFlash.error, true);
+            window.salaFlash.error = null;
         }
     }
 
-    function activarAutoEntradaGimcana() {
-        if (!config || !config.miEquipoId || !config.estadoLiveUrl || !config.mapaUrl) {
-            return;
-        }
+    async function checkEstado() {
+        if (!config.estadoLiveUrl) return;
 
-        if (config.salaEstado === 'jugando') {
-            window.location.href = config.mapaUrl;
-            return;
-        }
+        try {
+            const res = await fetch(config.estadoLiveUrl, {
+                headers: { Accept: 'application/json' },
+            });
 
-        const checkEstado = async () => {
-            try {
-                const res = await fetch(config.estadoLiveUrl, {
-                    headers: {
-                        Accept: 'application/json',
-                    },
-                });
+            if (!res.ok) return;
 
-                if (!res.ok) {
-                    return;
-                }
-
-                const payload = await res.json();
-                if (payload && payload.estado === 'jugando' && payload.miEquipoId) {
-                    window.location.href = config.mapaUrl;
-                }
-            } catch (_) {
-                // Keep polling in next cycle.
+            const payload = await res.json();
+            
+            // 1. Redirigir si la partida ha empezado
+            if (payload.estado === 'jugando' && payload.miEquipoId) {
+                window.location.href = config.mapaUrl;
+                return;
             }
-        };
 
+            // 2. Actualizar UI dinámicamente
+            renderRoom(payload);
+            
+            // Actualizar config local para futuras acciones
+            config.miEquipoId = payload.miEquipoId;
+            config.salaEstado = payload.estado;
+
+        } catch (e) {
+            console.error("Error polling room status:", e);
+        }
+    }
+
+    function renderRoom(data) {
+        const container = document.getElementById('sala-dynamic-content');
+        if (!container) return;
+
+        let html = '';
+
+        // HEADER
+        html += `
+            <header class="sala-header">
+                <div class="sala-header-info">
+                    <span class="sala-code-badge">${data.nombre}</span>
+                    <span class="sala-estado sala-estado--${data.estado}">${data.estado.charAt(0).toUpperCase() + data.estado.slice(1)}</span>
+                </div>
+                <div class="sala-header-user">
+                    <span class="user-name-header"><i class="bi bi-person-circle"></i> ${data.usuarioNombre}</span>
+                    <a href="/sala" class="btn-ghost-small" id="btn-leave-room-dynamic">
+                        <i class="bi bi-box-arrow-left"></i> Salir
+                    </a>
+                </div>
+            </header>
+        `;
+
+        // MAIN
+        html += '<main class="sala-main">';
+
+        // MI EQUIPO SECTION
+        if (data.miEquipo) {
+            html += `
+                <section class="sala-section">
+                    <h2 class="section-heading"><i class="bi bi-people-fill"></i> Mi equipo</h2>
+                    <div class="equipo-card equipo-card--mine">
+                        <div class="equipo-card-header">
+                            <span class="equipo-nombre">${data.miEquipo.nombre_equipo}</span>
+                            <span class="equipo-count"><i class="bi bi-person"></i> ${data.miEquipo.integrantes.length}</span>
+                        </div>
+                        <div class="equipo-miembros">
+                            ${data.miEquipo.integrantes.map(m => `
+                                <div class="miembro-chip">
+                                    <img src="${m.foto}" alt="Foto" class="miembro-avatar" onerror="this.src='/img/usuarios/default_user.png'">
+                                    <span>${m.nombre}</span>
+                                    ${m.id === data.miEquipo.id_lider ? '<i class="bi bi-star-fill lider-icon"></i>' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="btn-danger-small" onclick="salirEquipo()">
+                            <i class="bi bi-door-open"></i> Salir del equipo
+                        </button>
+                        ${config.retosCompletados ? `
+                            <form method="POST" action="${config.restartUrl}" class="restart-retos-form">
+                                <input type="hidden" name="_token" value="${config.csrfToken}">
+                                <button type="submit" class="btn-outline-small btn-start-retos">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Volver a empezar retos
+                                </button>
+                            </form>
+                        ` : ''}
+                    </div>
+                </section>
+            `;
+        } else {
+            html += `
+                <section class="sala-section">
+                    <h2 class="section-heading"><i class="bi bi-plus-circle"></i> ¿Listo para jugar?</h2>
+                    <p class="section-help">Crea tu propio equipo o únete a uno ya creado.</p>
+                    <button class="btn-primary btn-crear-equipo" onclick="abrirModalCrear()">
+                        <i class="bi bi-shield-plus"></i> Crear equipo
+                    </button>
+                </section>
+            `;
+        }
+
+        // EQUIPOS LIST SECTION
+        html += `
+            <section class="sala-section">
+                <h2 class="section-heading">
+                    <i class="bi bi-grid"></i> Equipos en esta sala
+                    <span class="sala-count-badge">${data.equipos.length}</span>
+                </h2>
+                ${data.equipos.length === 0 ? `
+                    <div class="equipos-empty">
+                        <i class="bi bi-people"></i>
+                        <p>Aún no hay equipos. ¡Sé el primero en crear uno!</p>
+                    </div>
+                ` : data.equipos.map(eq => {
+                    const esMio = data.miEquipoId === eq.id;
+                    const equipoLleno = eq.integrantes_count >= 8;
+                    return `
+                        <div class="equipo-card ${esMio ? 'equipo-card--mine' : ''}">
+                            <div class="equipo-card-header">
+                                <span class="equipo-nombre">${eq.nombre_equipo}</span>
+                                <span class="equipo-count"><i class="bi bi-person"></i> ${eq.integrantes_count}/8</span>
+                            </div>
+                            <p class="equipo-lider"><i class="bi bi-star"></i> Líder: ${eq.lider_nombre}</p>
+                            ${!data.miEquipoId ? `
+                                <button class="btn-outline-small" onclick="unirseEquipo(${eq.id})" ${equipoLleno ? 'disabled' : ''}>
+                                    <i class="bi ${equipoLleno ? 'bi-lock-fill' : 'bi-person-plus'}"></i>
+                                    ${equipoLleno ? 'Grupo lleno' : 'Unirse'}
+                                </button>
+                            ` : esMio ? `
+                                <span class="badge-mine"><i class="bi bi-check-circle-fill"></i> Tu equipo</span>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('')}
+            </section>
+        `;
+
+        html += '</main>';
+        container.innerHTML = html;
+
+        // Re-adjuntar listener del botón de salir si es necesario
+        const btnLeave = document.getElementById('btn-leave-room-dynamic');
+        if (btnLeave) {
+            btnLeave.onclick = (e) => {
+                if (config.miEquipoId) {
+                    e.preventDefault();
+                    confirmarSalidaSala(btnLeave.href);
+                }
+            };
+        }
+    }
+
+    async function confirmarSalidaSala(href) {
+        const result = await Swal.fire({
+            title: '¿Salir de la sala?',
+            text: 'Actualmente estás en un equipo. Si sales de la sala, abandonarás también el equipo.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#0ea5a4',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Salir y abandonar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            const ok = await salirEquipo(false);
+            if (ok) window.location.href = href;
+        }
+    }
+
+    function activarAutoPolling() {
         checkEstado();
-        window.setInterval(checkEstado, 5000);
+        window.setInterval(checkEstado, 4000);
     }
 
     // ── Modal helpers ────────────────────────────────────────
@@ -122,7 +263,7 @@
         if (data.success || status < 300) {
             cerrarModal('modalCrear');
             mostrarNotificacion('¡Equipo creado!');
-            reloadSoon();
+            checkEstado();
         } else {
             mostrarNotificacion(data.error ?? 'Error al crear el equipo.', true);
         }
@@ -130,12 +271,12 @@
 
     // ── Unirse a equipo ──────────────────────────────────────
     async function unirseEquipo(equipoId) {
-        const url = `/sala/${config.salaId}/equipos/${equipoId}/unirse`;
+        const url = config.unirseUrlTemplate.replace('EQUIPO_ID', equipoId);
         const { status, data } = await postJson(url, {});
 
         if (data.success || status < 300) {
             mostrarNotificacion('¡Te uniste al equipo!');
-            reloadSoon();
+            checkEstado();
         } else {
             mostrarNotificacion(data.error ?? 'No se pudo unir al equipo.', true);
         }
@@ -162,47 +303,23 @@
 
         if (data.success || status < 300) {
             mostrarNotificacion('Has salido del equipo.');
-            if (!confirmar) return true; // Para uso en el botón de la cabecera
-            reloadSoon();
+            checkEstado();
+            return true;
         } else {
             mostrarNotificacion(data.error ?? 'No se pudo salir del equipo.', true);
             return false;
         }
     }
 
-    // Interceptar botón de salir de la sala en la cabecera
-    const btnLeaveRoom = document.getElementById('btn-leave-room');
-    if (btnLeaveRoom) {
-        btnLeaveRoom.addEventListener('click', async function (e) {
-            if (config.miEquipoId) {
-                e.preventDefault();
-                const result = await Swal.fire({
-                    title: '¿Salir de la sala?',
-                    text: 'Actualmente estás en un equipo. Si sales de la sala, abandonarás también el equipo.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#0ea5a4',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Salir y abandonar',
-                    cancelButtonText: 'Cancelar'
-                });
-
-                if (result.isConfirmed) {
-                    const ok = await salirEquipo(false);
-                    if (ok) {
-                        window.location.href = btnLeaveRoom.href;
-                    }
-                }
-            }
+    // ── Backdrop del modal ──
+    const modalCrear = document.getElementById('modalCrear');
+    if (modalCrear) {
+        modalCrear.addEventListener('click', function (e) {
+            if (e.target === this) cerrarModal('modalCrear');
         });
     }
 
-    // ── Close modal on backdrop click ────────────────────────
-    document.getElementById('modalCrear').addEventListener('click', function (e) {
-        if (e.target === this) cerrarModal('modalCrear');
-    });
-
-    // ── Expose to global scope (used in onclick= attributes) ─
+    // ── Expose to global scope ──────────────────────────────
     window.abrirModalCrear = abrirModalCrear;
     window.cerrarModal     = cerrarModal;
     window.crearEquipo     = crearEquipo;
@@ -210,6 +327,6 @@
     window.salirEquipo     = salirEquipo;
 
     mostrarFlashServidorSiExiste();
-    activarAutoEntradaGimcana();
+    activarAutoPolling();
 
 }());

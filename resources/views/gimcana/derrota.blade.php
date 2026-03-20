@@ -16,7 +16,7 @@
     <div class="defeat-page">
         <header class="defeat-header">
             <i class="bi bi-flag-fill broken-heart-icon"></i>
-            <h1 class="defeat-title">GIMICANA FINALIZADA</h1>
+            <h1 class="defeat-title">GIMCANA FINALIZADA</h1>
             <p>Otro equipo ha cruzado la meta primero.</p>
         </header>
 

@@ -146,13 +146,57 @@
                     body: JSON.stringify({ lat: 0, lng: 0 })
                 });
                 const result = await resp.json();
+                
+                // 1. Redirigir si el juego termina
                 if (result.gameOver && result.redirectUrl) {
                     window.location.href = result.redirectUrl;
+                    return;
                 }
+
+                // 2. Redirigir al mapa si ya no tenemos que esperar (el equipo terminó el reto)
+                if (result.userWaiting === false && !result.gameOver) {
+                    window.location.href = "{{ route('gimcana.mapa') }}";
+                    return;
+                }
+
+                // 3. Actualizar lista de compañeros pendientes si estamos esperando
+                if (result.userWaiting && result.integrantesPendientes) {
+                    updatePendingUI(result.integrantesPendientes);
+                }
+
             } catch (e) {
                 console.error("Error comprobando estado:", e);
             }
-        }, 7000);
+        }, 1000);
+
+        function updatePendingUI(pendientes) {
+            const container = document.querySelector('.pending-members');
+            if (!container) return;
+
+            const title = container.querySelector('.pending-title');
+            if (title) {
+                title.innerHTML = `<i class="bi bi-people-fill"></i> Compañeros pendientes (${pendientes.length})`;
+            }
+
+            const list = container.querySelector('.member-list');
+            if (list) {
+                if (pendientes.length === 0) {
+                    container.style.display = 'none';
+                    return;
+                }
+                
+                container.style.display = 'block';
+                list.innerHTML = pendientes.map(m => `
+                    <div class="member-item">
+                        <img src="${m.foto ? (m.foto.startsWith('http') ? m.foto : '/storage/' + m.foto) : '/img/usuarios/default_user.png'}" 
+                             alt="${m.nombre}" class="member-photo" 
+                             onerror="this.src='/img/usuarios/default_user.png'">
+                        <span class="member-name">${m.nombre}</span>
+                        <span class="member-badge">EN CAMINO</span>
+                    </div>
+                `).join('');
+            }
+        }
     </script>
 </body>
 </html>

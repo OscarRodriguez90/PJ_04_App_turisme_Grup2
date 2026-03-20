@@ -19,6 +19,14 @@
             <p>Habéis completado la gimcana antes que nadie.</p>
         </header>
 
+        <section class="winner-announce-card">
+            <h3>EQUIPO GANADOR</h3>
+            <span class="winner-team-name">{{ $equipo->nombre_equipo }}</span>
+            <p class="winner-players">Integrantes: {{ $equipo->integrantes->pluck('nombre')->implode(', ') }}</p>
+        </section>
+
+        <h3 class="personal-stats-title">Vuestras Estadísticas</h3>
+
         <section class="stats-container">
             <div class="total-time-card">
                 <h3>TIEMPO TOTAL</h3>

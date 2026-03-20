@@ -270,8 +270,9 @@ body {
 
 .sala-header-info {
     display: flex;
-    align-items: center;
-    gap: 0.6rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
     min-width: 0;
 }
 
@@ -300,6 +301,24 @@ body {
 .sala-estado--esperando  { background: #fef3c7; color: #d97706; }
 .sala-estado--jugando    { background: var(--primary-light); color: var(--primary-dark); }
 .sala-estado--finalizada { background: #f1f5f9; color: var(--text-muted); }
+
+.sala-header-user {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+}
+
+.user-name-header {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
 
 /* ── Main content ── */
 .sala-main {

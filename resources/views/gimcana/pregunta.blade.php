@@ -118,5 +118,18 @@
     </div>
 
     <script src="{{ asset('js/gimcana/pregunta.js') }}"></script>
+    <script>
+        setInterval(async () => {
+            try {
+                const resp = await fetch("{{ route('gimcana.ubicacion.actualizar') }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': "{{ csrf_token() }}", 'Accept': 'application/json' },
+                    body: JSON.stringify({ lat: 0, lng: 0 })
+                });
+                const result = await resp.json();
+                if (result.gameOver && result.redirectUrl) window.location.href = result.redirectUrl;
+            } catch (e) {}
+        }, 2000);
+    </script>
 </body>
 </html>

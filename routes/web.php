@@ -37,6 +37,7 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::post('/grupos/salir', [GruposController::class, 'leave'])->name('grupos.leave');
 
     Route::get('/sala', [SalaController::class, 'index'])->name('sala.index');
+    Route::get('/sala/historial', [SalaController::class, 'historial'])->name('sala.historial');
     Route::get('/sala/{id}/entrar', [SalaController::class, 'entrar'])->name('sala.entrar');
     Route::get('/sala/{id}', [SalaController::class, 'show'])->name('sala.show');
     Route::get('/sala/{id}/estado-live', [SalaController::class, 'estadoLive'])->name('sala.estado.live');
@@ -56,6 +57,7 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::get('/gimcana/final', [GimcanaController::class, 'final'])->name('gimcana.final');
     Route::get('/gimcana/derrota', [GimcanaController::class, 'derrota'])->name('gimcana.derrota');
     Route::post('/gimcana/actualizar-ubicacion', [GimcanaController::class, 'actualizarUbicacion'])->name('gimcana.ubicacion.actualizar');
+    Route::post('/gimcana/reiniciar', [GimcanaController::class, 'reiniciar'])->name('gimcana.reiniciar');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
