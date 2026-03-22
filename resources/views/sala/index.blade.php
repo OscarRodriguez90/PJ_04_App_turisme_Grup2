@@ -15,10 +15,20 @@
 <body class="salas-body">
 
     <div class="salas-container">
-        <a href="{{ route('cliente.index') }}" class="btn-back">Volver</a>
-
-        <div class="salas-header">
-            <h1>🗺️ GeoTurismo</h1>
+        <div class="brand-block" style="margin-bottom: 2rem;">
+            <div class="brand-row">
+                <img src="{{ asset('img/admin/logo.png') }}" alt="GeoTurismo" class="brand-logo">
+                <div>
+                    <p class="eyebrow">Área cliente</p>
+                    <h1>GeoTurismo</h1>
+                </div>
+            </div>
+            <a href="{{ route('cliente.index') }}" class="btn btn-ghost" style="text-decoration: none;">
+                <i class="bi bi-arrow-left"></i> Atrás
+            </a>
+        </div>
+        
+        <div class="salas-header" style="margin-top: 0;">
             <p>Elige una gimcana para comenzar tu aventura</p>
         </div>
 
@@ -78,6 +88,11 @@
         </div>
     </div>
 
+    <script>
+        window.salaConfig = {
+            gimcanaActivaId: {{ $gimcanaActivaId ?? 'null' }}
+        };
+    </script>
     <script src="{{ asset('js/sala/sala_index.js') }}"></script>
 </body>
 </html>

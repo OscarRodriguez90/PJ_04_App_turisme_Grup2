@@ -22,12 +22,21 @@ class SalaController extends Controller
             ->withCount('equipos')
             ->get();
 
-        return view('sala.index', compact('salas'));
+        $usuario = Auth::user();
+        $gimcanaActiva = Equipo::whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id))
+            ->whereHas('sala', fn ($q) => $q->where('estado', '!=', 'finalizada'))
+            ->with('sala')
+            ->first();
+
+        $gimcanaActivaId = $gimcanaActiva ? $gimcanaActiva->sala->id : null;
+
+        return view('sala.index', compact('salas', 'gimcanaActivaId'));
     }
 
     public function entrar(Request $request, int $id): RedirectResponse|JsonResponse
     {
         $sala = Sala::findOrFail($id);
+        $usuario = Auth::user();
 
         if ($sala->estado === 'finalizada') {
             if ($request->expectsJson()) {
@@ -36,8 +45,20 @@ class SalaController extends Controller
             return back()->with('error', 'Esta sala ya ha finalizado.');
         }
 
+        // Check if user is in any group of ANOTHER active gimcana
+        $enOtraGimcana = Equipo::where('numero_equipo', '!=', $id)
+            ->whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id))
+            ->whereHas('sala', fn ($q) => $q->where('estado', '!=', 'finalizada'))
+            ->exists();
+
+        if ($enOtraGimcana) {
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'No puedes entrar porque ya perteneces a un grupo en otra gimcana.'], 403);
+            }
+            return back()->with('error', 'No puedes entrar porque ya perteneces a un grupo en otra gimcana.');
+        }
+
         if ($sala->estado === 'jugando') {
-            $usuario = Auth::user();
             $yaEnEquipo = Equipo::where('numero_equipo', $sala->id)
                 ->whereHas('integrantes', fn ($q) => $q->where('tbl_usuarios.id', $usuario->id))
                 ->exists();
