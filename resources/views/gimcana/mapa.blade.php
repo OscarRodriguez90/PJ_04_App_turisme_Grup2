@@ -34,7 +34,7 @@
 
     <!-- D-Pad Simulación (Copiado de DescubreMap) -->
     <div class="dev-dpad-wrapper" id="dev-dpad-wrapper">
-        <button id="btn-toggle-dpad" class="dpad-toggle-btn" title="Joystick de simulación">🎮</button>
+        <button id="btn-toggle-dpad" class="dpad-toggle-btn" title="Joystick de simulación" style="display: none !important;">🎮</button>
 
         @if(session('success'))
             <div class="alert-ok">
