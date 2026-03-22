@@ -14,6 +14,19 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <div class="brand-block" style="margin: 1rem auto; max-width: 600px;">
+        <div class="brand-row">
+            <img src="{{ asset('img/admin/logo.png') }}" alt="GeoTurismo" class="brand-logo">
+            <div>
+                <p class="eyebrow">Área cliente</p>
+                <h1>GeoTurismo</h1>
+            </div>
+        </div>
+        <a href="{{ route('sala.index') }}" class="btn btn-ghost" id="btn-leave-room-fixed" style="text-decoration: none;">
+            <i class="bi bi-arrow-left"></i> Atrás
+        </a>
+    </div>
+
     <div id="sala-dynamic-content">
         @include('sala.partials.dynamic_room')
     </div>

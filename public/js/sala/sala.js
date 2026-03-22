@@ -102,9 +102,6 @@
                 </div>
                 <div class="sala-header-user">
                     <span class="user-name-header"><i class="bi bi-person-circle"></i> ${data.usuarioNombre}</span>
-                    <a href="/sala" class="btn-ghost-small" id="btn-leave-room-dynamic">
-                        <i class="bi bi-box-arrow-left"></i> Salir
-                    </a>
                 </div>
             </header>
         `;
@@ -196,16 +193,7 @@
         html += '</main>';
         container.innerHTML = html;
 
-        // Re-adjuntar listener del botón de salir si es necesario
-        const btnLeave = document.getElementById('btn-leave-room-dynamic');
-        if (btnLeave) {
-            btnLeave.onclick = (e) => {
-                if (config.miEquipoId) {
-                    e.preventDefault();
-                    confirmarSalidaSala(btnLeave.href);
-                }
-            };
-        }
+        // Omitimos adjuntar el listener aquí ya que el botón "Salir" ahora es global y está fuera de dynamic-content
     }
 
     async function confirmarSalidaSala(href) {
@@ -325,6 +313,17 @@
     window.crearEquipo     = crearEquipo;
     window.unirseEquipo    = unirseEquipo;
     window.salirEquipo     = salirEquipo;
+
+    // ── Global Leave Room Listener ──
+    const btnLeaveFixed = document.getElementById('btn-leave-room-fixed');
+    if (btnLeaveFixed) {
+        btnLeaveFixed.addEventListener('click', function(e) {
+            if (config.miEquipoId) {
+                e.preventDefault();
+                confirmarSalidaSala(this.href);
+            }
+        });
+    }
 
     mostrarFlashServidorSiExiste();
     activarAutoPolling();

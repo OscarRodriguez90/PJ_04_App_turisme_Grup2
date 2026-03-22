@@ -254,11 +254,81 @@ body {
    ════════════════════════════════════════ */
 .sala-room-body { display: block; }
 
+/* ── Unified Brand Block (Matching Área Cliente) ── */
+.brand-block {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.brand-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.brand-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.eyebrow {
+    margin: 0 0 .15rem;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    font-size: .8rem;
+    font-weight: 800;
+    display: inline-block;
+    padding-bottom: 2px;
+    border-bottom: 2px solid rgba(14, 165, 164, 0.2);
+}
+
+.brand-row h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.btn {
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    padding: 0.625rem 1.125rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: .2s ease;
+    font-family: inherit;
+}
+
+.btn-ghost {
+    background: #ffffff;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+    background: #f8fafc;
+    color: var(--primary);
+}
+
 /* ── Header ── */
 .sala-header {
     background: var(--white);
-    border-bottom: 1px solid var(--border);
-    padding: 0.875rem 1.25rem;
+    border-bottom: 2px solid var(--border);
+    padding: 1rem 1.25rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -266,6 +336,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
 }
 
 .sala-header-info {
@@ -359,17 +430,26 @@ body {
 /* ── Equipo cards ── */
 .equipo-card {
     background: var(--white);
-    border-radius: var(--radius);
-    border: 1.5px solid var(--border);
-    padding: 1rem 1.1rem;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(0,0,0,0.04);
+    padding: 1.2rem 1.1rem;
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
-    box-shadow: var(--shadow);
-    transition: border-color 0.2s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.equipo-card--mine { border-color: var(--primary); }
+.equipo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+.equipo-card--mine { 
+    background: linear-gradient(to bottom, #ffffff, #f0fdfa);
+    border: 2px solid var(--primary); 
+    box-shadow: 0 8px 24px rgba(14, 165, 164, 0.12);
+}
 
 .equipo-card-header {
     display: flex;

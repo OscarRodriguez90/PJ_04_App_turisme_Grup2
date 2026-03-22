@@ -579,13 +579,18 @@ class GimcanaController extends Controller
                 
                 if (empty($eqPivotIds)) continue;
 
-                $completedCount = DB::table('tbl_progreso_retos')
+                $teamMemberCountEq = DB::table('tbl_equipo_usuarios')->where('id_equipo', $eq->id)->count();
+                
+                $fullyCompletedRetosEq = DB::table('tbl_progreso_retos')
                     ->whereIn('id_equipo_usuario', $eqPivotIds)
                     ->where('completado', true)
-                    ->distinct('id_reto')
-                    ->count('id_reto');
+                    ->select('id_reto')
+                    ->groupBy('id_reto')
+                    ->havingRaw('COUNT(id_equipo_usuario) >= ?', [$teamMemberCountEq])
+                    ->get()
+                    ->count();
                 
-                if ($completedCount >= $retos->count()) {
+                if ($fullyCompletedRetosEq >= $retos->count() && $retos->count() > 0) {
                     $winnerInfo = [
                         'id' => $eq->id,
                         'nombre' => $eq->nombre_equipo,

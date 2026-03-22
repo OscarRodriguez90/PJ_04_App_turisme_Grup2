@@ -1,10 +1,27 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const config = window.salaConfig || {};
     const botonesEntrar = document.querySelectorAll('.btn-entrar-ajax');
 
     botonesEntrar.forEach(boton => {
-        boton.addEventListener('click', function() {
+        boton.addEventListener('click', function(e) {
             const url = this.getAttribute('data-url');
             
+            // Extract the Sala ID from the URL (e.g., /sala/4/entrar)
+            const match = url.match(/\/sala\/(\d+)\/entrar/);
+            const salaId = match ? parseInt(match[1]) : null;
+
+            // Pure JS validation: if user is already in a different active gimcana
+            if (config.gimcanaActivaId && config.gimcanaActivaId !== salaId) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Acción no permitida',
+                    text: 'No puedes entrar porque ya perteneces a un grupo en otra gimcana.',
+                    confirmButtonColor: '#0ea5a4'
+                });
+                return;
+            }
+
             this.disabled = true;
             this.innerHTML = '<i class="bi bi-hourglass-split"></i> Entrando...';
 

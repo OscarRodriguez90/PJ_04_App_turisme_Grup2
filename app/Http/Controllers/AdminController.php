@@ -636,6 +636,31 @@ class AdminController extends Controller
                         ->delete();
                 }
             }
+        } elseif ($request->estado === 'disponible') {
+            $updateData['fecha_inicio'] = null;
+            $updateData['fecha_fin'] = null;
+
+            $teamIds = $sala->equipos()->pluck('id');
+            if ($teamIds->isNotEmpty()) {
+                $teamPivotIds = \Illuminate\Support\Facades\DB::table('tbl_equipo_usuarios')
+                    ->whereIn('id_equipo', $teamIds)
+                    ->pluck('id');
+                
+                if ($teamPivotIds->isNotEmpty()) {
+                    \Illuminate\Support\Facades\DB::table('tbl_progreso_retos')
+                        ->whereIn('id_equipo_usuario', $teamPivotIds)
+                        ->delete();
+                }
+                
+                \Illuminate\Support\Facades\DB::table('tbl_equipo_usuarios')
+                    ->whereIn('id_equipo', $teamIds)
+                    ->delete();
+                
+                // Unlink teams instead of deleting them to preserve tbl_historial (ON DELETE CASCADE)
+                \Illuminate\Support\Facades\DB::table('tbl_equipos')
+                    ->whereIn('id', $teamIds)
+                    ->update(['numero_equipo' => -1]);
+            }
         }
         
         $sala->update($updateData);

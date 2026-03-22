@@ -6,9 +6,6 @@
         </div>
         <div class="sala-header-user">
             <span class="user-name-header"><i class="bi bi-person-circle"></i> {{ auth()->user()->nombre }}</span>
-            <a href="{{ route('sala.index') }}" class="btn-ghost-small" id="btn-leave-room">
-                <i class="bi bi-box-arrow-left"></i> Salir
-            </a>
         </div>
     </header>
 

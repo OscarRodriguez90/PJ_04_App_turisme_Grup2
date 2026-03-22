@@ -60,12 +60,16 @@
 
     const DISTANCIA_PROXIMIDAD = 150; // Metros para activar la pregunta
 
-    // ── Inicialización ──
     function init() {
         initMap();
         initEvents();
         renderAllPlaces();
         checkGpsPersistence();
+        
+        // Polling incondicional para sincronización (detectar ganadores, etc.)
+        if (!state.syncIntervalId) {
+            state.syncIntervalId = window.setInterval(syncWithServer, 2000);
+        }
     }
 
     function initMap() {
@@ -266,14 +270,9 @@
             onLocationUpdate,
             (err) => {
                 console.error(err);
-
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
-
-        if (!state.syncIntervalId) {
-            state.syncIntervalId = window.setInterval(syncWithServer, 1000);
-        }
     }
 
     function initDeviceOrientation() {

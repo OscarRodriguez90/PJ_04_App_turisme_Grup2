@@ -156,10 +156,38 @@
             });
     }
 
+    function ponerDisponible(buttonEl, salaId) {
+        buttonEl.disabled = true;
+
+        updateEstado(salaId, 'disponible')
+            .then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Gimcana restaurada',
+                    text: 'El estado ha cambiado a "disponible" y se han borrado los grupos.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1200);
+            })
+            .catch((error) => {
+                buttonEl.disabled = false;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'No se pudo poner la gimcana como disponible.',
+                });
+            });
+    }
+
     refreshGruposLive();
     window.setInterval(refreshGruposLive, 7000);
 
     // Expose for inline onclick handlers in blade cards.
     window.empezarGimcana = empezarGimcana;
     window.reiniciarPartida = reiniciarPartida;
+    window.ponerDisponible = ponerDisponible;
 }());
